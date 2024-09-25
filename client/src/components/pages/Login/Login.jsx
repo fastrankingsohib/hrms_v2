@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 
 const Login = () => {
     const [seePassword, setSeePassword] = useState(false);
-    const [credentials, setCredentials] = useState({email: '', password: ''});
+    const [credentials, setCredentials] = useState({username: '', password: ''});
     const { login, isUserLoggedin } = useLogin();
     const userLoggedIn = useSelector((state) => state.user_auth);
     return(
@@ -16,7 +16,7 @@ const Login = () => {
             <form className="relative min-h-96 min-w-96 bg-white border p-16"
                 onSubmit={(e) => {
                     e.preventDefault();
-                    login(credentials.email, credentials.password);
+                    login(credentials.username, credentials.password);
                 }}
             >
                 <div className="flex justify-center mb-10 text-2xl">MAHAKAYA</div>
@@ -24,10 +24,10 @@ const Login = () => {
 
                 <div className="grid gap-4">
                     <div>
-                        <label htmlFor="email">Email</label>
-                        <input id="email" required type="email" 
-                            onChange={(e) => setCredentials((credentials) => ({...credentials, email: e.target.value}))} 
-                            className="primary-input border focus:border-purple-600 mt-2" placeholder="Enter Your Email" 
+                        <label htmlFor="username">Username</label>
+                        <input id="username" required type="text" 
+                            onChange={(e) => setCredentials((credentials) => ({...credentials, username: e.target.value}))} 
+                            className="primary-input border focus:border-purple-600 mt-2" placeholder="Enter Your Username" 
                         />
                     </div>
                     <div className="relative">
@@ -55,7 +55,7 @@ const Login = () => {
                 <div className={`w-full flex justify-center absolute -bottom-5 left-0 ${isUserLoggedin == false ? 'alert-animation' : 'opacity-0'}`}>
                     <div className="min-w-4/5 bg-white flex items-center gap-2 rounded-full border p-2 shadow-lg shadow-gray-200">
                         <MdOutlineError size={'18px'} color="#352A7A" />
-                        <span className="text-red-500 text-sm pr-2">Invalid Details. Please check the Email ID - Password</span>
+                        <span className="text-red-500 text-sm pr-2">Invalid <strong>Username</strong> or <strong>Password</strong></span>
                     </div>
                 </div>
             </form>

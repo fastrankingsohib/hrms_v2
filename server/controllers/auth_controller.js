@@ -190,10 +190,10 @@ const register = async (req, res) => {
 // Login function
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { username, password } = req.body;
 
         const user = await prisma.user.findUnique({
-            where: { email }
+            where: { username:username }
         });
 
         if (!user) {
@@ -208,12 +208,12 @@ const login = async (req, res) => {
         if (!isMatch) {
             return res.status(401).send({
                 success: false,
-                message: "Invalid email or password."
+                message: "Invalid username or password."
             });
         }
 
         // Generate JWT token
-        const token = jwt.sign({ email }, JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ username }, JWT_SECRET_KEY, { expiresIn: '1h' });
         res.cookie('token', token, { httpOnly: true });
 
         res.status(200).send({
