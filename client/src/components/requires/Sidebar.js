@@ -13,8 +13,10 @@ import { BsFillClockFill } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
 import { HiPlusSm } from "react-icons/hi";
 import logo from '../../assets/mahakaya.png'
+import useLogout from "../../helpers/useLogout";
 
 const Sidebar = () => {
+    const { logout } = useLogout();
     return(
         <section className="relative h-full">
             <div className="pt-8 flex items-center justify-center">
@@ -36,7 +38,7 @@ const Sidebar = () => {
             </div>
 
             <div className="absolute bottom-0 w-full p-4">
-                <button className="primary-button"><FiLogOut size={'16px'} className="w-10 rotate-180" /> Logout</button>
+                <button className="primary-button" onClick={logout}><FiLogOut size={'16px'} className="w-10 rotate-180" /> Logout</button>
             </div>
         </section>
     )
