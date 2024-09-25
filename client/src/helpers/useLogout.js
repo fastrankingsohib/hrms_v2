@@ -11,8 +11,8 @@ const useLogout = () => {
 
     const logout = () => {
         axios.get("/logout").then((response) => {
-            Dispatch(userLoggedOut());
             if(response.data.success){
+                Dispatch(userLoggedOut());
                 Navigate('/login')
                 // Dispatch(userLoggedIn({status: false, access: "super_admin"}));
                 // console.log(userStatus);
