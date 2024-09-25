@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from 'axios';
 
 const NewUser = () => {
     const [assignModules, setAssignModules] = useState(
@@ -15,6 +16,14 @@ const NewUser = () => {
             MyProfile: false
         }
     );
+    const  [rolesUsers, setrolesUsers] = useState();
+    useEffect(() => {
+        axios.get("/reporting-to-users").then((res) => {
+            setrolesUsers(res.data.report_users);
+            console.log(res.data.report_users);
+        })
+    }, [])
+
 
     return(
         <section className="p-4 component-rendering-tranistion">
@@ -71,14 +80,6 @@ const NewUser = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Confirm Password</label>
                         <input type="password" className="primary-input" placeholder="Last Name" name="" id="" />
-                    </div>
-                    
-                    <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Type</label>
-                        <select className="primary-input">
-                            <option value="#">Admin</option>
-                            <option value="#">Guest</option>
-                        </select>
                     </div>
                     
                     <div>
@@ -144,8 +145,14 @@ const NewUser = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Role</label>
                         <select className="primary-input">
-                            <option value="#">Role 1</option>
-                            <option value="#">Role 2</option>
+                            <option disabled={true} selected={true}>-- Select Role --</option>
+                            {
+                                rolesUsers ? rolesUsers.map((role, index) => {
+                                    return (
+                                        <option key={index} value={role}>{role.username}</option>
+                                    )
+                                }) : <option>No Users</option>
+                            }
                         </select>
                     </div>
                 </div>
@@ -340,7 +347,7 @@ const NewUser = () => {
 
                 <div className="flex items-center justify-end mt-10">
                     <div className="w-1/4 pl-4">
-                        <button className="primary-button justify-center">Create User</button>
+                        <button className="primary-button justify-center">Submit</button>
                     </div>
                 </div>
             </div>

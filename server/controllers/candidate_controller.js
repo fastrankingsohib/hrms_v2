@@ -65,6 +65,31 @@ const add_candidate = async(req,res)=>{
       const candidate_experience =async(req,res)=>{
         const {organisation_name,total_tenure,last_designation,last_drawn_salary}=req.body;
       }
+
+
 }
 
-export {add_candidate}
+const reporting_to_users = async(req, res) => {
+ try {
+   const reporting_to = await prisma.user.findMany({
+     where: {
+       role: 'Team Lead'
+     },
+     select: {
+       username: true
+     }
+   })
+   res.status(200).send({
+    message: 'Reporting to users fetched successfully',
+    success: true,
+    report_users: reporting_to
+   })
+
+ } catch (error) {
+  res.status(500).send({
+    message: "cannot send reporting to list"
+  })
+ }
+}
+
+export {add_candidate, reporting_to_users}
