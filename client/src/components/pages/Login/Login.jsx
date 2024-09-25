@@ -16,7 +16,7 @@ const Login = () => {
             <form className="relative min-h-96 min-w-96 bg-white border p-16"
                 onSubmit={(e) => {
                     e.preventDefault();
-                    login(credentials.email, credentials.password);
+                    login(credentials.username, credentials.password);
                 }}
             >
                 <div className="flex justify-center mb-10 text-2xl">MAHAKAYA</div>
@@ -25,8 +25,8 @@ const Login = () => {
                 <div className="grid gap-4">
                     <div>
                         <label htmlFor="email">Email</label>
-                        <input id="email" required type="email" 
-                            onChange={(e) => setCredentials((credentials) => ({...credentials, email: e.target.value}))} 
+                        <input id="email" required type="text" 
+                            onChange={(e) => setCredentials((credentials) => ({...credentials, username: e.target.value}))} 
                             className="primary-input border focus:border-purple-600 mt-2" placeholder="Enter Your Email" 
                         />
                     </div>

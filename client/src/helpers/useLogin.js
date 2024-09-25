@@ -9,9 +9,9 @@ const useLogin = () => {
     const dispatch = useDispatch();
 
     const Navigate = useNavigate();
-    const login = (email, password) => {
+    const login = (username, password) => {
         const credentials = {
-            "email": email,
+            "username": username,
             "password": password
         }
         axios.post("/login", credentials)
