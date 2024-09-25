@@ -1,0 +1,117 @@
+// Colors
+$primary-color: #000;
+$secondary-color: #ffffff;
+$tertiary-color: #f1f1f1;
+$quaternary-color: #e4e4e4;
+$quinary-color: #515151;
+
+.primary-color{
+    display: block;
+    color: $secondary-color;
+    background-color: $primary-color;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    height: 2.5rem;
+}
+
+.side-bar-default, .side-bar-active, .primary-button{
+    margin: 0.2rem 0;
+    color: $quinary-color;
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    border-radius: 5px;
+    gap: 10px;
+    position: relative;
+    transition: all 0.1s ease-in-out;
+}
+.side-bar-default:hover, .side-bar-active:hover{
+    background-color: $tertiary-color;
+}
+.side-bar-default:active{
+    background-color: $quaternary-color;
+}
+
+// Side Bar Active Active
+.side-bar-active{
+    color: $primary-color;
+    background-color: $tertiary-color;
+    font-weight: 700;
+}
+.side-bar-active::before{
+    content: "";
+    display: inline-block;
+    position: absolute;
+    height: 3rem;
+    width: 5px;
+    border-radius: 10px;
+    background-color: $primary-color;
+    left: calc(0px - 1rem);
+    transition: all 0.3s ease-in-out;
+}
+
+// Primary Button
+.primary-button{
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background-color: $primary-color;
+    color: $secondary-color;
+}
+
+
+// Search Bar
+.primary-search-bar{
+    padding: 0.8rem 1rem;
+    width: 20em;
+    background-color: $tertiary-color;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+.primary-search-bar:focus{
+    width: 30em;
+    outline: none;
+    background-color: $secondary-color;
+    border: 1px solid $tertiary-color;
+}
+
+// Inputs
+.primary-input{
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid $tertiary-color;
+    border-radius: 5px;
+}
+.primary-input:focus{
+    outline: none;
+}
+
+
+
+// Animations
+.alert-animation{
+    animation: alert-01 3s;
+    transform: translateY(-50%);
+    opacity: 0;
+}
+
+@keyframes alert-01 {
+    0%{
+        transform: translateY(-50%);
+        opacity: 0;
+    }
+    20%{
+        transform: translateY(0%);
+        opacity: 1;
+    }
+    80%{
+        transform: translateY(0%);
+        opacity: 1;
+    }
+    100%{
+        transform: translateY(-50%);
+        opacity: 0;
+    }
+}

@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font Family */
+*{
+    font-family: "Inter", system-ui;
+    font-size: 14px;
+}
+
+/* Tranistions */
+.component-rendering-tranistion{
+    animation: 0.2s show-in ease-in;
+}
+
+@keyframes show-in{
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}

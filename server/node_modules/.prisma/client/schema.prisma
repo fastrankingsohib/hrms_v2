@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id              Int             @id @default(autoincrement())
+  title           String?         @db.VarChar(255)
+  first_name      String?         @db.VarChar(50)
+  middle_name     String?         @db.VarChar(50)
+  last_name       String?         @db.VarChar(50)
+  gender          String?         @db.VarChar(20)
+  dob             String?         @db.VarChar(50)
+  email           String?         @unique @db.VarChar(255)
+  mobile          String?         @unique @db.VarChar(20)
+  username        String?         @unique @db.VarChar(100)
+  password        String?
+  date_of_joining String?         @db.VarChar(100)
+  employee_id     String?         @db.VarChar(100)
+  designation     String?         @db.VarChar(100)
+  teams           String?         @db.VarChar(100)
+  status          String?         @db.VarChar(100)
+  department      String?         @db.VarChar(100)
+  user_type       String?         @db.VarChar(100)
+  role            String?         @db.VarChar(100)
+  reporting_to    String?         @db.VarChar(100)
+  created_at      DateTime?       @default(now())
+  updated_at      DateTime?       @updatedAt
+  modulesTouser   modulesTouser[]
+}
+
+model modules {
+  id            Int             @id @default(autoincrement())
+  module_name   String          @db.VarChar(255)
+  created_at    DateTime?       @default(now())
+  updated_at    DateTime?       @updatedAt
+  modulesTouser modulesTouser[]
+}
+
+model modulesTouser {
+  user_id   Int
+  module_id Int
+  user      user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  modules   modules @relation(fields: [module_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, module_id])
+  @@index([module_id])
+  @@map("_modulesTouser")
+}
