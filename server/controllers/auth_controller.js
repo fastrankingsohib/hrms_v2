@@ -47,6 +47,7 @@ const add_to_user = async (req) => {
         user_type,
         role,
         reporting_to,
+        created_by
     } = req.body;
 
     // Validations
@@ -96,6 +97,7 @@ const add_to_user = async (req) => {
             user_type:user_type,
             role:role,
             reporting_to:reporting_to,
+            created_by:created_by
         }
     });
 
@@ -159,12 +161,18 @@ const register = async (req, res) => {
 
         // Get the module ID
         const module = await module_id(req);
+        const{c,r,u,d}=req.body
 
         // Assign the module to the user
         await prisma.modulesTouser.create({
             data: {
                 user: { connect: { id: user_id } },
-                modules: { connect: { id: module } }
+                modules: { connect: { id: module } },
+                c:c,
+                r:r,
+                u:u,
+                d:d
+
             }
         });
 

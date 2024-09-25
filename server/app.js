@@ -2,6 +2,7 @@ import express from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
 import auth_routes from './routes/auth_routes.js'
+import hr_routes from './routes/job_post_routes.js'
 const app =express()
 const port = 4040
 app.use(cookieParser())
@@ -18,6 +19,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 app.use('/',auth_routes)
+app.use('/',hr_routes)
 
 
 

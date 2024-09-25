@@ -28,6 +28,7 @@ model user {
   user_type       String?         @db.VarChar(100)
   role            String?         @db.VarChar(100)
   reporting_to    String?         @db.VarChar(100)
+  created_by      String?         @db.VarChar(50)
   created_at      DateTime?       @default(now())
   updated_at      DateTime?       @updatedAt
   modulesTouser   modulesTouser[]
@@ -42,12 +43,82 @@ model modules {
 }
 
 model modulesTouser {
-  user_id   Int
   module_id Int
-  user      user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id   Int
+  c         Int     @default(0)
+  d         Int     @default(0)
+  r         Int     @default(0)
+  u         Int     @default(0)
   modules   modules @relation(fields: [module_id], references: [id], onDelete: Cascade)
+  user      user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, module_id])
   @@index([module_id])
   @@map("_modulesTouser")
+}
+
+model job_post {
+  id         Int       @id @default(autoincrement())
+  job_title  String?   @db.VarChar(255)
+  job_type   String?   @db.VarChar(100)
+  job_desc   String?
+  experience String?   @db.VarChar(50)
+  salary     String?   @db.VarChar(100)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+}
+
+model candidate_list {
+  candidate_id         Int      @id @default(autoincrement())
+  title                String?  @db.VarChar(50)
+  first_name           String?  @db.VarChar(50)
+  middle_name          String?  @db.VarChar(50)
+  last_name            String?  @db.VarChar(50)
+  address_line1        String?  @db.VarChar(255)
+  address_line2        String?  @db.VarChar(255)
+  city                 String?  @db.VarChar(100)
+  state                String?  @db.VarChar(100)
+  pin_code             String?  @db.VarChar(20)
+  country              String?  @db.VarChar(100)
+  contact_number       String   @db.VarChar(20)
+  alt_contact_number   String?  @db.VarChar(20)
+  email_address        String   @db.VarChar(100)
+  alt_email_address    String?  @db.VarChar(100)
+  date_of_birth        String?  @db.VarChar(50)
+  job_title            String?  @db.VarChar(100)
+  department           String?  @db.VarChar(50)
+  work_experience      String?  @db.VarChar(50)
+  hobbies              String?  @db.VarChar(255)
+  interests            String?  @db.VarChar(255)
+  skills               String?  @db.VarChar(255)
+  recruiter_comments   String?  @db.VarChar(255)
+  communication_skills String?  @db.VarChar(255)
+  other1               String?  @db.VarChar(255)
+  other2               String?  @db.VarChar(255)
+  other3               String?  @db.VarChar(255)
+  status               String?  @db.VarChar(100)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+}
+
+model work_experience {
+  exp_id            Int      @id @default(autoincrement())
+  candidate_id      Int
+  organisation_name String   @db.VarChar(255)
+  total_tenure      String?  @db.VarChar(50)
+  last_designation  String?  @db.VarChar(100)
+  last_drawn_salary String?  @db.VarChar(50)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+}
+
+model qualifications {
+  qualifications_id  Int       @id @default(autoincrement())
+  candidate_id       Int
+  course             String    @db.VarChar(100)
+  college_university String    @db.VarChar(255)
+  year_of_passing    Int
+  percentage_cgpa    String?   @db.VarChar(20)
+  created_at         DateTime  @default(now())
+  updated_at         DateTime?
 }
