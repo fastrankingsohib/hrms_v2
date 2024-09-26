@@ -36,7 +36,7 @@ const Login = () => {
                             onChange={(e) => setCredentials((credentials) => ({...credentials, password: e.target.value}))}
                             className="primary-input border focus:border-purple-600 mt-2" placeholder="Enter Your Password" 
                         />
-                        <span onClick={() => setSeePassword(!seePassword)} className="inline-block absolute right-5 top-12 cursor-pointer">
+                        <span onClick={() => setSeePassword(!seePassword)} className="inline-block absolute right-5 top-12 cursor-pointer"> 
                             {
                                 seePassword
                                 ? <GoEye size={'18px'} /> 

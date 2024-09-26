@@ -1,24 +1,12 @@
 import { useEffect, useState } from "react";
 import useRegisterUser from "../../../helpers/useRegisterUser";
+import allModules from "./AllModules";
+import UserModule from "../../commons/UserModule";
+import { useSelector } from "react-redux";
 
 const NewUser = () => {
+    const userAssignedModule = useSelector((state) => state.userModules);
     const [passwordConfirm, setPasswordConfirm] = useState(true);
-
-    const [assignModules, setAssignModules] = useState(
-        {
-            Administrator: false, 
-            Candidates: false, 
-            Interviews: false, 
-            Offer: false, 
-            Training: false, 
-            OnBoarding: false, 
-            Appraisal: false, 
-            Exit: false, 
-            Jobs: false, 
-            MyProfile: false
-        }
-    );
-    
     const [user, setUser] = useState(
         {
             title: '',
@@ -44,7 +32,7 @@ const NewUser = () => {
         }
     );
 
-    const [allAccessModules, setAllAccessModules] = useState();
+    // const [allAccessModules, setAllAccessModules] = useState();
     const { registerUser } = useRegisterUser();
     const register = (e) => {
         if(user.password !== user.confirmPassword){
@@ -56,7 +44,7 @@ const NewUser = () => {
             console.log(`Password Mathed Successfully!`)
         }
         e.preventDefault();
-        registerUser(user)
+        registerUser(user);
     }
 
 
@@ -242,26 +230,20 @@ const NewUser = () => {
 
 
                 <div className="grid gap-4 grid-cols-2 border-t-2 mt-10">
-                    <div className="flex">
-                        <div className="px-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-gray-100">
-                            <label htmlFor="Administrator_ch" className="inline-block min-w-40">Administrator</label> 
-                            <input id="Administrator_ch" type="checkbox" 
-                                onChange={(e) => {
-                                    setAssignModules((allModules) => ({...allModules, Administrator: !assignModules.Administrator}));
-                                }}
-                            />
-                        </div>
-                        <div className="p-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-white" style={{display: assignModules.Administrator ? 'flex' : 'none'}}>
-                            <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_create">Create</label> <input id="Administrator_create" type="checkbox" /></div>
-                            <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_read">Read</label> <input id="Administrator_read" type="checkbox" /></div>
-                            <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_update">Update</label> <input id="Administrator_update" type="checkbox" /></div>
-                            <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_delete">Delete</label> <input id="Administrator_delete" type="checkbox" /></div>
-                        </div>
-                    </div>
+                    {
+                        allModules.map((currentModule, moduleKey) => {
+                            return(
+                                <UserModule
+                                    id = {`module-${currentModule.moduleName}`}
+                                    name = {currentModule.moduleName}
+                                />
+                            )
+                        })
+                    }
 
 
 
-                    <div className="flex">
+                    {/* <div className="flex">
                         <div className="px-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-gray-100">
                             <label htmlFor="Appraisal_ch" className="inline-block min-w-40">Appraisal</label> 
                             <input id="Appraisal_ch" type="checkbox" 
@@ -423,7 +405,7 @@ const NewUser = () => {
                             <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_update">Update</label> <input id="Administrator_update" type="checkbox" /></div>
                             <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_delete">Delete</label> <input id="Administrator_delete" type="checkbox" /></div>
                         </div>
-                    </div>
+                    </div> */}
                     
                 </div>
 

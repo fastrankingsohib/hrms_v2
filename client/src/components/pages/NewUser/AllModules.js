@@ -35,7 +35,7 @@ const allModules = [
         "d": 0
     },
     {
-        "moduleName": "OnBoarding",
+        "moduleName": "On_Boarding",
         "c": 0,
         "r": 0,
         "u": 0,
@@ -63,7 +63,7 @@ const allModules = [
         "d": 0
     },
     {
-        "moduleName": "MyProfile",
+        "moduleName": "My_Profile",
         "c": 0,
         "r": 0,
         "u": 0,

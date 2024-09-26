@@ -479,5 +479,24 @@ const update_user_data = async (req, res) => {
     }
 };
 
+const delete_user = async(req,res)=>{
+    try {
+        const id =req.params.id
+        await prisma.user.delete({
+            where:{
+                id:Number(id)
+            }
+        })
+        res.status(200).send({
+            success:true,
+            message:"User deleted successfully"
+        })
+    } catch (error) {
+        res.status(500).send({
+            success:false,
+            message: "Some error occurred while deleting the User.",
+        })
+    }
+}
   
-export { register, login, authenticateToken, logout,send_all_user_data ,id_based_data ,update_user_data};
+export { register, login, authenticateToken, logout,send_all_user_data ,id_based_data ,update_user_data, delete_user};
