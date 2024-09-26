@@ -355,5 +355,123 @@ const send_all_user_data = async (req, res) => {
    }
           
 }
+
+const update_user = async (req) => {
+    const user_id = parseInt(req.params.id); // Accessing user ID from URL parameters
+    const {
+        title,
+        first_name,
+        middle_name,
+        last_name,
+        gender,
+        dob,
+        email,
+        mobile,
+        username,
+        date_of_joining,
+        employee_id,
+        designation,
+        teams,
+        status,
+        department,
+        user_type,
+        role,
+        reporting_to,
+        created_by,
+    } = req.body;
+
+    // Validations
+    if (!username || !email) {
+        throw new Error("Username and email are required.");
+    }
+
+    if (!validator.isEmail(email)) {
+        throw new Error("Invalid email format.");
+    }
+
+    if (!validator.isMobilePhone(mobile, 'any', { strictMode: false })) {
+        throw new Error("Invalid mobile number.");
+    }
+
+    if (!validator.isLength(username, { min: 3, max: 100 })) {
+        throw new Error("Username must be between 3 and 100 characters long.");
+    }
+
+    // Update user
+    const user = await prisma.user.update({
+        where: { id: user_id },
+        data: {
+            title,
+            first_name,
+            middle_name,
+            last_name,
+            gender,
+            dob,
+            email,
+            mobile,
+            username,
+            date_of_joining,
+            employee_id,
+            designation,
+            teams,
+            status,
+            department,
+            user_type,
+            role,
+            reporting_to,
+            created_by
+        },
+    });
+
+    return user.id;
+};
+
+// Update module assignment function
+// Update module assignment function
+const update_module_assignment = async (req) => {
+    const userId = parseInt(req.params.id); // Accessing user ID from URL parameters
+    const { module, c, r, u, d } = req.body;
+
+    // Get the module ID
+    const moduleId = await module_id(req);
+
+    // Update the module assignment for the user
+    await prisma.modulesTouser.update({
+        where: {
+            user_id_module_id: {
+                user_id: userId,
+                module_id: moduleId,
+            },
+        },
+        data: {
+            c: c,
+            r: r,
+            u: u,
+            d: d,
+        },
+    });
+};
+
+
+// Update function
+const update_user_data = async (req, res) => {
+    try {
+        // Update user details
+        const user_id = await update_user(req);
+
+        // Update module assignment
+        await update_module_assignment(req);
+
+        // Send success response
+        return res.status(200).json({
+            message: 'User updated and module assignment updated successfully.',
+            user_id: user_id,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
   
-export { register, login, authenticateToken, logout,send_all_user_data ,id_based_data };
+export { register, login, authenticateToken, logout,send_all_user_data ,id_based_data ,update_user_data};
