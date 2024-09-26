@@ -272,6 +272,7 @@ const send_all_user_data = async (req, res) => {
           }
         },
       });
+      
   
       // Send response with user data and module names
       res.status(200).send({
@@ -287,5 +288,72 @@ const send_all_user_data = async (req, res) => {
       });
     }
   };
+
+  const id_based_data = async(req,res)=>{
+   try {
+     const user_id = req.params.id;
+     const user = await prisma.user.findUnique({
+         where: {
+           id: Number(user_id), // Use the specific user ID here
+         },
+         select: {
+           id: true, // Include the user ID
+           title: true,
+           first_name: true,
+           middle_name: true,
+           last_name: true,
+           gender: true,
+           dob: true,
+           email: true,
+           mobile: true,
+           username: true,
+           date_of_joining: true,
+           employee_id: true,
+           designation: true,
+           teams: true,
+           status: true,
+           department: true,
+           user_type: true,
+           role: true,
+           reporting_to: true,
+           created_by:true
+           
+         }
+       });
+ 
+       
+         const modules_data = await prisma.modulesTouser.findMany({
+             where: {
+               user_id: Number(user_id), // Assuming user_id is the variable containing the user's ID
+             },
+             select: {
+               module_id: true,
+               user_id: true,
+               c: true,
+               d: true,
+               r: true,
+               u: true,
+               modules: { // Selecting the related 'modules' data
+                 select: {
+                   module_name: true, // Selecting 'module_name' from the 'modules' table
+                 }
+               }
+             }
+           });
+           res.status(200).send({
+                success:true,
+                message:"data fetched successfully",
+                user_data:user,
+                modules_data:modules_data
+            })
+   } catch (error) {
+    console.log(error)
+    res.status(500).send({
+        message: "Error fetching user data",
+    })
+    
+   }
+          
+}
   
-export { register, login, authenticateToken, logout,send_all_user_data };
+export { register, login, authenticateToken, logout,send_all_user_data ,id_based_data };
