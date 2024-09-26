@@ -78,53 +78,56 @@ const add_to_user = async (req) => {
     // Create user
     const user = await prisma.user.create({
         data: {
-            title:title,
-            first_name:first_name,
-            middle_name:middle_name,
-            last_name:last_name,
-            gender:gender,
-            dob:dob,
-            email:email,
-            mobile:mobile,
-            username:username,
+            title: title,
+            first_name: first_name,
+            middle_name: middle_name,
+            last_name: last_name,
+            gender: gender,
+            dob: dob,
+            email: email,
+            mobile: mobile,
+            username: username,
             password: hashedPassword,
-            date_of_joining:date_of_joining,
-            employee_id:employee_id,
-            designation:designation,
-            teams:teams,
-            status:status,
-            department:department,
-            user_type:user_type,
-            role:role,
-            reporting_to:reporting_to,
-            created_by:created_by
+            date_of_joining: date_of_joining,
+            employee_id: employee_id,
+            designation: designation,
+            teams: teams,
+            status: status,
+            department: department,
+            user_type: user_type,
+            role: role,
+            reporting_to: reporting_to,
+            created_by: created_by
         }
     });
 
     return user.id;
 };
 
-// Helper function to get the module ID
-const module_id = async (req) => {
-    const  module = req.body.module;
-    
-    const module_data = await prisma.modules.findMany({
+// Helper function to get the module IDs from an array of module names
+const get_module_ids = async (module_names) => {
+    const modules = await prisma.modules.findMany({
         where: {
-            module_name: module
+            module_name: {
+                in: module_names
+            }
+        },
+        select: {
+            id: true
         }
     });
 
-    if (!module_data) {
-        throw new Error("Module not found.");
+    if (!modules.length) {
+        throw new Error("Modules not found.");
     }
 
-    return module_data[0].id;
+    return modules.map(module => module.id);
 };
 
 // Register function
 const register = async (req, res) => {
     try {
-        const { email, mobile, username } = req.body;
+        const { email, mobile, username, modules } = req.body;
 
         // Check if a user with the given email exists
         const user_data = await prisma.user.findUnique({
@@ -159,26 +162,28 @@ const register = async (req, res) => {
         // Add the user and get the user ID
         const user_id = await add_to_user(req);
 
-        // Get the module ID
-        const module = await module_id(req);
-        const{c,r,u,d}=req.body
+        // Get the module IDs from the array of modules
+        const module_names = modules.map(mod => mod.module_name);  // Assuming the form sends an array of module names
+        const module_ids = await get_module_ids(module_names);
 
-        // Assign the module to the user
-        await prisma.modulesTouser.create({
-            data: {
-                user: { connect: { id: user_id } },
-                modules: { connect: { id: module } },
-                c:c,
-                r:r,
-                u:u,
-                d:d
-
-            }
-        });
+        // Assign multiple modules to the user
+        for (let i = 0; i < module_ids.length; i++) {
+            const module = modules[i];
+            await prisma.modulesTouser.create({
+                data: {
+                    user: { connect: { id: user_id } },
+                    modules: { connect: { id: module_ids[i] } },
+                    c: module.c,
+                    r: module.r,
+                    u: module.u,
+                    d: module.d
+                }
+            });
+        }
 
         // Send success response
         return res.status(200).json({ 
-            message: 'User registered and module assigned successfully.' 
+            message: 'User registered and modules assigned successfully.' 
         });
 
     } catch (error) {
@@ -186,6 +191,7 @@ const register = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+
 
 // Login function
 const login = async (req, res) => {
