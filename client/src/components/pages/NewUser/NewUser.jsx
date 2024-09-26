@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import useRegisterUser from "../../../helpers/useRegisterUser";
 
 const NewUser = () => {
-    const [passwordConfirm, setPasswordConfirm] = useState(true)
+    const [passwordConfirm, setPasswordConfirm] = useState(true);
+
     const [assignModules, setAssignModules] = useState(
         {
             Administrator: false, 
@@ -17,6 +18,7 @@ const NewUser = () => {
             MyProfile: false
         }
     );
+    
     const [user, setUser] = useState(
         {
             title: '',
@@ -42,6 +44,7 @@ const NewUser = () => {
         }
     );
 
+    const [allAccessModules, setAllAccessModules] = useState();
     const { registerUser } = useRegisterUser();
     const register = (e) => {
         if(user.password !== user.confirmPassword){

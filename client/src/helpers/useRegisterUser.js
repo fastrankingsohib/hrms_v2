@@ -17,7 +17,6 @@ const useRegisterUser = () => {
             "date_of_joining": user.dateOfJoining,
             "employee_id": user.employeeId,
             "designation": user.designation,
-            "teams": "_____",
             "status": user.status,
             "department": user.department,
             "user_type": user.userType,
@@ -25,10 +24,29 @@ const useRegisterUser = () => {
             "reporting_to": user.reportingTo,
             "module": user.module,
             "created_by": "_____",
-            "c": 1,
-            "r":1,
-            "u":0,
-            "d":0,
+            "modules": [
+                {
+                    "module_name": "Administrator",
+                    "c": 1,
+                    "r": 1,
+                    "u": 1,
+                    "d": 0
+                },
+                {
+                    "module_name": "Candidates",
+                    "c": 1,
+                    "r": 1,
+                    "u": 0,
+                    "d": 0
+                },
+                {
+                    "module_name": "Offer",
+                    "c": 0,
+                    "r": 1,
+                    "u": 1,
+                    "d": 1
+                }
+            ]
           }
         ).then((response) => console.log(response.data)).catch((err) => console.log(err));
     }
