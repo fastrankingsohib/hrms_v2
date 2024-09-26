@@ -140,4 +140,16 @@ const reporting_to_users = async(req, res) => {
   }
 }
 
+const all_candidates = async(req,res) =>{
+  try {
+    const candidate_list = await prisma.user.findMany({})
+    
+  } catch (error) {
+    res.status(500).send({
+      success:false,
+      message:"could not fetch candidate list from database"
+    })
+  }
+}
+
 export {add_candidate,reporting_to_users}

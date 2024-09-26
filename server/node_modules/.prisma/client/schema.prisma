@@ -8,30 +8,30 @@ datasource db {
 }
 
 model user {
-  id              Int             @id @default(autoincrement())
-  title           String?         @db.VarChar(255)
-  first_name      String?         @db.VarChar(50)
-  middle_name     String?         @db.VarChar(50)
-  last_name       String?         @db.VarChar(50)
-  gender          String?         @db.VarChar(20)
-  dob             String?         @db.VarChar(50)
-  email           String?         @unique @db.VarChar(255)
-  mobile          String?         @unique @db.VarChar(20)
-  username        String?         @unique @db.VarChar(100)
+  id              Int     @id @default(autoincrement())
+  title           String? @db.VarChar(255)
+  first_name      String? @db.VarChar(50)
+  middle_name     String? @db.VarChar(50)
+  last_name       String? @db.VarChar(50)
+  gender          String? @db.VarChar(20)
+  dob             String? @db.VarChar(50)
+  email           String? @unique @db.VarChar(255)
+  mobile          String? @unique @db.VarChar(20)
+  username        String? @unique @db.VarChar(100)
   password        String?
-  date_of_joining String?         @db.VarChar(100)
-  employee_id     String?         @db.VarChar(100)
-  designation     String?         @db.VarChar(100)
-  teams           String?         @db.VarChar(100)
-  status          String?         @db.VarChar(100)
-  department      String?         @db.VarChar(100)
-  user_type       String?         @db.VarChar(100)
-  role            String?         @db.VarChar(100)
-  reporting_to    String?         @db.VarChar(100)
-  created_by      String?         @db.VarChar(50)
-  created_at      DateTime?       @default(now())
-  updated_at      DateTime?       @updatedAt
-  modulesTouser   modulesTouser[]
+  date_of_joining String? @db.VarChar(100)
+  employee_id     String? @db.VarChar(100)
+  designation     String? @db.VarChar(100)
+
+  status        String?         @db.VarChar(100)
+  department    String?         @db.VarChar(100)
+  user_type     String?         @db.VarChar(100)
+  role          String?         @db.VarChar(100)
+  reporting_to  String?         @db.VarChar(100)
+  created_by    String?         @db.VarChar(50)
+  created_at    DateTime?       @default(now())
+  updated_at    DateTime?       @updatedAt
+  modulesTouser modulesTouser[]
 }
 
 model modules {

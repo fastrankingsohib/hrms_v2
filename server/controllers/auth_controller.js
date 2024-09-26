@@ -41,7 +41,7 @@ const add_to_user = async (req) => {
         date_of_joining,
         employee_id,
         designation,
-        teams,
+       
         status,
         department,
         user_type,
@@ -91,7 +91,7 @@ const add_to_user = async (req) => {
             date_of_joining: date_of_joining,
             employee_id: employee_id,
             designation: designation,
-            teams: teams,
+            
             status: status,
             department: department,
             user_type: user_type,
