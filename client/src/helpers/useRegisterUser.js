@@ -1,8 +1,10 @@
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { resetModules } from "../redux/reducers/auth_slice";
 
 const useRegisterUser = () => {
     const allModules = useSelector((state) => state.userModules);
+    const dispatch = useDispatch()
     const selectedModules = [];
     allModules.map((module, moduleKey) => {
         if(module.moduleSelected){
@@ -42,6 +44,7 @@ const useRegisterUser = () => {
         //     "modules": selectedModules
         //   }
         // ).then((response) => console.log(response.data)).catch((err) => console.log(err));
+        dispatch(resetModules())
     }
 
     return { registerUser }
