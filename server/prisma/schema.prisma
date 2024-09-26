@@ -99,6 +99,9 @@ model candidate_list {
   status               String?  @db.VarChar(100)
   created_at           DateTime @default(now())
   updated_at           DateTime @updatedAt
+
+  workExperiences work_experience[] @relation("CandidateWorkExperience")
+  qualifications  qualifications[]  @relation("CandidateQualifications")
 }
 
 model work_experience {
@@ -110,6 +113,8 @@ model work_experience {
   last_drawn_salary String?  @db.VarChar(50)
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
+
+  candidate candidate_list @relation("CandidateWorkExperience", fields: [candidate_id], references: [candidate_id])
 }
 
 model qualifications {
@@ -121,4 +126,6 @@ model qualifications {
   percentage_cgpa    String?   @db.VarChar(20)
   created_at         DateTime  @default(now())
   updated_at         DateTime?
+
+  candidate candidate_list @relation("CandidateQualifications", fields: [candidate_id], references: [candidate_id])
 }
