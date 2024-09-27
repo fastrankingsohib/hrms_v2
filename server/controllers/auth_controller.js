@@ -231,7 +231,7 @@ const login = async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ username }, JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ username }, JWT_SECRET_KEY, { expiresIn: '2d' });
         res.cookie('token', token, { httpOnly: true });
 
         res.status(200).send({
@@ -425,8 +425,6 @@ const update_user = async (req) => {
         dob,
         email,
         mobile,
-        username,
-        password,
         date_of_joining,
         employee_id,
         designation,
@@ -442,10 +440,7 @@ const update_user = async (req) => {
 
     const user_id = req.params.id;
 
-    // Validations
-    if (!username || !email || !mobile) {
-        throw new Error("Username, email, and mobile are required.");
-    }
+   
 
     if (!validator.isEmail(email)) {
         throw new Error("Invalid email format.");
@@ -455,9 +450,7 @@ const update_user = async (req) => {
         throw new Error("Invalid mobile number.");
     }
 
-    if (!validator.isLength(username, { min: 3, max: 100 })) {
-        throw new Error("Username must be between 3 and 100 characters long.");
-    }
+    
 
     let updatedData = {
         title,
@@ -468,7 +461,6 @@ const update_user = async (req) => {
         dob,
         email,
         mobile,
-        username,
         date_of_joining,
         employee_id,
         designation,
@@ -480,12 +472,8 @@ const update_user = async (req) => {
         created_by
     };
 
-    // Check if password needs updating and hash it
-    if (password && validator.isLength(password, { min: 6 })) {
-        const salt = bcrypt.genSaltSync(10);
-        const hashedPassword = bcrypt.hashSync(password, salt);
-        updatedData.password = hashedPassword;
-    }
+    
+   
 
     // Update user
     const user = await prisma.user.update({

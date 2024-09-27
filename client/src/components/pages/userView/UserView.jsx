@@ -42,7 +42,7 @@ const NewUser = () => {
             .then((response) => {
                 const data = response.data.user_data;
                 const modulesData = response.data.modules_data;
-                console.log(modulesData)
+                // console.log(modulesData)
 
                 // Update the user state with fetched data
                 setFetchedUser(data);
@@ -119,7 +119,7 @@ const NewUser = () => {
                 </div>
             </h1>
 
-            <form onSubmit={register} className="w-full mt-10">
+            <form className="w-full mt-10">
                 <div className="grid grid-cols-4 gap-4">
                     <div>
                         <label htmlFor="title" className="font-semibold inline-block p-4 pl-0">Title</label>
@@ -391,6 +391,9 @@ const NewUser = () => {
 
                     {
                         user.modules.map((currentModule, moduleKey) => {
+                            // console.log(currentModule)
+                            // console.log(`${currentModule.module_name} ${currentModule.module_status}`);
+                            let module_status = currentModule.module_status
                             return(
                                 <UserModule
                                     editable={!isEditing}
@@ -402,6 +405,7 @@ const NewUser = () => {
                                     delete={currentModule.d}
                                     id={`module-${currentModule.module_name}`}
                                     name={currentModule.module_name}
+                                    module={currentModule.module_status}
                                     // assigned={userAssignedModule.includes(currentModule.moduleName)} // Example to mark assigned modules
                                 />
                             )
@@ -412,7 +416,8 @@ const NewUser = () => {
                 <div className="flex items-center justify-end mt-10">
                     <div className="w-1/4 pl-4">
                         <button className="primary-button cursor-pointer justify-center" type="submit"
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.preventDefault();
                                 updateUser(user, userid)
                             }}
                         >Update User</button>

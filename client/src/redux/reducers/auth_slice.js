@@ -48,7 +48,7 @@ const authSlice = createSlice({
             })
             state.userModules = updatedModules;
             // console.log(action.payload)
-            console.log(updatedModules)
+            // console.log(updatedModules)
         },
 
 

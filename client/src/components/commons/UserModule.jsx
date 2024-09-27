@@ -4,16 +4,17 @@ import { updateModules } from '../../redux/reducers/auth_slice';
 
 function UserModule(props) {
     const [crudVisibility, setCrudVisibility] = useState(false);
-    const cm = useSelector((state) => state.userModules)
     const dispatch = useDispatch()
     const [selectionCrud, setSelectionCrud] = useState({
         moduleName: props.name || '',
-        moduleSelected: props.checked,
+        moduleSelected: props.module_status,
         c: props.create || false,
         r: props.read || false,
         u: props.update || false,
         d: props.delete || false
     });
+
+    // console.console.log(`${props.name} ${props.module_status}`)
     
 
     useEffect(() => {
