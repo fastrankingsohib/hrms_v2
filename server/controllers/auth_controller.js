@@ -199,8 +199,20 @@ const login = async (req, res) => {
         const { username, password } = req.body;
 
         const user = await prisma.user.findUnique({
-            where: { username: username }
-        });
+            where: { username: username },
+            include: {
+              modulesTouser: {
+                include: {
+                  modules: { // This includes the module name from the 'modules' table
+                    select: {
+                      module_name: true, // Fetch only the module name
+                    },
+                  },
+                },
+              },
+            },
+          });
+          ;
 
         if (!user) {
             return res.status(401).send({
