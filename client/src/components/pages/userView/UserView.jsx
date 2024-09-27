@@ -41,6 +41,7 @@ const NewUser = () => {
             .then((response) => {
                 const data = response.data.user_data;
                 const modulesData = response.data.modules_data;
+                console.log(modulesData)
 
                 // Update the user state with fetched data
                 setFetchedUser(data);
@@ -339,8 +340,8 @@ const NewUser = () => {
                     </div>
                 </div>
 
-                <div className="grid gap-4 grid-cols-2 border-t-2 mt-10">
-                    {
+                <div className="grid gap-4 grid-cols-1 2xl:grid-cols-2 border-t-2 mt-10">
+                    {/* {
                         allModules.map((currentModule, moduleKey) => {
                             return(
                                 user.modules.map((value, index) => {
@@ -377,6 +378,26 @@ const NewUser = () => {
                                     }
                                     // console.log(value.modules.module_name)
                                 })
+                            )
+                        })
+                    } */}
+
+
+                    {
+                        user.modules.map((currentModule, moduleKey) => {
+                            return(
+                                <UserModule
+                                    editable={!isEditing}
+                                    key={moduleKey}
+                                    checked={currentModule.module_status}
+                                    create={currentModule.c}
+                                    read={currentModule.r}
+                                    update={currentModule.u}
+                                    delete={currentModule.d}
+                                    id={`module-${currentModule.module_name}`}
+                                    name={currentModule.module_name}
+                                    // assigned={userAssignedModule.includes(currentModule.moduleName)} // Example to mark assigned modules
+                                />
                             )
                         })
                     }

@@ -19,11 +19,11 @@ function UserModule(props) {
         dispatch(updateModules(selectionCrud))
     }, [selectionCrud])
     return (
-        <div className="flex">
+        <div className="flex select-none">
             <div className="px-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-gray-100">
                 <label htmlFor={props.id} className="inline-block min-w-40">{props.name} {props.checked}</label>
                 <input id={props.id} type="checkbox"
-                    checked={selectionCrud.moduleSelected ? true : false} 
+                    checked={selectionCrud.moduleSelected} 
                     onChange={
                         (e) => {
                             // hanldeState()
@@ -34,7 +34,7 @@ function UserModule(props) {
             </div>
             <div className="p-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-white" style={{ display: selectionCrud.moduleSelected ? 'flex' : 'none' }}>
                 <div className="p-4 inline-flex items-center gap-4">
-                    <label htmlFor="Administrator_create">Create</label> 
+                    <label htmlFor={`${props.id}-c`}>Create</label> 
                     <input id={`${props.id}-c`} type="checkbox" 
                         onChange={() => {
                             // hanldeState()
@@ -45,7 +45,7 @@ function UserModule(props) {
 
 
                 <div className="p-4 inline-flex items-center gap-4">
-                    <label htmlFor="Administrator_read">Read</label> 
+                    <label htmlFor={`${props.id}-r`}>Read</label> 
                     <input id={`${props.id}-r`} type="checkbox"
                         onChange={() => {
                             // hanldeState()
@@ -56,7 +56,7 @@ function UserModule(props) {
 
                 
                 <div className="p-4 inline-flex items-center gap-4">
-                    <label htmlFor="Administrator_update">Update</label> 
+                    <label htmlFor={`${props.id}-u`}>Update</label> 
                     <input id={`${props.id}-u`} type="checkbox" 
                         onChange={() => {
                             // hanldeState()
@@ -67,7 +67,7 @@ function UserModule(props) {
 
                 
                 <div className="p-4 inline-flex items-center gap-4">
-                    <label htmlFor="Administrator_delete">Delete</label> 
+                    <label htmlFor={`${props.id}-d`}>Delete</label> 
                     <input id={`${props.id}-d`} type="checkbox" 
                         onChange={() => {
                             // hanldeState()
