@@ -25,7 +25,8 @@ const useLogin = () => {
                     userLoggedIn(
                         {
                             status: true, 
-                            access: "admin"
+                            access: "admin",
+                            username: response.data.user.username
                         }
                     )
                 )

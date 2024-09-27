@@ -6,12 +6,12 @@ function UserModule(props) {
     const [crudVisibility, setCrudVisibility] = useState(false);
     const dispatch = useDispatch()
     const [selectionCrud, setSelectionCrud] = useState({
-        moduleName: props.name,
-        moduleSelected: false,
-        c: false,
-        r: false,
-        u: false,
-        d: false
+        moduleName: props.name || '',
+        moduleSelected: props.checked,
+        c: props.create || false,
+        r: props.read || false,
+        u: props.update || false,
+        d: props.delete || false
     });
     
 
@@ -21,8 +21,9 @@ function UserModule(props) {
     return (
         <div className="flex">
             <div className="px-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-gray-100">
-                <label htmlFor={props.id} className="inline-block min-w-40">{props.name}</label>
-                <input id={props.id} type="checkbox" 
+                <label htmlFor={props.id} className="inline-block min-w-40">{props.name} {props.checked}</label>
+                <input id={props.id} type="checkbox"
+                    checked={selectionCrud.moduleSelected ? true : false} 
                     onChange={
                         (e) => {
                             // hanldeState()

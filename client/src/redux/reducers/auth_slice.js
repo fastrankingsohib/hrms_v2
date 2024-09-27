@@ -5,6 +5,7 @@ const initialState = {
     user_auth: {
         loggedIn: false,
         userType: "admin",
+        username: null,
         loginTimestamp: null
     },
     userModules: allModules,
@@ -19,6 +20,7 @@ const authSlice = createSlice({
             const userDetails = {
                 loggedIn: action.payload.status,
                 userType: action.payload.access,
+                username: action.payload.username,
                 logoutTimestamp: Date.now()
             };
             localStorage.setItem("user", JSON.stringify(userDetails));
@@ -45,8 +47,8 @@ const authSlice = createSlice({
                 }
             })
             state.userModules = updatedModules;
-            // console.log(updatedModules)
             // console.log(action.payload)
+            // console.log(updatedModules)
         },
 
 
