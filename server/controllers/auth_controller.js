@@ -261,7 +261,7 @@ const send_all_user_data = async (req, res) => {
           date_of_joining: true,
           employee_id: true,
           designation: true,
-          teams: true,
+         
           status: true,
           department: true,
           user_type: true,
@@ -316,7 +316,7 @@ const send_all_user_data = async (req, res) => {
            date_of_joining: true,
            employee_id: true,
            designation: true,
-           teams: true,
+          
            status: true,
            department: true,
            user_type: true,
@@ -377,7 +377,7 @@ const update_user = async (req) => {
         date_of_joining,
         employee_id,
         designation,
-        teams,
+     
         status,
         department,
         user_type,
@@ -419,7 +419,7 @@ const update_user = async (req) => {
             date_of_joining,
             employee_id,
             designation,
-            teams,
+            
             status,
             department,
             user_type,
