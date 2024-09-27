@@ -7,7 +7,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { updateModules } from "../../../redux/reducers/auth_slice";
 
-const UserView = () => {
+const NewUser = () => {
     const { userid } = useParams();
     const userAssignedModule = useSelector((state) => state.userModules);
     const dispatch = useDispatch();
@@ -375,6 +375,7 @@ const UserView = () => {
                                             />
                                         )
                                     }
+                                    // console.log(value.modules.module_name)
                                 })
                             )
                         })
@@ -391,4 +392,4 @@ const UserView = () => {
     );
 }
 
-export default UserView;
+export default NewUser;

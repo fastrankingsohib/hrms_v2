@@ -49,8 +49,9 @@ const Sidebar = () => {
                         onClick={() => {
                             setDropdowns((values) => ({...values, jobs: !dropdowns.jobs}));
                         }}
-                    >Jobs</div>
+                    >Others</div>
                     <div style={{display: dropdowns.jobs ? 'block' : 'none'}}>
+                    <NavLink to={'/add-new-candidate'} className={({isActive}) => `${isActive ? 'side-bar-active' : 'side-bar-default'}`}><FaUserPlus size={'14px'} className="w-10" /> Add New candidate</NavLink>
                         <NavLink to={'/post-new-job'} className={({isActive}) => `${isActive ? 'side-bar-active' : 'side-bar-default'}`}><IoCreate size={'18px'} className="w-10" /> Post New Job</NavLink>
                     </div>
                 </div>
