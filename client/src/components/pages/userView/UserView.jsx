@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { updateModules } from "../../../redux/reducers/auth_slice";
+import useUpdateUser from "../../../helpers/useUpadateUser";
 
 const NewUser = () => {
     const { userid } = useParams();
@@ -98,6 +99,11 @@ const NewUser = () => {
     const toggleEdit = () => {
         setIsEditing((prev) => !prev); // Toggle edit mode
     };
+
+    const { updateUser } = useUpdateUser();
+    const updateTheUser = () => {
+
+    }
 
     return (
         <section className="p-4 component-rendering-transition">
@@ -405,7 +411,11 @@ const NewUser = () => {
 
                 <div className="flex items-center justify-end mt-10">
                     <div className="w-1/4 pl-4">
-                        <button className="primary-button justify-center" type="submit" disabled={!isEditing}>Create User</button>
+                        <button className="primary-button cursor-pointer justify-center" type="submit"
+                            onClick={() => {
+                                updateUser(user, userid)
+                            }}
+                        >Update User</button>
                     </div>
                 </div>
             </form>

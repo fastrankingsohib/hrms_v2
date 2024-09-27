@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateModules } from '../../redux/reducers/auth_slice';
 
 function UserModule(props) {
     const [crudVisibility, setCrudVisibility] = useState(false);
+    const cm = useSelector((state) => state.userModules)
     const dispatch = useDispatch()
     const [selectionCrud, setSelectionCrud] = useState({
         moduleName: props.name || '',
@@ -16,7 +17,8 @@ function UserModule(props) {
     
 
     useEffect(() => {
-        dispatch(updateModules(selectionCrud))
+        dispatch(updateModules(selectionCrud));
+        console.log("called")
     }, [selectionCrud])
     return (
         <div className="flex select-none">
