@@ -57,9 +57,9 @@ const NewUser = () => {
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Title</label>
                         <select className="primary-input"
                             onChange={(e) => setUser((values) => ({...values, title: e.target.value}))} >
-                            <option value="#" disabled={true}>-- Select --</option>
-                            <option value="#">Mr.</option>
-                            <option value="#">Ms.</option>
+                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option value="Mr.">Mr.</option>
+                            <option value="Ms.">Ms.</option>
                         </select>
                     </div>
 
@@ -89,9 +89,9 @@ const NewUser = () => {
                         <select className="primary-input" 
                             onChange={(e) => setUser((values) => ({...values, gender: e.target.value}))} 
                         >
-                            <option value="#" disabled={true}>-- Select --</option>
-                            <option value="#">Male</option>
-                            <option value="#">Female</option>
+                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
                         </select>
                     </div>
 
@@ -149,9 +149,9 @@ const NewUser = () => {
                         <select className="primary-input"
                             onChange={(e) => setUser((values) => ({...values, reportingTo: e.target.value}))} 
                         >
-                            <option value="#" disabled={true}>-- Select --</option>
-                            <option value="#">User 1</option>
-                            <option value="#">User 2</option>
+                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option value="User 1">User 1</option>
+                            <option value="User 2">User 2</option>
                         </select>
                     </div>
                     
@@ -167,9 +167,9 @@ const NewUser = () => {
                         <select className="primary-input" 
                             onChange={(e) => setUser((values) => ({...values, status: e.target.value}))} 
                         >
-                            <option value="#" disabled={true}>-- Select --</option>
-                            <option value="#">Active</option>
-                            <option value="#">Inactive</option>
+                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option value="Active">Active</option>
+                            <option value="Inavtive">Inactive</option>
                         </select>
                     </div>
                     
@@ -178,9 +178,9 @@ const NewUser = () => {
                         <select className="primary-input" 
                             onChange={(e) => setUser((values) => ({...values, userType: e.target.value}))} 
                         >
-                            <option value="#" disabled={true}>-- Select --</option>
-                            <option value="#">Type 1</option>
-                            <option value="#">Type 2</option>
+                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option value="Type 1">Type 1</option>
+                            <option value="Type 2">Type 2</option>
                         </select>
                     </div>
                     
@@ -189,9 +189,9 @@ const NewUser = () => {
                         <select className="primary-input"
                             onChange={(e) => setUser((values) => ({...values, designation: e.target.value}))} 
                         >
-                            <option value="#" disabled={true}>-- Select --</option>
-                            <option value="#">Designation 1</option>
-                            <option value="#">Designation 2</option>
+                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option value="Designation 1">Designation 1</option>
+                            <option value="Designation 2">Designation 2</option>
                         </select>
                     </div>
                     
@@ -200,9 +200,9 @@ const NewUser = () => {
                         <select className="primary-input"
                             onChange={(e) => setUser((values) => ({...values, department: e.target.value}))} 
                         >
-                            <option value="#" disabled={true}>-- Select --</option>
-                            <option value="#">Department 1</option>
-                            <option value="#">Department 2</option>
+                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option value="Department 1">Department 1</option>
+                            <option value="Department 2">Department 2</option>
                         </select>
                     </div>
                     
@@ -211,15 +211,15 @@ const NewUser = () => {
                         <select className="primary-input"
                             onChange={(e) => setUser((values) => ({...values, role: e.target.value}))} 
                         >
-                            <option value="#" disabled={true}>-- Select --</option>
-                            <option value="#">Super Admin</option>
-                            <option value="#">Admin</option>
-                            <option value="#">Director</option>
-                            <option value="#">Manager</option>
-                            <option value="#">Executive</option>
-                            <option value="#">Candidate</option>
-                            <option value="#">Consultant</option>
-                            <option value="#">Other</option>
+                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option value="Super Admin">Super Admin</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Director">Director</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Executive">Executive</option>
+                            <option value="Candidate">Candidate</option>
+                            <option value="Consultant">Consultant</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                 </div>
@@ -230,8 +230,8 @@ const NewUser = () => {
                         allModules.map((currentModule, moduleKey) => {
                             return(
                                 <UserModule
-                                    id = {`module-${currentModule.moduleName}`}
-                                    name = {currentModule.moduleName}
+                                    id = {`module-${currentModule.module_name}`}
+                                    name = {currentModule.module_name}
                                 />
                             )
                         })

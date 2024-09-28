@@ -1,14 +1,23 @@
 import axios from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { resetModules } from "../redux/reducers/auth_slice";
+import { useNavigate } from "react-router-dom";
 
 const useUpdateUser = () => {
     let userModules = useSelector((state) => state.userModules);
+    let navigate = useNavigate()
     let dispatch = useDispatch()
     
     
     const updateUser = (user, userid) => {
-        console.log(userModules)
+        const updatedModules = [];
+        userModules.map((currentModule, moduleKey) => {
+            if(currentModule.moduleSelected || currentModule.module_status){
+                updatedModules.push(currentModule);
+            }
+        })
+        // console.log(updatedModules);
+
         // console.log(userid, user)
         // console.log(userModules)
         axios.post(`/userdata/update/${userid}`, {
@@ -29,11 +38,12 @@ const useUpdateUser = () => {
             "role": user.role,
             "reporting_to": user.reportingTo,
             "created_by": "----",
-            "modules": userModules
+            "modules": updatedModules
         })
         .then((response) => {
             console.log(response);
             dispatch(resetModules());
+            navigate('/all-users');
         })
         .catch((err) => console.log(err))
     }

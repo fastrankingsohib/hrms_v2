@@ -12,7 +12,7 @@ const useRegisterUser = () => {
     allModules.map((module, moduleKey) => {
         if(module.moduleSelected){
             selectedModules.push({
-                module_name: module.moduleName,
+                module_name: module.module_name,
                 c: module.c,
                 r: module.r,
                 u: module.u,
