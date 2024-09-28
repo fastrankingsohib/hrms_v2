@@ -407,8 +407,25 @@ const update_candidate = async (req, res) => {
   }
 };
 
+const module_data = async(req,res)=>{
+  try {
+    const modules = await prisma.modules.findMany()
+    return res.status(200).send({
+      success:true,
+      message:"user data by id sent",
+      modules:modules
+    })
+    
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Some error occurred while fetching module data.",
+    })
+  }
+}
 
 
 
 
-export {add_candidate,reporting_to_users,all_candidates, delete_candidate,send_data_by_id, update_candidate}
+
+export {add_candidate,reporting_to_users,all_candidates, delete_candidate,send_data_by_id, update_candidate,module_data}
