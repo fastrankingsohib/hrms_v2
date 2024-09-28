@@ -41,7 +41,7 @@ const add_to_user = async (req) => {
         date_of_joining,
         employee_id,
         designation,
-       
+
         status,
         department,
         user_type,
@@ -91,7 +91,7 @@ const add_to_user = async (req) => {
             date_of_joining: date_of_joining,
             employee_id: employee_id,
             designation: designation,
-            
+
             status: status,
             department: department,
             user_type: user_type,
@@ -182,8 +182,8 @@ const register = async (req, res) => {
         }
 
         // Send success response
-        return res.status(200).json({ 
-            message: 'User registered and modules assigned successfully.' 
+        return res.status(200).json({
+            message: 'User registered and modules assigned successfully.'
         });
 
     } catch (error) {
@@ -236,7 +236,7 @@ const login = async (req, res) => {
 
         res.status(200).send({
             success: true,
-            user:user,
+            user: user,
             message: "User logged in successfully."
         });
     } catch (error) {
@@ -300,13 +300,13 @@ const send_all_user_data = async (req, res) => {
         data: usersWithModules,
       });
     } catch (error) {
-      console.error("Error fetching user data:", error); // Log the error for debugging
-      res.status(500).send({
-        success: false,
-        message: "Error fetching user data",
-      });
+        console.error("Error fetching user data:", error); // Log the error for debugging
+        res.status(500).send({
+            success: false,
+            message: "Error fetching user data",
+        });
     }
-  };
+};
 
   const id_based_data = async (req, res) => {
     try {
@@ -428,6 +428,7 @@ const update_user = async (req) => {
         date_of_joining,
         employee_id,
         designation,
+     
         status,
         department,
         user_type,
@@ -542,24 +543,25 @@ const update_user_data = async (req, res) => {
 };
 
 
-const delete_user = async(req,res)=>{
+
+const delete_user = async (req, res) => {
     try {
-        const id =req.params.id
+        const id = req.params.id
         await prisma.user.delete({
-            where:{
-                id:Number(id)
+            where: {
+                id: Number(id)
             }
         })
         res.status(200).send({
-            success:true,
-            message:"User deleted successfully"
+            success: true,
+            message: "User deleted successfully"
         })
     } catch (error) {
         res.status(500).send({
-            success:false,
+            success: false,
             message: "Some error occurred while deleting the User.",
         })
     }
 }
-  
-export { register, login, authenticateToken, logout,send_all_user_data ,id_based_data ,update_user_data, delete_user};
+
+export { register, login, authenticateToken, logout, send_all_user_data, id_based_data, update_user_data, delete_user };

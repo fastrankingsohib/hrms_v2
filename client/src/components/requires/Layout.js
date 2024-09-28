@@ -7,11 +7,10 @@ import { useEffect } from "react";
 const Layout = () => {
     const Navigate = useNavigate();
     const userLoggedIn = useSelector((state) => state.user_auth);
+    const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
     useEffect(() => {
-        if(!userLoggedIn.logged_in){
-            setTimeout(() => {
-                // Navigate('/login')
-            }, 2000)
+        if(!user.loggedIn){
+            Navigate('/login');
         }
     })
     return(

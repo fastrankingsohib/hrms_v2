@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ExperienceField from "../../commons/ExperienceField";
+import Qualifications from "../../commons/Qualifications";
 
 const NewCandidate = () => {
     const [assignModules, setAssignModules] = useState(
@@ -107,9 +108,9 @@ const NewCandidate = () => {
                 </div>
 
 
+                <h1 className="flex items-center my-8"><span className="inline-block min-w-fit text-2xl mr-5">Qualifications</span> <hr className="w-full" /></h1>
+                <Qualifications />
                 <h1 className="flex items-center my-8"><span className="inline-block min-w-fit text-2xl mr-5">Experience</span> <hr className="w-full" /></h1>
-
-
                 <ExperienceField />
 
 

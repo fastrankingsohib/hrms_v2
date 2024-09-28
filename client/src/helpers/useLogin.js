@@ -1,21 +1,35 @@
 import axios from "axios";
 import { useState } from "react"
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { userLoggedIn } from "../redux/reducers/auth_slice";
 
 const useLogin = () => {
     const [isUserLoggedin, setIsUserLoggedin] = useState();
+    const dispatch = useDispatch();
+
     const Navigate = useNavigate();
-    const login = (email, password) => {
+    const login = (username, password) => {
         const credentials = {
-            "email": email,
+            "username": username,
             "password": password
         }
         axios.post("/login", credentials)
         .then((response) => {
             if(response.data.success){
-                setIsUserLoggedin(true);
                 console.log(response.data);
-                Navigate('/admin')
+                setIsUserLoggedin(true);
+                Navigate('/post-new-job');
+                
+                dispatch(
+                    userLoggedIn(
+                        {
+                            status: true, 
+                            access: "admin",
+                            username: response.data.user.username
+                        }
+                    )
+                )
             }
         })
         .catch((err) => {

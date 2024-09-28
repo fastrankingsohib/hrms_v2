@@ -1,30 +1,63 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useRegisterUser from "../../../helpers/useRegisterUser";
+import allModules from "./AllModules";
+import UserModule from "../../commons/UserModule";
+import { useSelector } from "react-redux";
 
 const NewUser = () => {
-    const [assignModules, setAssignModules] = useState(
+    const userAssignedModule = useSelector((state) => state.userModules);
+    const [passwordConfirm, setPasswordConfirm] = useState(true);
+    const [user, setUser] = useState(
         {
-            Administrator: false, 
-            Candidates: false, 
-            Interviews: false, 
-            Offer: false, 
-            Training: false, 
-            OnBoarding: false, 
-            Appraisal: false, 
-            Exit: false, 
-            Jobs: false, 
-            MyProfile: false
+            title: '',
+            firstName: '',
+            middleName: '', 
+            lastName: '',
+            gender: '',
+            dateOfJoining: '',
+            username: '',
+            password: '',
+            confirmPassword: '',
+            emailId: '',
+            status: '',
+            mobile: '',
+            dateOfBirth: '',
+            reportingTo: '',
+            employeeId: '',
+            status: '',
+            userType: '',
+            designation: '',
+            department: '',
+            role: '',      
         }
     );
+
+    // const [allAccessModules, setAllAccessModules] = useState();
+    const { registerUser } = useRegisterUser();
+    const register = (e) => {
+        if(user.password !== user.confirmPassword){
+            setPasswordConfirm(false);
+            console.log(`Password Does Not Match`)
+        }
+        else{
+            setPasswordConfirm(true)
+            console.log(`Password Mathed Successfully!`)
+        }
+        e.preventDefault();
+        registerUser(user);
+    }
 
     return(
         <section className="p-4 component-rendering-tranistion">
             <h1 className="text-2xl font-semibold">Create New User</h1>
 
-            <div className="w-full mt-10">
+            <form onSubmit={register} className="w-full mt-10">
                 <div className="grid grid-cols-4 gap-4">
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Title</label>
-                        <select className="primary-input">
+                        <select className="primary-input"
+                            onChange={(e) => setUser((values) => ({...values, title: e.target.value}))} >
+                            <option value="#" disabled={true}>-- Select --</option>
                             <option value="#">Mr.</option>
                             <option value="#">Ms.</option>
                         </select>
@@ -32,22 +65,31 @@ const NewUser = () => {
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">First Name</label>
-                        <input type="text" className="primary-input" placeholder="First Name" name="" id="" />
+                        <input type="text" className="primary-input" placeholder="First Name" name="" id=""
+                            onChange={(e) => setUser((values) => ({...values, firstName: e.target.value}))} 
+                        />
                     </div>
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Middle Name</label>
-                        <input type="text" className="primary-input" placeholder="Middle Name" name="" id="" />
+                        <input type="text" className="primary-input" placeholder="Middle Name" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, middleName: e.target.value}))} 
+                        />
                     </div>
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Last Name</label>
-                        <input type="text" className="primary-input" placeholder="Last Name" name="" id="" />
+                        <input type="text" className="primary-input" placeholder="Last Name" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, lastName: e.target.value}))} 
+                        />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Gender</label>
-                        <select className="primary-input">
+                        <select className="primary-input" 
+                            onChange={(e) => setUser((values) => ({...values, gender: e.target.value}))} 
+                        >
+                            <option value="#" disabled={true}>-- Select --</option>
                             <option value="#">Male</option>
                             <option value="#">Female</option>
                         </select>
@@ -55,50 +97,59 @@ const NewUser = () => {
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of Joining</label>
-                        <input type="date" className="primary-input" name="" id="" />
+                        <input type="date" className="primary-input" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, dateOfJoining: e.target.value}))} 
+                        />
                     </div>
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Username</label>
-                        <input type="text" className="primary-input" placeholder="Last Name" name="" id="" />
+                        <input type="text" className="primary-input" placeholder="Last Name" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, username: e.target.value}))} 
+                        />
                     </div>
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Password</label>
-                        <input type="password" className="primary-input" placeholder="Last Name" name="" id="" />
+                        <input type="password" className="primary-input" placeholder="Password" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, password: e.target.value}))} 
+                        />
                     </div>
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Confirm Password</label>
-                        <input type="password" className="primary-input" placeholder="Last Name" name="" id="" />
-                    </div>
-                    
-                    <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Type</label>
-                        <select className="primary-input">
-                            <option value="#">Admin</option>
-                            <option value="#">Guest</option>
-                        </select>
+                        <input type="password" className="primary-input" placeholder="Confirm Password" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, confirmPassword: e.target.value}))} 
+                        />
                     </div>
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Email ID</label>
-                        <input type="email" className="primary-input" placeholder="Last Name" name="" id="" />
+                        <input type="email" className="primary-input" placeholder="Email ID" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, emailId: e.target.value}))} 
+                        />
                     </div>
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Mobile</label>
-                        <input type="tel" className="primary-input" placeholder="Last Name" name="" id="" />
+                        <input type="tel" className="primary-input" placeholder="Mobile Number" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, mobile: e.target.value}))} 
+                        />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of birth</label>
-                        <input type="date" className="primary-input" placeholder="Last Name" name="" id="" />
+                        <input type="date" className="primary-input" placeholder="Date of Birth" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, dateOfBirth: e.target.value}))} 
+                        />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Reporting to</label>
-                        <select className="primary-input">
+                        <select className="primary-input"
+                            onChange={(e) => setUser((values) => ({...values, reportingTo: e.target.value}))} 
+                        >
+                            <option value="#" disabled={true}>-- Select --</option>
                             <option value="#">User 1</option>
                             <option value="#">User 2</option>
                         </select>
@@ -106,12 +157,17 @@ const NewUser = () => {
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Employee ID</label>
-                        <input type="text" className="primary-input" placeholder="Last Name" name="" id="" />
+                        <input type="text" className="primary-input" placeholder="Emploayee ID" name="" id="" 
+                            onChange={(e) => setUser((values) => ({...values, employeeId: e.target.value}))} 
+                        />
                     </div>
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Status</label>
-                        <select className="primary-input">
+                        <select className="primary-input" 
+                            onChange={(e) => setUser((values) => ({...values, status: e.target.value}))} 
+                        >
+                            <option value="#" disabled={true}>-- Select --</option>
                             <option value="#">Active</option>
                             <option value="#">Inactive</option>
                         </select>
@@ -119,7 +175,10 @@ const NewUser = () => {
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">User Type</label>
-                        <select className="primary-input">
+                        <select className="primary-input" 
+                            onChange={(e) => setUser((values) => ({...values, userType: e.target.value}))} 
+                        >
+                            <option value="#" disabled={true}>-- Select --</option>
                             <option value="#">Type 1</option>
                             <option value="#">Type 2</option>
                         </select>
@@ -127,7 +186,10 @@ const NewUser = () => {
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Designation</label>
-                        <select className="primary-input">
+                        <select className="primary-input"
+                            onChange={(e) => setUser((values) => ({...values, designation: e.target.value}))} 
+                        >
+                            <option value="#" disabled={true}>-- Select --</option>
                             <option value="#">Designation 1</option>
                             <option value="#">Designation 2</option>
                         </select>
@@ -135,7 +197,10 @@ const NewUser = () => {
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Department</label>
-                        <select className="primary-input">
+                        <select className="primary-input"
+                            onChange={(e) => setUser((values) => ({...values, department: e.target.value}))} 
+                        >
+                            <option value="#" disabled={true}>-- Select --</option>
                             <option value="#">Department 1</option>
                             <option value="#">Department 2</option>
                         </select>
@@ -143,35 +208,38 @@ const NewUser = () => {
                     
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Role</label>
-                        <select className="primary-input">
-                            <option value="#">Role 1</option>
-                            <option value="#">Role 2</option>
+                        <select className="primary-input"
+                            onChange={(e) => setUser((values) => ({...values, role: e.target.value}))} 
+                        >
+                            <option value="#" disabled={true}>-- Select --</option>
+                            <option value="#">Super Admin</option>
+                            <option value="#">Admin</option>
+                            <option value="#">Director</option>
+                            <option value="#">Manager</option>
+                            <option value="#">Executive</option>
+                            <option value="#">Candidate</option>
+                            <option value="#">Consultant</option>
+                            <option value="#">Other</option>
                         </select>
                     </div>
                 </div>
 
 
                 <div className="grid gap-4 grid-cols-2 border-t-2 mt-10">
-                    <div className="flex">
-                        <div className="px-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-gray-100">
-                            <label htmlFor="Administrator_ch" className="inline-block min-w-40">Administrator</label> 
-                            <input id="Administrator_ch" type="checkbox" 
-                                onChange={(e) => {
-                                    setAssignModules((allModules) => ({...allModules, Administrator: !assignModules.Administrator}));
-                                }}
-                            />
-                        </div>
-                        <div className="p-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-white" style={{display: assignModules.Administrator ? 'flex' : 'none'}}>
-                            <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_create">Create</label> <input id="Administrator_create" type="checkbox" /></div>
-                            <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_read">Read</label> <input id="Administrator_read" type="checkbox" /></div>
-                            <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_update">Update</label> <input id="Administrator_update" type="checkbox" /></div>
-                            <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_delete">Delete</label> <input id="Administrator_delete" type="checkbox" /></div>
-                        </div>
-                    </div>
+                    {
+                        allModules.map((currentModule, moduleKey) => {
+                            return(
+                                <UserModule
+                                    id = {`module-${currentModule.moduleName}`}
+                                    name = {currentModule.moduleName}
+                                />
+                            )
+                        })
+                    }
 
 
 
-                    <div className="flex">
+                    {/* <div className="flex">
                         <div className="px-4 h-12 border flex gap-4 justify-between items-center mt-10 bg-gray-100">
                             <label htmlFor="Appraisal_ch" className="inline-block min-w-40">Appraisal</label> 
                             <input id="Appraisal_ch" type="checkbox" 
@@ -333,7 +401,7 @@ const NewUser = () => {
                             <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_update">Update</label> <input id="Administrator_update" type="checkbox" /></div>
                             <div className="p-4 inline-flex items-center gap-4"><label htmlFor="Administrator_delete">Delete</label> <input id="Administrator_delete" type="checkbox" /></div>
                         </div>
-                    </div>
+                    </div> */}
                     
                 </div>
 
@@ -343,7 +411,7 @@ const NewUser = () => {
                         <button className="primary-button justify-center">Create User</button>
                     </div>
                 </div>
-            </div>
+            </form>
         </section>
     )
 }
