@@ -47,9 +47,6 @@ const NewUser = () => {
         registerUser(user);
     }
 
-
-
-
     return(
         <section className="p-4 component-rendering-tranistion">
             <h1 className="text-2xl font-semibold">Create New User</h1>
@@ -59,8 +56,7 @@ const NewUser = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Title</label>
                         <select className="primary-input"
-                            onChange={(e) => setUser((values) => ({...values, title: e.target.value}))} 
-                        >
+                            onChange={(e) => setUser((values) => ({...values, title: e.target.value}))} >
                             <option value="#" disabled={true}>-- Select --</option>
                             <option value="#">Mr.</option>
                             <option value="#">Ms.</option>

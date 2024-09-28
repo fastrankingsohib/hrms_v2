@@ -8,30 +8,29 @@ datasource db {
 }
 
 model user {
-  id              Int     @id @default(autoincrement())
-  title           String? @db.VarChar(255)
-  first_name      String? @db.VarChar(50)
-  middle_name     String? @db.VarChar(50)
-  last_name       String? @db.VarChar(50)
-  gender          String? @db.VarChar(20)
-  dob             String? @db.VarChar(50)
-  email           String? @unique @db.VarChar(255)
-  mobile          String? @unique @db.VarChar(20)
-  username        String? @unique @db.VarChar(100)
+  id              Int             @id @default(autoincrement())
+  title           String?         @db.VarChar(255)
+  first_name      String?         @db.VarChar(50)
+  middle_name     String?         @db.VarChar(50)
+  last_name       String?         @db.VarChar(50)
+  gender          String?         @db.VarChar(20)
+  dob             String?         @db.VarChar(50)
+  email           String?         @unique @db.VarChar(255)
+  mobile          String?         @unique @db.VarChar(20)
+  username        String?         @unique @db.VarChar(100)
   password        String?
-  date_of_joining String? @db.VarChar(100)
-  employee_id     String? @db.VarChar(100)
-  designation     String? @db.VarChar(100)
-
-  status        String?         @db.VarChar(100)
-  department    String?         @db.VarChar(100)
-  user_type     String?         @db.VarChar(100)
-  role          String?         @db.VarChar(100)
-  reporting_to  String?         @db.VarChar(100)
-  created_by    String?         @db.VarChar(50)
-  created_at    DateTime?       @default(now())
-  updated_at    DateTime?       @updatedAt
-  modulesTouser modulesTouser[]
+  date_of_joining String?         @db.VarChar(100)
+  employee_id     String?         @db.VarChar(100)
+  designation     String?         @db.VarChar(100)
+  status          String?         @db.VarChar(100)
+  department      String?         @db.VarChar(100)
+  user_type       String?         @db.VarChar(100)
+  role            String?         @db.VarChar(100)
+  reporting_to    String?         @db.VarChar(100)
+  created_at      DateTime?       @default(now())
+  updated_at      DateTime?       @updatedAt
+  created_by      String?         @db.VarChar(50)
+  modulesTouser   modulesTouser[]
 }
 
 model modules {
@@ -69,63 +68,60 @@ model job_post {
 }
 
 model candidate_list {
-  candidate_id         Int      @id @default(autoincrement())
-  title                String?  @db.VarChar(50)
-  first_name           String?  @db.VarChar(50)
-  middle_name          String?  @db.VarChar(50)
-  last_name            String?  @db.VarChar(50)
-  address_line1        String?  @db.VarChar(255)
-  address_line2        String?  @db.VarChar(255)
-  city                 String?  @db.VarChar(100)
-  state                String?  @db.VarChar(100)
-  pin_code             String?  @db.VarChar(20)
-  country              String?  @db.VarChar(100)
-  contact_number       String   @unique @db.VarChar(20)
-  alt_contact_number   String?  @db.VarChar(20)
-  email_address        String   @unique @db.VarChar(100)
-  alt_email_address    String?  @db.VarChar(100)
-  date_of_birth        String?  @db.VarChar(50)
-  job_title            String?  @db.VarChar(100)
-  department           String?  @db.VarChar(50)
-  work_experience      String?  @db.VarChar(50)
-  hobbies              String?  @db.VarChar(255)
-  interests            String?  @db.VarChar(255)
-  skills               String?  @db.VarChar(255)
-  recruiter_comments   String?  @db.VarChar(255)
-  communication_skills String?  @db.VarChar(255)
-  other1               String?  @db.VarChar(255)
-  other2               String?  @db.VarChar(255)
-  other3               String?  @db.VarChar(255)
-  status               String?  @db.VarChar(100)
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
-
-  workExperiences work_experience[] @relation("CandidateWorkExperience")
-  qualifications  qualifications[]  @relation("CandidateQualifications")
+  department           String?           @db.VarChar(50)
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @updatedAt
+  address_line1        String?           @db.VarChar(255)
+  address_line2        String?           @db.VarChar(255)
+  alt_contact_number   String?           @db.VarChar(20)
+  alt_email_address    String?           @db.VarChar(100)
+  candidate_id         Int               @id @default(autoincrement())
+  city                 String?           @db.VarChar(100)
+  communication_skills String?           @db.VarChar(255)
+  contact_number       String            @unique @db.VarChar(20)
+  country              String?           @db.VarChar(100)
+  date_of_birth        String?           @db.VarChar(50)
+  email_address        String            @unique @db.VarChar(100)
+  first_name           String?           @db.VarChar(50)
+  hobbies              String?           @db.VarChar(255)
+  interests            String?           @db.VarChar(255)
+  job_title            String?           @db.VarChar(100)
+  last_name            String?           @db.VarChar(50)
+  middle_name          String?           @db.VarChar(50)
+  other1               String?           @db.VarChar(255)
+  other2               String?           @db.VarChar(255)
+  other3               String?           @db.VarChar(255)
+  pin_code             String?           @db.VarChar(20)
+  recruiter_comments   String?           @db.VarChar(255)
+  skills               String?           @db.VarChar(255)
+  state                String?           @db.VarChar(100)
+  status               String?           @db.VarChar(100)
+  title                String?           @db.VarChar(50)
+  work_experience      String?           @db.VarChar(50)
+  qualifications       qualifications[]  @relation("CandidateQualifications")
+  workExperiences      work_experience[] @relation("CandidateWorkExperience")
 }
 
 model work_experience {
-  exp_id            Int      @id @default(autoincrement())
+  exp_id            Int            @id @default(autoincrement())
   candidate_id      Int
-  organisation_name String   @db.VarChar(255)
-  total_tenure      String?  @db.VarChar(50)
-  last_designation  String?  @db.VarChar(100)
-  last_drawn_salary String?  @db.VarChar(50)
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
-
-  candidate candidate_list @relation("CandidateWorkExperience", fields: [candidate_id], references: [candidate_id])
+  organisation_name String         @db.VarChar(255)
+  total_tenure      String?        @db.VarChar(50)
+  last_designation  String?        @db.VarChar(100)
+  last_drawn_salary String?        @db.VarChar(50)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  candidate         candidate_list @relation("CandidateWorkExperience", fields: [candidate_id], references: [candidate_id])
 }
 
 model qualifications {
-  qualifications_id  Int       @id @default(autoincrement())
+  qualifications_id  Int            @id @default(autoincrement())
   candidate_id       Int
-  course             String    @db.VarChar(100)
-  college_university String    @db.VarChar(255)
+  course             String         @db.VarChar(100)
+  college_university String         @db.VarChar(255)
   year_of_passing    Int
-  percentage_cgpa    String?   @db.VarChar(20)
-  created_at         DateTime  @default(now())
+  percentage_cgpa    String?        @db.VarChar(20)
+  created_at         DateTime       @default(now())
   updated_at         DateTime?
-
-  candidate candidate_list @relation("CandidateQualifications", fields: [candidate_id], references: [candidate_id])
+  candidate          candidate_list @relation("CandidateQualifications", fields: [candidate_id], references: [candidate_id])
 }

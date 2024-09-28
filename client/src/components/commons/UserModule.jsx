@@ -7,16 +7,15 @@ function UserModule(props) {
     const dispatch = useDispatch()
     const [selectionCrud, setSelectionCrud] = useState({
         moduleName: props.name || '',
-        moduleSelected: props.module_status,
+        moduleSelected: props.checked,
         c: props.create || false,
         r: props.read || false,
         u: props.update || false,
         d: props.delete || false
     });
 
-    // console.console.log(`${props.name} ${props.module_status}`)
+     console.log(`${props.name} ${props.checked}`)
     
-
     useEffect(() => {
         dispatch(updateModules(selectionCrud));
         console.log("called")

@@ -11,6 +11,7 @@ import useUpdateUser from "../../../helpers/useUpadateUser";
 const NewUser = () => {
     const { userid } = useParams();
     const userAssignedModule = useSelector((state) => state.userModules);
+   
     const dispatch = useDispatch();
     const [fetchedUser, setFetchedUser] = useState(null); // Initial state set to null to check if data is loaded
     const [passwordConfirm, setPasswordConfirm] = useState(true);
@@ -42,6 +43,7 @@ const NewUser = () => {
             .then((response) => {
                 const data = response.data.user_data;
                 const modulesData = response.data.modules_data;
+           
                 // console.log(modulesData)
 
                 // Update the user state with fetched data
@@ -101,9 +103,7 @@ const NewUser = () => {
     };
 
     const { updateUser } = useUpdateUser();
-    const updateTheUser = () => {
-
-    }
+ 
 
     return (
         <section className="p-4 component-rendering-transition">
@@ -347,53 +347,12 @@ const NewUser = () => {
                 </div>
 
                 <div className="grid gap-4 grid-cols-1 2xl:grid-cols-2 border-t-2 mt-10">
-                    {/* {
-                        allModules.map((currentModule, moduleKey) => {
-                            return(
-                                user.modules.map((value, index) => {
-                                    if(value.modules.module_name == currentModule.moduleName){
-                                        return (
-                                            <UserModule
-                                                key={moduleKey}
-                                                checked={true}
-                                                create={value.c}
-                                                read={value.r}
-                                                update={value.u}
-                                                delete={value.d}
-                                                id={`module-${currentModule.moduleName}`}
-                                                name={currentModule.moduleName}
-                                                assigned={userAssignedModule.includes(currentModule.moduleName)} // Example to mark assigned modules
-                                            />
-                                        )
-                                    }
-    
-                                    else{
-                                        return (
-                                            <UserModule
-                                                key={moduleKey}
-                                                checked={false}
-                                                c={currentModule.c}
-                                                r={currentModule.r}
-                                                u={currentModule.u}
-                                                d={currentModule.d}
-                                                id={`module-${currentModule.moduleName}`}
-                                                name={currentModule.moduleName}
-                                                assigned={userAssignedModule.includes(currentModule.moduleName)} // Example to mark assigned modules
-                                            />
-                                        )
-                                    }
-                                    // console.log(value.modules.module_name)
-                                })
-                            )
-                        })
-                    } */}
-
-
                     {
                         user.modules.map((currentModule, moduleKey) => {
-                            // console.log(currentModule)
-                            // console.log(`${currentModule.module_name} ${currentModule.module_status}`);
+                    
                             let module_status = currentModule.module_status
+                            console.log(currentModule.module_status)
+                        
                             return(
                                 <UserModule
                                     editable={!isEditing}
@@ -406,7 +365,7 @@ const NewUser = () => {
                                     id={`module-${currentModule.module_name}`}
                                     name={currentModule.module_name}
                                     module={currentModule.module_status}
-                                    // assigned={userAssignedModule.includes(currentModule.moduleName)} // Example to mark assigned modules
+                                 
                                 />
                             )
                         })
