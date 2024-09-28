@@ -45,10 +45,10 @@ model modules {
 model modulesTouser {
   module_id Int
   user_id   Int
-  c         Int     @default(0)
-  d         Int     @default(0)
-  r         Int     @default(0)
-  u         Int     @default(0)
+  c         Boolean @default(false)
+  d         Boolean @default(false)
+  r         Boolean @default(false)
+  u         Boolean @default(false)
   modules   modules @relation(fields: [module_id], references: [id], onDelete: Cascade)
   user      user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 

@@ -7,7 +7,7 @@ const useLogout = () => {
     const Navigate = useNavigate();
     const Dispatch = useDispatch();
     const user = JSON.parse(localStorage.getItem("user"));
-    const userStatus = useSelector((state) => state.user_auth.logged_in)
+    const userStatus = useSelector((state) => state.user_auth.loggedIn)
 
     const logout = () => {
         axios.get("/logout").then((response) => {

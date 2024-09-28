@@ -8,12 +8,12 @@ import { useSelector } from "react-redux";
 
 const Login = () => {
     const [seePassword, setSeePassword] = useState(false);
-    const [credentials, setCredentials] = useState({email: '', password: ''});
+    const [credentials, setCredentials] = useState({username: '', password: ''});
     const { login, isUserLoggedin } = useLogin();
     const userLoggedIn = useSelector((state) => state.user_auth);
     return(
-        <section className="h-screen w-screen flex justify-center items-center bg-gray-50">
-            <form className="relative min-h-96 min-w-96 bg-white border p-16"
+        <section className="flex items-center justify-center w-screen h-screen bg-gray-50">
+            <form className="relative p-16 bg-white border min-h-96 min-w-96"
                 onSubmit={(e) => {
                     e.preventDefault();
                     login(credentials.username, credentials.password);
@@ -24,19 +24,19 @@ const Login = () => {
 
                 <div className="grid gap-4">
                     <div>
-                        <label htmlFor="email">Email</label>
-                        <input id="email" required type="text" 
+                        <label htmlFor="username">Username</label>
+                        <input id="username" required type="text" 
                             onChange={(e) => setCredentials((credentials) => ({...credentials, username: e.target.value}))} 
-                            className="primary-input border focus:border-purple-600 mt-2" placeholder="Enter Your Email" 
+                            className="mt-2 border primary-input focus:border-purple-600" placeholder="Enter Your Username" 
                         />
                     </div>
                     <div className="relative">
                         <label htmlFor="password">Password</label>
                         <input id="password" required type={seePassword ? 'text' : 'password'}
                             onChange={(e) => setCredentials((credentials) => ({...credentials, password: e.target.value}))}
-                            className="primary-input border focus:border-purple-600 mt-2" placeholder="Enter Your Password" 
+                            className="mt-2 border primary-input focus:border-purple-600" placeholder="Enter Your Password" 
                         />
-                        <span onClick={() => setSeePassword(!seePassword)} className="inline-block absolute right-5 top-12 cursor-pointer">
+                        <span onClick={() => setSeePassword(!seePassword)} className="absolute inline-block cursor-pointer right-5 top-12"> 
                             {
                                 seePassword
                                 ? <GoEye size={'18px'} /> 
@@ -53,9 +53,9 @@ const Login = () => {
                 
                 
                 <div className={`w-full flex justify-center absolute -bottom-5 left-0 ${isUserLoggedin == false ? 'alert-animation' : 'opacity-0'}`}>
-                    <div className="min-w-4/5 bg-white flex items-center gap-2 rounded-full border p-2 shadow-lg shadow-gray-200">
+                    <div className="flex items-center gap-2 p-2 bg-white border rounded-full shadow-lg min-w-4/5 shadow-gray-200">
                         <MdOutlineError size={'18px'} color="#352A7A" />
-                        <span className="text-red-500 text-sm pr-2">Invalid Details. Please check the Email ID - Password</span>
+                        <span className="pr-2 text-sm text-red-500">Invalid <strong>Username</strong> or <strong>Password</strong></span>
                     </div>
                 </div>
             </form>

@@ -41,7 +41,7 @@ const add_to_user = async (req) => {
         date_of_joining,
         employee_id,
         designation,
-       
+
         status,
         department,
         user_type,
@@ -91,7 +91,7 @@ const add_to_user = async (req) => {
             date_of_joining: date_of_joining,
             employee_id: employee_id,
             designation: designation,
-            
+
             status: status,
             department: department,
             user_type: user_type,
@@ -182,8 +182,8 @@ const register = async (req, res) => {
         }
 
         // Send success response
-        return res.status(200).json({ 
-            message: 'User registered and modules assigned successfully.' 
+        return res.status(200).json({
+            message: 'User registered and modules assigned successfully.'
         });
 
     } catch (error) {
@@ -199,7 +199,7 @@ const login = async (req, res) => {
         const { username, password } = req.body;
 
         const user = await prisma.user.findUnique({
-            where: { username:username }
+            where: { username: username }
         });
 
         if (!user) {
@@ -224,7 +224,7 @@ const login = async (req, res) => {
 
         res.status(200).send({
             success: true,
-            user:user,
+            user: user,
             message: "User logged in successfully."
         });
     } catch (error) {
@@ -247,119 +247,120 @@ const logout = (req, res) => {
 
 const send_all_user_data = async (req, res) => {
     try {
-      const usersWithModules = await prisma.user.findMany({
-        select: {
-          title: true,
-          first_name: true,
-          middle_name: true,
-          last_name: true,
-          gender: true,
-          dob: true,
-          email: true,
-          mobile: true,
-          username: true,
-          date_of_joining: true,
-          employee_id: true,
-          designation: true,
-          teams: true,
-          status: true,
-          department: true,
-          user_type: true,
-          role: true,
-          reporting_to: true,
-          modulesTouser: {
+        const usersWithModules = await prisma.user.findMany({
             select: {
-              modules: {
-                select: {
-                  module_name: true, // Selecting the 'module_name' from the module table
-                }
-              }
-            }
-          }
-        },
-      });
-      
-  
-      // Send response with user data and module names
-      res.status(200).send({
-        success: true,
-        message: "All user data retrieved.",
-        data: usersWithModules,
-      });
-    } catch (error) {
-      console.error("Error fetching user data:", error); // Log the error for debugging
-      res.status(500).send({
-        success: false,
-        message: "Error fetching user data",
-      });
-    }
-  };
+                id: true,
+                title: true,
+                first_name: true,
+                middle_name: true,
+                last_name: true,
+                gender: true,
+                dob: true,
+                email: true,
+                mobile: true,
+                username: true,
+                date_of_joining: true,
+                employee_id: true,
+                designation: true,
 
-  const id_based_data = async(req,res)=>{
-   try {
-     const user_id = req.params.id;
-     const user = await prisma.user.findUnique({
-         where: {
-           id: Number(user_id), // Use the specific user ID here
-         },
-         select: {
-           id: true, // Include the user ID
-           title: true,
-           first_name: true,
-           middle_name: true,
-           last_name: true,
-           gender: true,
-           dob: true,
-           email: true,
-           mobile: true,
-           username: true,
-           date_of_joining: true,
-           employee_id: true,
-           designation: true,
-           teams: true,
-           status: true,
-           department: true,
-           user_type: true,
-           role: true,
-           reporting_to: true,
-           created_by:true
-           
-         }
-       });
- 
-       
-         const modules_data = await prisma.modulesTouser.findMany({
-             where: {
-               user_id: Number(user_id), // Assuming user_id is the variable containing the user's ID
-             },
-             select: {
-               module_id: true,
-               user_id: true,
-               c: true,
-               d: true,
-               r: true,
-               u: true,
-               modules: { // Selecting the related 'modules' data
-                 select: {
-                   module_name: true, // Selecting 'module_name' from the 'modules' table
-                 }
-               }
-             }
-           });
-           res.status(200).send({
-                success:true,
-                message:"data fetched successfully",
-                user_data:user,
-                modules_data:modules_data
-            })
-   } catch (error) {
-    console.log(error)
-    res.status(500).send({
-        message: "Error fetching user data",
-    })
-    
-   }
-          
+                status: true,
+                department: true,
+                user_type: true,
+                role: true,
+                reporting_to: true,
+                modulesTouser: {
+                    select: {
+                        modules: {
+                            select: {
+                                module_name: true, // Selecting the 'module_name' from the module table
+                            }
+                        }
+                    }
+                }
+            },
+        });
+
+
+        // Send response with user data and module names
+        res.status(200).send({
+            success: true,
+            message: "All user data retrieved.",
+            data: usersWithModules,
+        });
+    } catch (error) {
+        console.error("Error fetching user data:", error); // Log the error for debugging
+        res.status(500).send({
+            success: false,
+            message: "Error fetching user data",
+        });
+    }
+};
+
+const id_based_data = async (req, res) => {
+    try {
+        const user_id = req.params.id;
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(user_id), // Use the specific user ID here
+            },
+            select: {
+                id: true, // Include the user ID
+                title: true,
+                first_name: true,
+                middle_name: true,
+                last_name: true,
+                gender: true,
+                dob: true,
+                email: true,
+                mobile: true,
+                username: true,
+                date_of_joining: true,
+                employee_id: true,
+                designation: true,
+
+                status: true,
+                department: true,
+                user_type: true,
+                role: true,
+                reporting_to: true,
+                created_by: true
+
+            }
+        });
+
+
+        const modules_data = await prisma.modulesTouser.findMany({
+            where: {
+                user_id: Number(user_id), // Assuming user_id is the variable containing the user's ID
+            },
+            select: {
+                module_id: true,
+                user_id: true,
+                c: true,
+                d: true,
+                r: true,
+                u: true,
+                modules: { // Selecting the related 'modules' data
+                    select: {
+                        module_name: true, // Selecting 'module_name' from the 'modules' table
+                    }
+                }
+            }
+        });
+        res.status(200).send({
+            success: true,
+            message: "data fetched successfully",
+            user_data: user,
+            modules_data: modules_data
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({
+            message: "Error fetching user data",
+        })
+
+    }
+
 }
 
 const update_user = async (req) => {
@@ -377,7 +378,7 @@ const update_user = async (req) => {
         date_of_joining,
         employee_id,
         designation,
-        teams,
+
         status,
         department,
         user_type,
@@ -419,7 +420,7 @@ const update_user = async (req) => {
             date_of_joining,
             employee_id,
             designation,
-            teams,
+
             status,
             department,
             user_type,
@@ -479,24 +480,24 @@ const update_user_data = async (req, res) => {
     }
 };
 
-const delete_user = async(req,res)=>{
+const delete_user = async (req, res) => {
     try {
-        const id =req.params.id
+        const id = req.params.id
         await prisma.user.delete({
-            where:{
-                id:Number(id)
+            where: {
+                id: Number(id)
             }
         })
         res.status(200).send({
-            success:true,
-            message:"User deleted successfully"
+            success: true,
+            message: "User deleted successfully"
         })
     } catch (error) {
         res.status(500).send({
-            success:false,
+            success: false,
             message: "Some error occurred while deleting the User.",
         })
     }
 }
-  
-export { register, login, authenticateToken, logout,send_all_user_data ,id_based_data ,update_user_data, delete_user};
+
+export { register, login, authenticateToken, logout, send_all_user_data, id_based_data, update_user_data, delete_user };

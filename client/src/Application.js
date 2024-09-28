@@ -1,10 +1,12 @@
 import AllJobs from "./components/pages/AllJobs/AllJobs";
+import AllUsers from "./components/pages/AllUsers/AllUsers";
 import JobOpening from "./components/pages/JobOpening/JobOpening";
 import Login from "./components/pages/Login/Login";
 import NewCandidate from "./components/pages/NewCandidate/NewCandidate";
 import NewUser from "./components/pages/NewUser/NewUser";
 import PageNotFound from "./components/pages/PageNotFound";
 import PostNewJob from "./components/pages/PostNewJob/PostNewJob";
+import UserView from "./components/pages/userView/UserView";
 import Layout from "./components/requires/Layout";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom")
@@ -20,6 +22,8 @@ const Application = () => {
                         <Route path="/all-job-posts" element={<AllJobs />} />
                         <Route path="/all-job-posts/job/01" element={<JobOpening />} />
                         <Route path="/add-new-user" element={<NewUser />} />
+                        <Route path="/all-users" element={<AllUsers />} />
+                        <Route path="/user/:userid" element={<UserView />} />
                         <Route path="/add-new-candidate" element={<NewCandidate />} />
                         <Route path="*" element={<PageNotFound />} />
                     </Route>
