@@ -249,6 +249,7 @@ const send_all_user_data = async (req, res) => {
     try {
       const usersWithModules = await prisma.user.findMany({
         select: {
+          id:true,
           title: true,
           first_name: true,
           middle_name: true,
@@ -295,72 +296,112 @@ const send_all_user_data = async (req, res) => {
     }
   };
 
-  const id_based_data = async(req,res)=>{
-   try {
-     const user_id = req.params.id;
-     const user = await prisma.user.findUnique({
-         where: {
-           id: Number(user_id), // Use the specific user ID here
-         },
-         select: {
-           id: true, // Include the user ID
-           title: true,
-           first_name: true,
-           middle_name: true,
-           last_name: true,
-           gender: true,
-           dob: true,
-           email: true,
-           mobile: true,
-           username: true,
-           date_of_joining: true,
-           employee_id: true,
-           designation: true,
-          
-           status: true,
-           department: true,
-           user_type: true,
-           role: true,
-           reporting_to: true,
-           created_by:true
-           
-         }
-       });
- 
-       
-         const modules_data = await prisma.modulesTouser.findMany({
-             where: {
-               user_id: Number(user_id), // Assuming user_id is the variable containing the user's ID
-             },
-             select: {
-               module_id: true,
-               user_id: true,
-               c: true,
-               d: true,
-               r: true,
-               u: true,
-               modules: { // Selecting the related 'modules' data
-                 select: {
-                   module_name: true, // Selecting 'module_name' from the 'modules' table
-                 }
-               }
-             }
-           });
-           res.status(200).send({
-                success:true,
-                message:"data fetched successfully",
-                user_data:user,
-                modules_data:modules_data
-            })
-   } catch (error) {
-    console.log(error)
-    res.status(500).send({
+  const id_based_data = async (req, res) => {
+    try {
+      const user_id = req.params.id;
+  
+      // Fetch user data
+      const user = await prisma.user.findUnique({
+        where: {
+          id: Number(user_id),
+        },
+        select: {
+          id: true,
+          title: true,
+          first_name: true,
+          middle_name: true,
+          last_name: true,
+          gender: true,
+          dob: true,
+          email: true,
+          mobile: true,
+          username: true,
+          date_of_joining: true,
+          employee_id: true,
+          designation: true,
+          status: true,
+          department: true,
+          user_type: true,
+          role: true,
+          reporting_to: true,
+          created_by: true,
+        },
+      });
+  
+      // Fetch all modules
+      const allModules = await prisma.modules.findMany({
+        select: {
+          id: true,
+          module_name: true,
+        },
+      });
+  
+      // Fetch user-specific modules data
+      const userModules = await prisma.modulesTouser.findMany({
+        where: {
+          user_id: Number(user_id),
+        },
+        select: {
+          module_id: true,
+          c: true,
+          d: true,
+          r: true,
+          u: true,
+          modules: {
+            select: {
+              module_name: true,
+            },
+          },
+        },
+      });
+  
+      // Map user-specific modules data for quick lookup
+      const userModulesMap = userModules.reduce((map, mod) => {
+        map[mod.module_id] = mod;
+        return map;
+      }, {});
+  
+      // Merge allModules with user-specific data and add module_status
+      const modules_data = allModules.map((mod) => {
+        if (userModulesMap[mod.id]) {
+          // If user has this module, include user's specific data and set module_status to true
+          return {
+            module_id: mod.id,
+            module_name: mod.module_name,
+            c: userModulesMap[mod.id].c,
+            d: userModulesMap[mod.id].d,
+            r: userModulesMap[mod.id].r,
+            u: userModulesMap[mod.id].u,
+            module_status: true, // user has this module
+          };
+        } else {
+          // If user doesn't have this module, return default false values and set module_status to false
+          return {
+            module_id: mod.id,
+            module_name: mod.module_name,
+            c: false,
+            d: false,
+            r: false,
+            u: false,
+            module_status: false, // user doesn't have this module
+          };
+        }
+      });
+  
+      res.status(200).send({
+        success: true,
+        message: "Data fetched successfully",
+        user_data: user,
+        modules_data: modules_data,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
         message: "Error fetching user data",
-    })
-    
-   }
-          
-}
+      });
+    }
+  };
+  
 
 const update_user = async (req) => {
     const {
