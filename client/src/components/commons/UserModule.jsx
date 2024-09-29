@@ -6,7 +6,7 @@ function UserModule(props) {
     const [crudVisibility, setCrudVisibility] = useState(false);
     const dispatch = useDispatch()
     const [selectionCrud, setSelectionCrud] = useState({
-        moduleName: props.name || '',
+        module_name: props.name || '',
         moduleSelected: props.checked,
         c: props.create || false,
         r: props.read || false,
@@ -38,6 +38,7 @@ function UserModule(props) {
                 <div className="p-4 inline-flex items-center gap-4">
                     <label htmlFor={`${props.id}-c`}>Create</label> 
                     <input id={`${props.id}-c`} type="checkbox" 
+                        checked={selectionCrud.c} 
                         onChange={() => {
                             // hanldeState()
                             setSelectionCrud((cruds) => ({...cruds, c: !selectionCrud.c}))
@@ -49,6 +50,7 @@ function UserModule(props) {
                 <div className="p-4 inline-flex items-center gap-4">
                     <label htmlFor={`${props.id}-r`}>Read</label> 
                     <input id={`${props.id}-r`} type="checkbox"
+                        checked={selectionCrud.r}
                         onChange={() => {
                             // hanldeState()
                             setSelectionCrud((cruds) => ({...cruds, r: !selectionCrud.r}))
@@ -60,6 +62,7 @@ function UserModule(props) {
                 <div className="p-4 inline-flex items-center gap-4">
                     <label htmlFor={`${props.id}-u`}>Update</label> 
                     <input id={`${props.id}-u`} type="checkbox" 
+                        checked={selectionCrud.u}
                         onChange={() => {
                             // hanldeState()
                             setSelectionCrud((cruds) => ({...cruds, u: !selectionCrud.u}))
@@ -70,7 +73,8 @@ function UserModule(props) {
                 
                 <div className="p-4 inline-flex items-center gap-4">
                     <label htmlFor={`${props.id}-d`}>Delete</label> 
-                    <input id={`${props.id}-d`} type="checkbox" 
+                    <input id={`${props.id}-d`} type="checkbox"
+                        checked={selectionCrud.d} 
                         onChange={() => {
                             // hanldeState()
                             setSelectionCrud((cruds) => ({...cruds, d: !selectionCrud.d}))

@@ -351,17 +351,17 @@ const NewUser = () => {
                         user.modules.map((currentModule, moduleKey) => {
                     
                             let module_status = currentModule.module_status
-                            console.log(currentModule.module_status)
+                            // console.log(`module_name: ${currentModule.module_name}, module crud: c - ${currentModule.c}, r - ${currentModule.r}, u - ${currentModule.u}, d - ${currentModule.d}, `)
                         
                             return(
                                 <UserModule
                                     editable={!isEditing}
                                     key={moduleKey}
-                                    checked={currentModule.module_status}
-                                    create={currentModule.c}
-                                    read={currentModule.r}
-                                    update={currentModule.u}
-                                    delete={currentModule.d}
+                                    checked={currentModule.module_status == true ? true : false}
+                                    create={currentModule.c == true ? true : false}
+                                    read={currentModule.r == true ? true : false}
+                                    update={currentModule.u == true ? true : false}
+                                    delete={currentModule.d == true ? true : false}
                                     id={`module-${currentModule.module_name}`}
                                     name={currentModule.module_name}
                                     module={currentModule.module_status}

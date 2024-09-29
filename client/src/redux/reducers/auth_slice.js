@@ -37,18 +37,18 @@ const authSlice = createSlice({
 
         // Assign Modules
         updateModules: (state, action) => {
-            // const { moduleName, moduleSelected } = action.payload;
+            const { module_name, moduleSelected } = action.payload;
 
             const updatedModules = [];
             state.userModules.map((module, moduleKey) => {
                 updatedModules.push(module);
-                if(module.moduleName === action.payload.moduleName){
+                if(module.module_name === action.payload.module_name){
                     updatedModules[moduleKey] = action.payload;
                 }
             })
             state.userModules = updatedModules;
             // console.log(action.payload)
-            console.log(updatedModules)
+            // console.log('hello: ', updatedModules)
         },
 
 
