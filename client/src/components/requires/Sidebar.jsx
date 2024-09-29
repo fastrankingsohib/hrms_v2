@@ -21,6 +21,7 @@ const Sidebar = () => {
     const { logout } = useLogout();
     const [dropdowns, setDropdowns] = useState({
         user: false,
+        candidate: false,
         jobs: false,
     })
     return(
@@ -47,11 +48,23 @@ const Sidebar = () => {
                 <div>
                     <div className="p-3 font-bold cursor-pointer"
                         onClick={() => {
+                            setDropdowns((values) => ({...values, candidate: !dropdowns.candidate}));
+                        }}
+                    >Candidate Management</div>
+                    <div style={{display: dropdowns.candidate ? 'block' : 'none'}}>
+                    <NavLink to={'/add-new-candidate'} className={({isActive}) => `${isActive ? 'side-bar-active' : 'side-bar-default'}`}><FaUserPlus size={'14px'} className="w-10" /> Add New candidate</NavLink>
+                    <NavLink to={'/my-candidates'} className={({isActive}) => `${isActive ? 'side-bar-active' : 'side-bar-default'}`}><FaUserPlus size={'14px'} className="w-10" /> My Candidates</NavLink>
+                    <NavLink to={'/all-candidates'} className={({isActive}) => `${isActive ? 'side-bar-active' : 'side-bar-default'}`}><FaUserPlus size={'14px'} className="w-10" /> All Candidate</NavLink>
+                    </div>
+                </div>
+
+                <div>
+                    <div className="p-3 font-bold cursor-pointer"
+                        onClick={() => {
                             setDropdowns((values) => ({...values, jobs: !dropdowns.jobs}));
                         }}
-                    >Others</div>
+                    >Jobs</div>
                     <div style={{display: dropdowns.jobs ? 'block' : 'none'}}>
-                    <NavLink to={'/add-new-candidate'} className={({isActive}) => `${isActive ? 'side-bar-active' : 'side-bar-default'}`}><FaUserPlus size={'14px'} className="w-10" /> Add New candidate</NavLink>
                         <NavLink to={'/post-new-job'} className={({isActive}) => `${isActive ? 'side-bar-active' : 'side-bar-default'}`}><IoCreate size={'18px'} className="w-10" /> Post New Job</NavLink>
                     </div>
                 </div>
