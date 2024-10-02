@@ -3,9 +3,11 @@ import Qualifications from "../../commons/Qualifications";
 import { useSelector } from "react-redux";
 import useNewCandidate from "../../../helpers/useNewCandidate";
 import { FaTimes } from "react-icons/fa";
+import { MdDone } from "react-icons/md";
+import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 
 const NewCandidate = () => {
-    const { registerCandidate, loading, success } = useNewCandidate()
+    const { registerCandidate, loading, success, error } = useNewCandidate()
 
     // Canidate Handlings
     const [candidate, setCandidate] = useState({
@@ -232,9 +234,102 @@ const NewCandidate = () => {
 
 
 
+
+    // Email Validation
+    const [errors, setErrors] = useState({
+        emailError: '',
+        altEmailError: ''
+    });
+
+    // Email validation function (disallow special characters outside valid email format)
+    const validateEmail = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+    };
+
+    // Handle changes and validation for primary email
+    const handleEmailChange = (e) => {
+        const email = e.target.value;
+        setCandidate((values) => ({ ...values, email_address: email }));
+
+        if (!validateEmail(email)) {
+            setErrors((prevErrors) => ({ ...prevErrors, emailError: 'Invalid email or contains special characters.' }));
+        } else {
+            setErrors((prevErrors) => ({ ...prevErrors, emailError: '' }));
+        }
+    };
+
+    // Handle changes and validation for alternate email
+    const handleAltEmailChange = (e) => {
+        const altEmail = e.target.value;
+        setCandidate((values) => ({ ...values, alt_email_address: altEmail }));
+
+        if (!validateEmail(altEmail)) {
+            setErrors((prevErrors) => ({ ...prevErrors, altEmailError: 'Invalid alternate email or contains special characters.' }));
+        } else {
+            setErrors((prevErrors) => ({ ...prevErrors, altEmailError: '' }));
+        }
+    };
+
+
+
+
+
+    // Phone Number
+    const [validationErrors, setValidationErrors] = useState({
+        contact_number: '',
+        alt_contact_number: '',
+    });
+
+    const validatePhoneNumber = (number) => {
+        // Regular expression for validating a phone number
+        const regex = /^[0-9]{10,10}$/;
+        return regex.test(number);
+    };
+
+    const handleContactChange = (e) => {
+        const value = e.target.value;
+        setCandidate((values) => ({ ...values, contact_number: value }));
+
+        // Validate phone number
+        if (!validatePhoneNumber(value)) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                contact_number: 'Contact number must be at least 10 digits and contain only numbers.',
+            }));
+        } else {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                contact_number: '',
+            }));
+        }
+    };
+
+    const handleAltContactChange = (e) => {
+        const value = e.target.value;
+        setCandidate((values) => ({ ...values, alt_contact_number: value }));
+
+        // Validate alternate contact number
+        if (!validatePhoneNumber(value)) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                alt_contact_number: 'Alternate contact number must be at least 10 digits and contain only numbers.',
+            }));
+        } else {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                alt_contact_number: '',
+            }));
+        }
+    };
+
+
+
     return (
         <section className="p-4 component-rendering-tranistion">
             <h1 className="text-2xl font-semibold">Create New Candidate</h1>
+            <span className={`inline-flex items-center gap-2 fixed top-28 p-3 min-w-60 bg-green-600 text-white transition-small ${success ? 'right-12' : '-right-[100%]'}`}><IoIosCheckmarkCircleOutline size={'18px'} />User Created Successfully</span>
+            <span className={`inline-flex items-center gap-2 fixed top-28 p-3 min-w-60 bg-red-600 text-white transition-small ${error ? 'right-12' : '-right-[100%]'}`}><IoIosCheckmarkCircleOutline size={'18px'} />User Creation Failed</span>
 
             <div className="w-full mt-10">
 
@@ -245,7 +340,7 @@ const NewCandidate = () => {
                     <div>
                         <label htmlFor="#" value={candidate.title} className="font-semibold inline-block p-4 pl-0">Title</label>
                         <select className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, title: e.target.value}))}  
+                            onChange={(e) => setCandidate((values) => ({ ...values, title: e.target.value }))}
                         >
                             <option value="Mr." selected disabled>-- Select Title --</option>
                             <option value="Mr.">Mr.</option>
@@ -256,104 +351,130 @@ const NewCandidate = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">First Name</label>
                         <input type="text" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, first_name: e.target.value}))}
-                        placeholder="First Name" name="" id="" />
+                            onChange={(e) => setCandidate((values) => ({ ...values, first_name: e.target.value }))}
+                            placeholder="First Name" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Middle Name</label>
-                        <input type="text" className="primary-input" 
-                            onChange={(e) => setCandidate((values) => ({...values, middle_name: e.target.value}))} 
-                        placeholder="Middle Name" name="" id="" />
+                        <input type="text" className="primary-input"
+                            onChange={(e) => setCandidate((values) => ({ ...values, middle_name: e.target.value }))}
+                            placeholder="Middle Name" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Last Name</label>
-                        <input type="text" className="primary-input" 
-                            onChange={(e) => setCandidate((values) => ({...values, last_name: e.target.value}))} 
-                        placeholder="Last Name" name="" id="" />
+                        <input type="text" className="primary-input"
+                            onChange={(e) => setCandidate((values) => ({ ...values, last_name: e.target.value }))}
+                            placeholder="Last Name" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Address Line 1</label>
                         <input type="text" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, address_line1: e.target.value}))} 
-                        placeholder="Address Line1" name="" id="" />
+                            onChange={(e) => setCandidate((values) => ({ ...values, address_line1: e.target.value }))}
+                            placeholder="Address Line1" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Address Line 2</label>
                         <input type="text" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, address_line2: e.target.value}))} 
-                        placeholder="Address Line 2" name="" id="" />
+                            onChange={(e) => setCandidate((values) => ({ ...values, address_line2: e.target.value }))}
+                            placeholder="Address Line 2" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">City</label>
                         <input type="text" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, city: e.target.value}))}
-                        placeholder="Address Line 2" name="" id="" />
+                            onChange={(e) => setCandidate((values) => ({ ...values, city: e.target.value }))}
+                            placeholder="Address Line 2" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">State</label>
                         <input type="text" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, state: e.target.value}))} 
-                        placeholder="State" name="" id="" />
+                            onChange={(e) => setCandidate((values) => ({ ...values, state: e.target.value }))}
+                            placeholder="State" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Pin Code</label>
-                        <input type="text" className="primary-input" placeholder="Pin Code" name="" id="" />
+                        <input type="number" className="primary-input" placeholder="Pin Code" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Country</label>
                         <input type="text" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, country: e.target.value}))}
-                        placeholder="Country" name="" id="" />
+                            onChange={(e) => setCandidate((values) => ({ ...values, country: e.target.value }))}
+                            placeholder="Country" name="" id="" />
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Contact Number</label>
-                        <input type="tel" className="primary-input" 
-                            onChange={(e) => setCandidate((values) => ({...values, contact_number: e.target.value}))} 
-                        placeholder="Contact Number" name="" id="" />
+                        <label htmlFor="contact_number" className="font-semibold inline-block p-4 pl-0">Contact Number</label>
+                        <input
+                            type="tel"
+                            className="primary-input"
+                            onChange={handleContactChange}
+                            placeholder="Contact Number"
+                            name="contact_number"
+                            id="contact_number"
+                        />
+                        {validationErrors.contact_number && <span className="text-red-600">{validationErrors.contact_number}</span>}
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Alt. Contact Number</label>
-                        <input type="tel" className="primary-input" 
-                            onChange={(e) => setCandidate((values) => ({...values, alt_contact_number: e.target.value}))}
-                        placeholder="Alt. Contact Number" name="" id="" />
+                        <label htmlFor="alt_contact_number" className="font-semibold inline-block p-4 pl-0">Alt. Contact Number</label>
+                        <input
+                            type="tel"
+                            className="primary-input"
+                            onChange={handleAltContactChange}
+                            placeholder="Alt. Contact Number"
+                            name="alt_contact_number"
+                            id="alt_contact_number"
+                        />
+                        {validationErrors.alt_contact_number && <span className="text-red-600">{validationErrors.alt_contact_number}</span>}
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Email Address</label>
-                        <input type="email" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, email_address: e.target.value}))} 
-                        placeholder="Email Address" name="" id="" />
+                        <label htmlFor="email_address" className="font-semibold inline-block p-4 pl-0">Email Address</label>
+                        <input
+                            type="email"
+                            className="primary-input"
+                            onChange={handleEmailChange}
+                            placeholder="Email Address"
+                            name="email_address"
+                            id="email_address"
+                        />
+                        {/* Show validation error for email */}
+                        {errors.emailError && <p className="text-red-500">{errors.emailError}</p>}
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Alt. Email Address</label>
-                        <input type="email" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, alt_email_address: e.target.value}))} 
-                        placeholder="Alt. Email Address" name="" id="" />
+                        <label htmlFor="alt_email_address" className="font-semibold inline-block p-4 pl-0">Alt. Email Address</label>
+                        <input
+                            type="email"
+                            className="primary-input"
+                            onChange={handleAltEmailChange}
+                            placeholder="Alt. Email Address"
+                            name="alt_email_address"
+                            id="alt_email_address"
+                        />
+                        {/* Show validation error for alternate email */}
+                        {errors.altEmailError && <p className="text-red-500">{errors.altEmailError}</p>}
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of Birth</label>
                         <input type="date" className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, date_of_birth: e.target.value}))} 
-                        placeholder="Date of Birth" name="" id="" />
+                            onChange={(e) => setCandidate((values) => ({ ...values, date_of_birth: e.target.value }))}
+                            placeholder="Date of Birth" name="" id="" />
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Job Title</label>
 
                         <select className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({...values, job_title: e.target.value}))} 
+                            onChange={(e) => setCandidate((values) => ({ ...values, job_title: e.target.value }))}
                         >
                             <option value="" selected disabled>-- Job Title --</option>
 
@@ -686,7 +807,8 @@ const NewCandidate = () => {
 
                 <div className="flex items-center justify-end mt-10">
                     <div className="w-1/4 pl-4">
-                        <button className="primary-button justify-center"
+                        <button className={`primary-button justify-center ${loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
+                            disabled={loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError}
                             onClick={() => {
                                 // console.log(qualifications);
                                 // registerCandidate(candidate, experiences, educations, skills, hobbies)

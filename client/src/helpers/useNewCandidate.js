@@ -1,21 +1,16 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const useNewCandidate = () => {
-    const [data, setData] = useState({
-        qualifications: [],
-        experience: [],
-        hobbies: [],
-        skills: [],
-    });
-
-    
-
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const Navigate = useNavigate()
     const registerCandidate = (candidate, experiences, educations, skills, hobbies) => {
         // register candidate logic here
+        setLoading(true)
         let new_candidate =
         {
             "title": `${candidate.title}`,
@@ -49,18 +44,32 @@ const useNewCandidate = () => {
             "qualifications": educations,
         }
 
+        axios.post("/add-candidate", new_candidate)
+        .then((response) => {
+            console.log(response.data);
+            setLoading(false)
+            setSuccess(true)
+            setError(false)
 
-        
+            setTimeout(() => {
+                setSuccess(false)
+                Navigate("/my-candidates")
+            }, 3000)
+        })
+        .catch((err) => {
+            console.log(err);
+            setLoading(false)
+            setSuccess(false)
+            setError(true)
 
-        axios.post("/add-candidate", new_candidate).then((response) => console.log(response.data)).catch((err) => console.log(err))
-       console.log(new_candidate)
-    //    console.log(experiences)
-    //    console.log(educations)
-    //    console.log(skills)
-    //    console.log(hobbies)
+            setTimeout(() => {
+                setError(false)
+            }, 3000)
+        })
+        console.log(new_candidate)
     }
 
-    return { registerCandidate, loading, success }
+    return { registerCandidate, loading, success, error }
 }
 
 export default useNewCandidate
