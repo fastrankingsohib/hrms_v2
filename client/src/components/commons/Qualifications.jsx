@@ -13,6 +13,7 @@ const Qualifications = () => {
         }
     ]);
 
+    // Add new qualification field
     const addQualificationField = () => {
         setQualificationFields([
             ...qualificationFields,
@@ -25,24 +26,32 @@ const Qualifications = () => {
         ]);
     };
 
-    const handleInputChange = (index, event) => {
+    // Handle input change in the qualification field
+    const handleQualificationChange = (index, event) => {
         const { name, value } = event.target;
         const values = [...qualificationFields];
         values[index][name] = value;
         setQualificationFields(values);
 
-        // Dispatch the qualification change
-        dispatch(addQualification(values)); // Send updated qualifications to Redux store
+        // Log the updated qualification fields to the console
+        console.log("Updated Qualification Fields: ", values);
+
+        // Dispatch updated qualifications to the Redux store
+        dispatch(addQualification(values));
     };
 
+    // Remove a qualification field
     const removeQualificationField = (index) => {
         if (qualificationFields.length > 1) {
             const values = [...qualificationFields];
             values.splice(index, 1);
             setQualificationFields(values);
 
-            // Dispatch the updated qualifications
-            dispatch(addQualification(values)); // Update the Redux store after removal
+            // Log the updated qualification fields to the console after removal
+            console.log("Updated Qualification Fields after removal: ", values);
+
+            // Dispatch updated qualifications after removal to the Redux store
+            dispatch(addQualification(values));
         }
     };
 
@@ -59,7 +68,7 @@ const Qualifications = () => {
                             name="course"
                             id={`course-${index}`}
                             value={qualificationField.course}
-                            onChange={event => handleInputChange(index, event)}
+                            onChange={event => handleQualificationChange(index, event)}
                         />
                     </div>
 
@@ -72,7 +81,7 @@ const Qualifications = () => {
                             name="collegeName"
                             id={`collegeName-${index}`}
                             value={qualificationField.collegeName}
-                            onChange={event => handleInputChange(index, event)}
+                            onChange={event => handleQualificationChange(index, event)}
                         />
                     </div>
 
@@ -85,7 +94,7 @@ const Qualifications = () => {
                             name="yearOfPassing"
                             id={`yearOfPassing-${index}`}
                             value={qualificationField.yearOfPassing}
-                            onChange={event => handleInputChange(index, event)}
+                            onChange={event => handleQualificationChange(index, event)}
                         />
                     </div>
 
@@ -98,7 +107,7 @@ const Qualifications = () => {
                             name="percentageOrCgpa"
                             id={`percentageOrCgpa-${index}`}
                             value={qualificationField.percentageOrCgpa}
-                            onChange={event => handleInputChange(index, event)}
+                            onChange={event => handleQualificationChange(index, event)}
                         />
                     </div>
 

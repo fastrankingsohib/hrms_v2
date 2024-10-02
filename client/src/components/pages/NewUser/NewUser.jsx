@@ -4,48 +4,144 @@ import allModules from "./AllModules";
 import UserModule from "../../commons/UserModule";
 import { useSelector } from "react-redux";
 
+// Icons
+import { GoEyeClosed, GoEye, GoTriangleUp } from "react-icons/go";
+
 const NewUser = () => {
+    const warnDefault = useSelector((state) => state.moduleSelection.invalid.length);
+    const [mobileError, setMobileError] = useState(false);
+    const [submitError, setsubmitError] = useState(false)
     const userAssignedModule = useSelector((state) => state.userModules);
     const [passwordConfirm, setPasswordConfirm] = useState(true);
-    const [user, setUser] = useState(
-        {
-            title: '',
-            firstName: '',
-            middleName: '',
-            lastName: '',
-            gender: '',
-            dateOfJoining: '',
-            username: '',
-            password: '',
-            confirmPassword: '',
-            emailId: '',
-            status: '',
-            mobile: '',
-            dateOfBirth: '',
-            reportingTo: '',
-            employeeId: '',
-            status: '',
-            userType: '',
-            designation: '',
-            department: '',
-            role: '',
-        }
-    );
+    const [user, setUser] = useState({
+        title: '',
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        gender: '',
+        dateOfJoining: '',
+        username: '',
+        password: '',
+        confirmPassword: '',
+        emailId: '',
+        status: '',
+        mobile: '',
+        dateOfBirth: '',
+        reportingTo: '',
+        employeeId: '',
+        userType: '',
+        designation: '',
+        department: '',
+        role: '',
+    });
 
-    // const [allAccessModules, setAllAccessModules] = useState();
+    // useEffect(() => {
+    //     if(
+    //         user.title === '' ||
+    //         user.firstName === '' ||
+    //         user.middleName === '' ||
+    //         user.lastName === '' ||
+    //         user.gender === '' ||
+    //         user.dateOfJoining === '' ||
+    //         user.username === '' ||
+    //         user.emailId === '' ||
+    //         user.status === '' ||
+    //         user.mobile === '' ||
+    //         user.dateOfBirth === '' ||
+    //         user.reportingTo === '' ||
+    //         user.employeeId === '' ||
+    //         user.userType === '' ||
+    //         user.designation === '' ||
+    //         user.department === '' ||
+    //         user.role === '' ||
+    //         user.modules.length > 0
+    //     ){
+    //         setsubmitError(true)
+    //     }
+    //     else{
+    //         setsubmitError(false)
+    //     }
+    // }, [user])
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const { registerUser } = useRegisterUser();
+
     const register = (e) => {
+        e.preventDefault();
         if (user.password !== user.confirmPassword) {
             setPasswordConfirm(false);
-            console.log(`Password Does Not Match`)
+            alert("Passwords do not match!"); // Show alert if passwords do not match
+            return; // Prevent form submission
+        } else {
+            setPasswordConfirm(true);
+            console.log(`Password Matched Successfully!`);
         }
-        else {
-            setPasswordConfirm(true)
-            console.log(`Password Mathed Successfully!`)
-        }
-        e.preventDefault();
         registerUser(user);
-    }
+    };
+
+    // Email Validation
+    const [emailError, setEmailError] = useState('');
+
+    const handleEmailChange = (e) => {
+        const value = e.target.value;
+
+        // Basic email validation regex (also prevents spam)
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const invalidCharactersPattern = /[!#$%^&*()_+={}\[\]:;"'<>,?\/\\|`~]/;
+
+        // Set the email in the state
+        setUser((values) => ({ ...values, emailId: value }));
+
+        // Validate the email and set error message
+        if (value) {
+            if (invalidCharactersPattern.test(value)) {
+                setsubmitError(true)
+                setEmailError('Email should not contain special characters like !@#$%^&*()_+ etc.');
+            } else if (!emailPattern.test(value)) {
+                setsubmitError(true)
+                setEmailError('Please enter a valid email address.');
+            } else {
+                setsubmitError(false)
+                setEmailError('');
+            }
+        } else {
+            setsubmitError(false)
+            setEmailError('');
+        }
+    };
+
+    // Password Validation
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+    const validatePassword = (password, confirmPassword) => {
+        if (password.length < 6) {
+            setPasswordError("Password must be at least 6 characters.");
+        } else {
+            setPasswordError('');
+        }
+
+        if (confirmPassword && confirmPassword !== password) {
+            setConfirmPasswordError("Passwords do not match.");
+        } else {
+            setConfirmPasswordError('');
+        }
+    };
+
+    const handlePasswordChange = (e) => {
+        const newPassword = e.target.value;
+        setUser((values) => ({ ...values, password: newPassword }));
+        validatePassword(newPassword, user.confirmPassword);
+    };
+
+    const handleConfirmPasswordChange = (e) => {
+        const newConfirmPassword = e.target.value;
+        setUser((values) => ({ ...values, confirmPassword: newConfirmPassword }));
+        validatePassword(user.password, newConfirmPassword);
+    };
+
 
     return (
         <section className="p-4 component-rendering-tranistion">
@@ -54,18 +150,18 @@ const NewUser = () => {
             <form onSubmit={register} className="w-full mt-10">
                 <div className="grid grid-cols-4 gap-4">
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Title</label>
-                        <select className="primary-input"
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Title <span className="text-red-500">*</span></label>
+                        <select className="primary-input" required
                             onChange={(e) => setUser((values) => ({ ...values, title: e.target.value }))} >
-                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option disabled={true} defaultValue={true}>-- Select --</option>
                             <option value="Mr.">Mr.</option>
                             <option value="Ms.">Ms.</option>
                         </select>
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">First Name</label>
-                        <input type="text" className="primary-input" placeholder="First Name" name="" id=""
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">First Name <span className="text-red-500">*</span></label>
+                        <input type="text" className="primary-input" required placeholder="First Name" name="" id=""
                             onChange={(e) => setUser((values) => ({ ...values, firstName: e.target.value }))}
                         />
                     </div>
@@ -78,64 +174,136 @@ const NewUser = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Last Name</label>
-                        <input type="text" className="primary-input" placeholder="Last Name" name="" id=""
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Last Name <span className="text-red-500">*</span></label>
+                        <input type="text" className="primary-input" required placeholder="Last Name" name="" id=""
                             onChange={(e) => setUser((values) => ({ ...values, lastName: e.target.value }))}
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Gender</label>
-                        <select className="primary-input"
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Gender <span className="text-red-500">*</span></label>
+                        <select className="primary-input" required
                             onChange={(e) => setUser((values) => ({ ...values, gender: e.target.value }))}
                         >
-                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option disabled={true} defaultValue={true}>-- Select --</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of Joining</label>
-                        <input type="date" className="primary-input" name="" id=""
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of Joining <span className="text-red-500">*</span></label>
+                        <input type="date" className="primary-input" name="" id="" required
                             onChange={(e) => setUser((values) => ({ ...values, dateOfJoining: e.target.value }))}
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Username</label>
-                        <input type="text" className="primary-input" placeholder="Last Name" name="" id=""
-                            onChange={(e) => setUser((values) => ({ ...values, username: e.target.value }))}
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Username <span className="text-red-500">*</span></label>
+                        <input
+                            required
+                            type="text"
+                            className="primary-input"
+                            placeholder="Username"
+                            name=""
+                            id=""
+                            value={user.username} // Controlled input
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                // Capitalize the first letter and keep the rest unchanged
+                                const capitalizedUsername = value.charAt(0).toUpperCase() + value.slice(1);
+                                setUser((values) => ({ ...values, username: capitalizedUsername }));
+                            }}
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Password</label>
-                        <input type="password" className="primary-input" placeholder="Password" name="" id=""
-                            onChange={(e) => setUser((values) => ({ ...values, password: e.target.value }))}
-                        />
+                        <label htmlFor="password" className="font-semibold inline-block p-4 pl-0">Password <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                            <input
+                                required
+                                type={showPassword ? "text" : "password"}
+                                className="primary-input"
+                                placeholder="Password"
+                                value={user.password}
+                                onChange={handlePasswordChange}
+                            />
+                            <button
+                                type="button"
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <GoEye size={'17px'} /> : <GoEyeClosed size={'17px'} />}
+                            </button>
+                        </div>
+                        {passwordError && <p className="text-red-500">{passwordError}</p>}
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Confirm Password</label>
-                        <input type="password" className="primary-input" placeholder="Confirm Password" name="" id=""
-                            onChange={(e) => setUser((values) => ({ ...values, confirmPassword: e.target.value }))}
-                        />
+                        <label htmlFor="confirmPassword" className="font-semibold inline-block p-4 pl-0">Confirm Password <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                            <input
+                                required
+                                type={showConfirmPassword ? "text" : "password"}
+                                className="primary-input"
+                                placeholder="Confirm Password"
+                                value={user.confirmPassword}
+                                onChange={handleConfirmPasswordChange}
+                            />
+                            <button
+                                type="button"
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                                {showConfirmPassword ? <GoEye size={'17px'} /> : <GoEyeClosed size={'17px'} />}
+                            </button>
+                        </div>
+                        {confirmPasswordError && <p className="text-red-500">{confirmPasswordError}</p>}
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Email ID</label>
-                        <input type="email" className="primary-input" placeholder="Email ID" name="" id=""
-                            onChange={(e) => setUser((values) => ({ ...values, emailId: e.target.value }))}
+                        <input
+                            type="email"
+                            className="primary-input"
+                            placeholder="Email ID"
+                            value={user.emailId} // Controlled input
+                            onChange={handleEmailChange}
                         />
+                        {emailError && (
+                            <p className="text-red-500 text-sm mt-1">{emailError}</p>
+                        )}
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Mobile</label>
-                        <input type="tel" className="primary-input" placeholder="Mobile Number" name="" id=""
-                            onChange={(e) => setUser((values) => ({ ...values, mobile: e.target.value }))}
+                        <label htmlFor="mobile" className="font-semibold inline-block p-4 pl-0">Mobile</label>
+                        <input
+                            type="tel"
+                            className="primary-input"
+                            placeholder="Mobile Number"
+                            id="mobile"
+                            value={user.mobile}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                const sanitizedValue = value.replace(/\D/g, '');
+                                setUser((values) => ({ ...values, mobile: sanitizedValue }));
+                                if (sanitizedValue.length > 0 && sanitizedValue.length < 10) {
+                                    setMobileError(true);
+                                } else if (sanitizedValue.length === 10) {
+                                    setMobileError(false);
+                                } else if (sanitizedValue.length > 10) {
+                                    setMobileError(true);
+                                } else if (sanitizedValue > 1999999999) {
+                                    setMobileError(true);
+                                }
+                                else {
+                                    setMobileError(false)
+                                }
+                            }}
                         />
+                        {mobileError ? <p className="text-red-500 text-sm mt-1">Inavlid Mobile Number</p> : ''}
                     </div>
+
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of birth</label>
@@ -145,40 +313,42 @@ const NewUser = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Reporting to</label>
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Reporting to <span className="text-red-500">*</span></label>
                         <select className="primary-input"
+                            required
                             onChange={(e) => setUser((values) => ({ ...values, reportingTo: e.target.value }))}
                         >
-                            <option disabled={true} selected={true}>-- Select --</option>
-                            <option value="User 1">User 1</option>
-                            <option value="User 2">User 2</option>
+                            <option disabled={true} defaultValue={true}>-- Select --</option>
+                            <option value="Akram">Akram</option>
+                            <option value="Vivek Singh">Vivek Singh</option>
                         </select>
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Employee ID</label>
-                        <input type="text" className="primary-input" placeholder="Emploayee ID" name="" id=""
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Employee ID <span className="text-red-500">*</span></label>
+                        <input type="text" className="primary-input" required placeholder="Emploayee ID" name="" id=""
                             onChange={(e) => setUser((values) => ({ ...values, employeeId: e.target.value }))}
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Status</label>
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Status <span className="text-red-500">*</span></label>
                         <select className="primary-input"
+                            required
                             onChange={(e) => setUser((values) => ({ ...values, status: e.target.value }))}
                         >
-                            <option disabled={true} selected={true}>-- Select --</option>
+                            <option disabled={true} defaultValue={true}>-- Select --</option>
                             <option value="Active">Active</option>
                             <option value="Inavtive">Inactive</option>
                         </select>
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">User Type</label>
-                        <select className="primary-input"
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">User Type <span className="text-red-500">*</span></label>
+                        <select className="primary-input" required
                             onChange={(e) => setUser((values) => ({ ...values, userType: e.target.value }))}
                         >
-                            <option value="" disabled selected>-- Select User Type --</option>
+                            <option value="" disabled defaultValue={true}>-- Select User Type --</option>
 
                             <optgroup label="Admin">
                                 <option value="Super Admin">Super Admin</option>
@@ -210,11 +380,12 @@ const NewUser = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Designation</label>
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Designation <span className="text-red-500">*</span></label>
                         <select className="primary-input"
+                            required
                             onChange={(e) => setUser((values) => ({ ...values, designation: e.target.value }))}
                         >
-                            <option value="" disabled selected>-- Select Designation --</option>
+                            <option value="" disabled defaultValue={true}>-- Select Designation --</option>
 
                             <optgroup label="Software Development">
                                 <option value="Software Engineer">Software Engineer</option>
@@ -287,13 +458,14 @@ const NewUser = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Department</label>
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Department <span className="text-red-500">*</span></label>
                         <select className="primary-input"
+                            required
                             onChange={(e) => setUser((values) => ({ ...values, department: e.target.value }))}
                         >
-                            <option value="" disabled selected>-- Select Department --</option>
+                            <option value="" disabled defaultValue={true}>-- Select Department --</option>
 
-                            <optgroup label="Technical Departments" class="optgroup">
+                            <optgroup label="Technical Departments" className="optgroup">
                                 <option value="Software Development">Software Development</option>
                                 <option value="IT Support">IT Support</option>
                                 <option value="Research and Development">Research and Development</option>
@@ -302,7 +474,7 @@ const NewUser = () => {
                                 <option value="Network Administration">Network Administration</option>
                             </optgroup>
 
-                            <optgroup label="Business Departments" class="optgroup">
+                            <optgroup label="Business Departments" className="optgroup">
                                 <option value="Marketing">Marketing</option>
                                 <option value="Sales">Sales</option>
                                 <option value="Finance">Finance</option>
@@ -316,31 +488,20 @@ const NewUser = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Role</label>
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Role <span className="text-red-500">*</span></label>
                         <select className="primary-input"
+                            required
                             onChange={(e) => setUser((values) => ({ ...values, role: e.target.value }))}
                         >
-                            <option disabled={true} selected={true}>-- Select --</option>
-
-                            <optgroup label="Administrative Roles">
-                                <option value="Super Admin">Super Admin</option>
-                                <option value="Admin">Admin</option>
-                            </optgroup>
-
-                            <optgroup label="Management">
-                                <option value="Director">Director</option>
-                                <option value="Manager">Manager</option>
-                            </optgroup>
-
-                            <optgroup label="Operational Roles">
-                                <option value="Executive">Executive</option>
-                                <option value="Candidate">Candidate</option>
-                                <option value="Consultant">Consultant</option>
-                            </optgroup>
-
-                            <optgroup label="Others">
-                                <option value="Other">Other</option>
-                            </optgroup>
+                            <option disabled={true} defaultValue={true}>-- Select --</option>
+                            <option value="Super Admin">Super Admin</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Director">Director</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Executive">Executive</option>
+                            <option value="Candidate">Candidate</option>
+                            <option value="Consultant">Consultant</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                 </div>
@@ -351,6 +512,7 @@ const NewUser = () => {
                         allModules.map((currentModule, moduleKey) => {
                             return (
                                 <UserModule
+                                    key={moduleKey}
                                     id={`module-${currentModule.module_name}`}
                                     name={currentModule.module_name}
                                 />
@@ -361,10 +523,23 @@ const NewUser = () => {
 
 
                 <div className="flex items-center justify-end mt-10">
-                    <div className="w-1/4 pl-4">
-                        <button className="primary-button justify-center">Create User</button>
+                    <div className="w-1/4 pl-4 relative">
+                        <button
+                            className="primary-button justify-center"
+                            disabled={mobileError || submitError || warnDefault > 0} // Simplified condition
+                            style={{
+                                opacity: mobileError || submitError || warnDefault > 0 ? 0.8 : 1,
+                                cursor: mobileError || submitError || warnDefault > 0 ? 'not-allowed' : 'pointer'
+                            }}
+                        >
+                            Create User
+                        </button>
+                        {/* <span className="inline-block">
+                            {submitError ? 'Invalid Details Found!' : ''}
+                        </span> */}
                     </div>
                 </div>
+
             </form>
         </section>
     )

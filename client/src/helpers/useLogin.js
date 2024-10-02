@@ -3,9 +3,11 @@ import { useState } from "react"
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { userLoggedIn } from "../redux/reducers/auth_slice";
+import useSidebarAuth from "./useSidebarLink";
 
 const useLogin = () => {
     const [isUserLoggedin, setIsUserLoggedin] = useState();
+    const { ValidateSidebar } = useSidebarAuth();
     const dispatch = useDispatch();
 
     const Navigate = useNavigate();
@@ -26,10 +28,13 @@ const useLogin = () => {
                         {
                             status: true, 
                             access: "admin",
-                            username: response.data.user.username
+                            username: response.data.user.username,
+                            data: response.data
                         }
                     )
                 )
+
+                ValidateSidebar()
             }
         })
         .catch((err) => {

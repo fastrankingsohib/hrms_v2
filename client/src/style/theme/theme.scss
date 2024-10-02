@@ -86,6 +86,7 @@ $quinary-color: #515151;
 }
 .primary-input:focus{
     outline: none;
+    border: 1px solid black;
 }
 
 
@@ -95,6 +96,16 @@ $quinary-color: #515151;
     animation: alert-01 3s;
     transform: translateY(-50%);
     opacity: 0;
+}
+.tranition-basic{
+    transition: 0.5s all ease-in-out;
+}
+
+.transition-small{
+    transition: all 0.2s ease-in-out;    
+}
+.tranition-basic{
+    transition: 0.5s all ease-in-out;
 }
 
 @keyframes alert-01 {
@@ -113,5 +124,20 @@ $quinary-color: #515151;
     100%{
         transform: translateY(-50%);
         opacity: 0;
+    }
+}
+
+
+// Circle Animation Infinite
+.loading-01{
+    animation: linear infinite loading-01 1s;
+}
+
+@keyframes loading-01 {
+    from{
+        rotate: 0deg;
+    }
+    to{
+        rotate: 360deg;
     }
 }

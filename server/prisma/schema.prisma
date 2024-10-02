@@ -81,7 +81,7 @@ model candidate_list {
   contact_number       String            @unique @db.VarChar(20)
   country              String?           @db.VarChar(100)
   date_of_birth        String?           @db.VarChar(50)
-  email_address        String            @unique @db.VarChar(100)
+  email_address        String?            @unique @db.VarChar(100)
   first_name           String?           @db.VarChar(50)
   hobbies              String?           @db.VarChar(255)
   interests            String?           @db.VarChar(255)
@@ -117,9 +117,9 @@ model work_experience {
 model qualifications {
   qualifications_id  Int            @id @default(autoincrement())
   candidate_id       Int
-  course             String         @db.VarChar(100)
-  college_university String         @db.VarChar(255)
-  year_of_passing    Int
+  course             String?         @db.VarChar(100)
+  college_university String?         @db.VarChar(255)
+  year_of_passing    String?        @db.VarChar(100)
   percentage_cgpa    String?        @db.VarChar(20)
   created_at         DateTime       @default(now())
   updated_at         DateTime?

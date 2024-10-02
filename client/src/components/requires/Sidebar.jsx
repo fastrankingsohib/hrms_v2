@@ -1,19 +1,11 @@
 import { Link, NavLink } from "react-router-dom";
 import '../../style/theme/theme.scss';
-import { HiMiniPlus } from "react-icons/hi2";
-import { FaList, FaUsers, FaUserPlus } from "react-icons/fa";
-import { IoCreate } from "react-icons/io5";
-import { BsCalendar2CheckFill, BsFillClockFill } from "react-icons/bs";
-import { TbTimelineEventFilled } from "react-icons/tb";
-import { ImUsers } from "react-icons/im";
-import { FaCircleCheck } from "react-icons/fa6";
-import { TiCancel } from "react-icons/ti";
 import { FiLogOut } from "react-icons/fi";
-import { HiPlusSm } from "react-icons/hi";
 import logo from '../../assets/mahakaya.png';
 import useLogout from "../../helpers/useLogout";
-import { useState } from "react";
-import { AiOutlineDown, AiOutlineUp } from "react-icons/ai"; // Import arrow icons
+import { useEffect, useState } from "react";
+import useSidebarAuth from "../../helpers/useSidebarLink";
+import { IoIosArrowDown } from "react-icons/io";
 
 const SidebarLink = ({ to, icon, label }) => (
     <NavLink to={to} className={({ isActive }) => (isActive ? 'side-bar-active' : 'side-bar-default')}>
@@ -25,9 +17,11 @@ const Dropdown = ({ title, links, isOpen, toggle }) => (
     <div className="relative">
         <div className="flex items-center justify-between p-3 font-bold cursor-pointer" onClick={toggle}>
             <span>{title}</span>
-            {isOpen ? <AiOutlineUp /> : <AiOutlineDown />} {/* Show arrows based on state */}
+            {/* {isOpen ? <AiOutlineUp /> : <AiOutlineDown />} */}
+            <span className={`transition-all duration-100 ease-in-out ${isOpen ? 'rotate-180' : ''}`}><IoIosArrowDown /></span>
+            {/* <span className="inline-block transition-small"><AiOutlineUp /></span> */}
         </div>
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}>
+        <div className={`overflow-hidden transition-all duration-100 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}>
             <div className="bg-white">
                 {links.map((link, index) => (
                     <SidebarLink key={index} {...link} />
@@ -39,11 +33,31 @@ const Dropdown = ({ title, links, isOpen, toggle }) => (
 
 const Sidebar = () => {
     const { logout } = useLogout();
-    const [openDropdown, setOpenDropdown] = useState(null); // Track currently open dropdown
-
+    const [openDropdown, setOpenDropdown] = useState(null);
     const handleToggle = (dropdownName) => {
-        setOpenDropdown((prev) => (prev === dropdownName ? null : dropdownName)); // Close if already open, otherwise open new
+        setOpenDropdown((prev) => (prev === dropdownName ? null : dropdownName));
     };
+
+    const userRole = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
+    const { ValidateSidebar, reducedModules } = useSidebarAuth()
+    
+    useEffect(() => {
+        let modules = [];
+        userRole.modulesTouser.map((value) => {
+            let module = {
+                module_name: value.modules.module_name,
+                c: value.c,
+                r: value.r,
+                u: value.u,
+                d: value.d
+            };
+
+            modules.push(module);
+        })
+        ValidateSidebar(modules)
+    }, [])
+
+    // const sideBarLinks = allSideBarLinks;
 
     return (
         <section className="relative h-full">
@@ -52,7 +66,7 @@ const Sidebar = () => {
             </div>
             <h1 className="p-4 mb-8 text-xl text-center">HR Management System</h1>
 
-            <div className="p-4 select-none">
+            {/* <div className="p-4 select-none">
                 <Dropdown
                     title="Administration"
                     isOpen={openDropdown === 'user'} // Check if this dropdown is open
@@ -62,7 +76,7 @@ const Sidebar = () => {
                         { to: '/all-users', icon: <FaUsers size={'14px'} className="w-10" />, label: 'All Users' },
                     ]}
                 />
-                
+
                 <Dropdown
                     title="Candidate Management"
                     isOpen={openDropdown === 'candidate'}
@@ -82,6 +96,23 @@ const Sidebar = () => {
                         { to: '/post-new-job', icon: <IoCreate size={'18px'} className="w-10" />, label: 'Post New Job' },
                     ]}
                 />
+            </div> */}
+
+            <div className="p-10">
+                {
+                    reducedModules.map((sideBar, key) => {
+                        // return sideBar.moduleName
+                        return (
+                            <Dropdown
+                                key={key}
+                                title={sideBar.module_name}
+                                isOpen={openDropdown === sideBar.module_name}
+                                toggle={() => handleToggle(sideBar.module_name)}
+                                links={sideBar.subLinks}
+                            />
+                        )
+                    })
+                }
             </div>
 
             <div className="absolute bottom-0 w-full p-4">

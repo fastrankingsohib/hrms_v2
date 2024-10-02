@@ -26,7 +26,14 @@ const Login = () => {
                     <div>
                         <label htmlFor="username">Username</label>
                         <input id="username" required type="text" 
-                            onChange={(e) => setCredentials((credentials) => ({...credentials, username: e.target.value}))} 
+                            onChange={(e) => {
+                                // setCredentials((credentials) => ({...credentials, username: e.target.value}));
+                                const value = e.target.value;
+                                // Capitalize the first letter and keep the rest unchanged
+                                const capitalizedUsername = value.charAt(0).toUpperCase() + value.slice(1);
+                                setCredentials((values) => ({ ...values, username: capitalizedUsername }));
+                            }} 
+                            value={credentials.username}
                             className="primary-input border focus:border-purple-600 mt-2" placeholder="Enter Your Username" 
                         />
                     </div>

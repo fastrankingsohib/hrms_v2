@@ -1,22 +1,39 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function AllUsers() {
     const [allUser, setAllUsers] = useState([]);
-    axios.get("/user/all-users")
-    .then((response) => {
-            setAllUsers(response.data.data);
-    })
-    .catch((err) => {
-        console.log(err);
-    })
 
+    useEffect(() => {
+        // Fetching all users on component mount
+        axios.get("/user/all-users")
+            .then((response) => {
+                setAllUsers(response.data.data);
+                setLoading(false)
+                console.log(loading)
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, []);
+
+    const scaleton = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    const [loading, setLoading] = useState(true)
     const handleDelete = (userId) => {
-        axios.get(`/delete-user/${userId}`).then(() => {
-            console.log("success");
-        }).catch((err) => console.log(err))
-    }
+        // Show confirmation dialog
+        const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+        if (confirmDelete) {
+            // Call the API to delete the user if confirmed
+            axios.get(`/delete-user/${userId}`)
+                .then(() => {
+                    console.log("User deleted successfully");
+                    // Optionally, remove the deleted user from the state
+                    setAllUsers(allUser.filter(user => user.id !== userId));
+                })
+                .catch((err) => console.log(err));
+        }
+    };
 
     return (
         <div className='overflow-auto'>
@@ -38,15 +55,13 @@ function AllUsers() {
                 <div className='w-full min-w-60 font-bold p-3 border'>Reporting To</div>
             </div>
             {
-                allUser.map((user, userKey) => {
-                    return (
-                        <div className='flex w-full'>
+                loading == false ?
+                    allUser.map((user) => (
+                        <div className='flex w-full' key={user.id}> {/* Add key prop for unique identification */}
                             <div className='w-full min-w-60 p-3 border flex justify-between'>
                                 <Link to={`/user/${user.id}`} className='p-1 rounded-full px-4 bg-green-500 text-white'>View</Link>
                                 <button type='button' className='p-1 rounded-full px-4 bg-red-500 text-white'
-                                    onClick={() => {
-                                        handleDelete(user.id)
-                                    } }
+                                    onClick={() => handleDelete(user.id)} // Call handleDelete with user id
                                 >Delete</button>
                             </div>
                             <div className='w-full min-w-60 p-3 border'>{user.employee_id}</div>
@@ -64,11 +79,38 @@ function AllUsers() {
                             <div className='w-full min-w-60 p-3 border'>{user.role}</div>
                             <div className='w-full min-w-60 p-3 border'>{user.reporting_to}</div>
                         </div>
-                    )
-                })
+                    )) :
+                    <div>
+                        {
+                            scaleton.map((value, key) => {
+                                return (
+                                    <div className='flex w-full' key={key}> {/* Add key prop for unique identification */}
+                                        <div className='w-full min-w-60 p-3 border flex justify-between'>
+                                            <span className='p-1 rounded-full px-4 bg-gray-200 text-gray-200'>View</span>
+                                            <span className='p-1 rounded-full px-4 bg-gray-200 text-gray-200'>Delete</span>
+                                        </div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
             }
         </div>
-    )
+    );
 }
 
-export default AllUsers
+export default AllUsers;

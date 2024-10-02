@@ -68,20 +68,7 @@ const add_candidate = async (req, res) => {
       experiences,
     } = req.body;
 
-    // Input validation
-    if (!validator.isEmail(email_address)) {
-      return res.status(400).send({ message: "Invalid email format." });
-    }
-
-    if (!validator.isMobilePhone(contact_number, 'any', { strictMode: false })) {
-      return res.status(400).send({ message: "Invalid mobile number." });
-    }
-
-    // Check if email or contact number already exists
-    const emailOrContactCheck = await check_email_contact(req, res);
-    if (emailOrContactCheck) return; // Early exit if there's a conflict
-
-    // Create candidate in the database
+    // Create candidate in the database without any validation checks
     const candidate = await prisma.candidate_list.create({
       data: {
         title,
@@ -92,7 +79,7 @@ const add_candidate = async (req, res) => {
         address_line2,
         city,
         state,
-        pin_code,
+        pin_code: pin_code || null, // Handle empty pin_code
         country,
         contact_number,
         alt_contact_number,
@@ -101,7 +88,7 @@ const add_candidate = async (req, res) => {
         date_of_birth,
         job_title,
         department,
-        work_experience,
+        work_experience: work_experience || null, // Handle empty work_experience
         hobbies,
         interests,
         skills,
@@ -116,23 +103,24 @@ const add_candidate = async (req, res) => {
 
     const candidate_id = candidate.candidate_id;
 
-    // Experience handling
-    if (!Array.isArray(experiences) || experiences.length === 0) {
-      throw new Error("Experience data is required and must be an array.");
+    // Experience handling: skip empty experience objects
+    if (Array.isArray(experiences) && experiences.length > 0) {
+      const experienceData = experiences
+        .filter((exp) => exp.organisation_name || exp.total_tenure || exp.last_designation || exp.last_drawn_salary) // Filter out empty objects
+        .map((exp) => ({
+          candidate_id: candidate_id,
+          organisation_name: exp.organisation_name || null,
+          total_tenure: exp.total_tenure || null,
+          last_designation: exp.last_designation || null,
+          last_drawn_salary: exp.last_drawn_salary || null,
+        }));
+
+      if (experienceData.length > 0) {
+        await prisma.work_experience.createMany({
+          data: experienceData,
+        });
+      }
     }
-
-    const experienceData = experiences.map((exp) => ({
-      candidate_id: candidate_id,
-      organisation_name: exp.organisation_name,
-      total_tenure: exp.total_tenure || null,
-      last_designation: exp.last_designation || null,
-      last_drawn_salary: exp.last_drawn_salary || null,
-    }));
-
-    // Insert experiences into the database
-    await prisma.work_experience.createMany({
-      data: experienceData,
-    });
 
     // Qualification handling
     if (Array.isArray(qualifications) && qualifications.length > 0) {
@@ -164,6 +152,8 @@ const add_candidate = async (req, res) => {
     });
   }
 };
+
+
 
 const reporting_to_users = async(req, res) => {
   try {
