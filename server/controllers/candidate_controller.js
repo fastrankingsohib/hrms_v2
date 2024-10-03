@@ -66,6 +66,7 @@ const add_candidate = async (req, res) => {
       status,
       qualifications,
       experiences,
+      created_by,
     } = req.body;
 
     // Input validation
@@ -111,6 +112,7 @@ const add_candidate = async (req, res) => {
         other2,
         other3,
         status,
+        created_by,
       },
     });
 
@@ -194,6 +196,35 @@ const all_candidates = async (req, res) => {
       include: {
         workExperiences: true,  // Include related work experiences
         qualifications: true,   // Include related qualifications
+      },
+    });
+
+    
+    res.status(200).send({
+      message: 'Candidates fetched successfully',
+      success: true,
+      candidates: candidates
+    })
+  } catch (error) {
+    console.error('Error fetching candidates:', error);
+    res.status(500).json({ 
+      message: 'Internal server error',
+      success: false
+    });
+  }
+};
+
+const my_candidates = async (req, res) => {
+  try {
+    // Fetch all candidates with work experience and qualifications
+    const candidates = await prisma.candidate_list.findMany({
+      where: {
+        created_by : 'Sohib'
+
+      },
+      include: {
+        workExperiences: true,  
+        qualifications: true,   
       },
     });
 
@@ -428,4 +459,4 @@ const module_data = async(req,res)=>{
 
 
 
-export {add_candidate,reporting_to_users,all_candidates, delete_candidate,send_data_by_id, update_candidate,module_data}
+export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data}

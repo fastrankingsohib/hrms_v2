@@ -100,6 +100,7 @@ model candidate_list {
   work_experience      String?           @db.VarChar(50)
   qualifications       qualifications[]  @relation("CandidateQualifications")
   workExperiences      work_experience[] @relation("CandidateWorkExperience")
+  created_by           String?           @db.VarChar(255)
 }
 
 model work_experience {
