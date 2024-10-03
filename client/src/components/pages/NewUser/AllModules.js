@@ -7,6 +7,13 @@ const allModules = [
         "d": 0
     },
     {
+        "module_name": "Jobs",
+        "c": 0,
+        "r": 0,
+        "u": 0,
+        "d": 0
+    },
+    {
         "module_name": "Candidates",
         "c": 0,
         "r": 0,
@@ -28,14 +35,14 @@ const allModules = [
         "d": 0
     },
     {
-        "module_name": "Training",
+        "module_name": "On-Boarding",
         "c": 0,
         "r": 0,
         "u": 0,
         "d": 0
     },
     {
-        "module_name": "On_Boarding",
+        "module_name": "Training",
         "c": 0,
         "r": 0,
         "u": 0,
@@ -49,21 +56,7 @@ const allModules = [
         "d": 0
     },
     {
-        "module_name": "Exit",
-        "c": 0,
-        "r": 0,
-        "u": 0,
-        "d": 0
-    },
-    {
-        "module_name": "Jobs",
-        "c": 0,
-        "r": 0,
-        "u": 0,
-        "d": 0
-    },
-    {
-        "module_name": "My_Profile",
+        "module_name": "My Profile",
         "c": 0,
         "r": 0,
         "u": 0,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Qualifications from "../../commons/Qualifications";
+import Qualifications from "../../Commons/Qualifications";
 import { useSelector } from "react-redux";
 import useNewCandidate from "../../../helpers/useNewCandidate";
 import { FaTimes } from "react-icons/fa";

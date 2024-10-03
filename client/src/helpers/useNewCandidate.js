@@ -1,12 +1,13 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { json, useNavigate } from "react-router-dom";
 
 const useNewCandidate = () => {
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
+    const loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : []
     const Navigate = useNavigate()
     const registerCandidate = (candidate, experiences, educations, skills, hobbies) => {
         // register candidate logic here
@@ -40,6 +41,7 @@ const useNewCandidate = () => {
             "other2": "Additional info 2",
             "other3": "Additional info 3",
             "status": "Active",
+            "created_by": loggedInUser.username,
             "experiences": experiences,
             "qualifications": educations,
         }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useRegisterUser from "../../../helpers/useRegisterUser";
 import allModules from "./AllModules";
-import UserModule from "../../commons/UserModule";
+import UserModule from "../../Commons/UserModule";
 import { useSelector } from "react-redux";
 
 // Icons

@@ -13,14 +13,14 @@ const SidebarLink = ({ to, icon, label }) => (
     </NavLink>
 );
 
-const Dropdown = ({ title, links, isOpen, toggle }) => (
-    <div className="relative">
-        <div className="flex items-center justify-between p-3 font-bold cursor-pointer" onClick={toggle}>
+const Dropdown = ({ title, links, isOpen, toggle, isLink }) => (
+    <Link className="relative">
+        <Link to={isLink} className="flex items-center justify-between p-3 font-bold cursor-pointer" onClick={toggle}>
             <span>{title}</span>
             {/* {isOpen ? <AiOutlineUp /> : <AiOutlineDown />} */}
             <span className={`transition-all duration-100 ease-in-out ${isOpen ? 'rotate-180' : ''}`}><IoIosArrowDown /></span>
             {/* <span className="inline-block transition-small"><AiOutlineUp /></span> */}
-        </div>
+        </Link>
         <div className={`overflow-hidden transition-all duration-100 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}>
             <div className="bg-white">
                 {links.map((link, index) => (
@@ -28,7 +28,7 @@ const Dropdown = ({ title, links, isOpen, toggle }) => (
                 ))}
             </div>
         </div>
-    </div>
+    </Link>
 );
 
 const Sidebar = () => {
@@ -109,6 +109,7 @@ const Sidebar = () => {
                                 isOpen={openDropdown === sideBar.module_name}
                                 toggle={() => handleToggle(sideBar.module_name)}
                                 links={sideBar.subLinks}
+                                isLink={sideBar.module_name === "Jobs" ? "/jobs" : ""}
                             />
                         )
                     })
