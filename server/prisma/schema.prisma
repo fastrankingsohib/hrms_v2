@@ -119,7 +119,7 @@ model qualifications {
   candidate_id       Int
   course             String         @db.VarChar(100)
   college_university String         @db.VarChar(255)
-  year_of_passing    Int
+  year_of_passing    String         @db.VarChar(100)
   percentage_cgpa    String?        @db.VarChar(20)
   created_at         DateTime       @default(now())
   updated_at         DateTime?
