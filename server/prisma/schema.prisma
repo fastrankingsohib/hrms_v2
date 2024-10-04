@@ -65,6 +65,7 @@ model job_post {
   interview_timing       String?   @db.VarChar(255)
   job_timing             String?   @db.VarChar(255)
   required_qualification String?   @db.VarChar(255)
+  skills                 String?   @db.VarChar(255)
   min_offered_salary     String?   @db.VarChar(255)
   max_offered_salary     String?   @db.VarChar(255)
   job_shift              String?   @db.VarChar(255)
