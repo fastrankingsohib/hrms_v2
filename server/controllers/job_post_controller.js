@@ -3,15 +3,28 @@ const prisma = new PrismaClient()
 
 const post_jobs = async(req,res)=>{
     try {
-        const { job_title, job_type, job_desc, experience, salary } = req.body;
+        const { job_title, job_type, job_desc, experience, job_location, number_of_opening, interview_timing, job_timing, required_qualification, min_offered_salary,
+            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by
+         } = req.body;
     
         await prisma.job_post.create({
             data: {
                 job_title: job_title,
                 job_type: job_type,
+                job_location: job_location,
+                number_of_opening: number_of_opening,
+                interview_timing: interview_timing,
+                job_timing: job_timing,
+                required_qualification: required_qualification,
+                min_offered_salary: min_offered_salary,
+                max_offered_salary: max_offered_salary,
+                job_shift: job_shift,
+                genders: genders,
                 job_desc: job_desc,
                 experience: experience,
-                salary: salary
+                min_experience: min_experience,
+                max_experience: max_experience,
+                created_by: created_by,
             }
         })
 
@@ -76,14 +89,27 @@ const update_post_job = async (req,res)=>{
     try{
         
         const id = req.params.id;
-        const { job_title, job_type, job_desc, experience, salary } = req.body;
+        const { job_title, job_type, job_desc, experience, job_location, number_of_opening, interview_timing, job_timing, required_qualification, min_offered_salary,
+            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by
+         } = req.body;
 
         await prisma.job_post.update({where:{id:Number(id)}, data: {
             job_title: job_title,
             job_type: job_type,
+            job_location: job_location,
+            number_of_opening: number_of_opening,
+            interview_timing: interview_timing,
+            job_timing: job_timing,
+            required_qualification: required_qualification,
+            min_offered_salary: min_offered_salary,
+            max_offered_salary: max_offered_salary,
+            job_shift: job_shift,
+            genders: genders,
             job_desc: job_desc,
             experience: experience,
-            salary: salary
+            min_experience: min_experience,
+            max_experience: max_experience,
+            created_by: created_by,
         }})
         res.status(200).send({
             success:true,
