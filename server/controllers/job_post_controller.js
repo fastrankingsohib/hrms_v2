@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 const post_jobs = async(req,res)=>{
     try {
         const { job_title, job_type, job_desc, experience, job_location, number_of_opening, interview_timing, job_timing, required_qualification, min_offered_salary,
-            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by
+            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date
          } = req.body;
     
         await prisma.job_post.create({
@@ -25,6 +25,9 @@ const post_jobs = async(req,res)=>{
                 min_experience: min_experience,
                 max_experience: max_experience,
                 created_by: created_by,
+                job_status: job_status,
+                job_exp_date: job_exp_date,
+                job_scheduled_date: job_scheduled_date,
             }
         })
 
@@ -90,26 +93,29 @@ const update_post_job = async (req,res)=>{
         
         const id = req.params.id;
         const { job_title, job_type, job_desc, experience, job_location, number_of_opening, interview_timing, job_timing, required_qualification, min_offered_salary,
-            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by
+            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date
          } = req.body;
 
         await prisma.job_post.update({where:{id:Number(id)}, data: {
             job_title: job_title,
-            job_type: job_type,
-            job_location: job_location,
-            number_of_opening: number_of_opening,
-            interview_timing: interview_timing,
-            job_timing: job_timing,
-            required_qualification: required_qualification,
-            min_offered_salary: min_offered_salary,
-            max_offered_salary: max_offered_salary,
-            job_shift: job_shift,
-            genders: genders,
-            job_desc: job_desc,
-            experience: experience,
-            min_experience: min_experience,
-            max_experience: max_experience,
-            created_by: created_by,
+                job_type: job_type,
+                job_location: job_location,
+                number_of_opening: number_of_opening,
+                interview_timing: interview_timing,
+                job_timing: job_timing,
+                required_qualification: required_qualification,
+                min_offered_salary: min_offered_salary,
+                max_offered_salary: max_offered_salary,
+                job_shift: job_shift,
+                genders: genders,
+                job_desc: job_desc,
+                experience: experience,
+                min_experience: min_experience,
+                max_experience: max_experience,
+                created_by: created_by,
+                job_status: job_status,
+                job_exp_date: job_exp_date,
+                job_scheduled_date: job_scheduled_date,
         }})
         res.status(200).send({
             success:true,

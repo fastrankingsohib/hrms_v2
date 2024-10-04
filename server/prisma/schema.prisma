@@ -76,6 +76,9 @@ model job_post {
   created_at             DateTime? @default(now())
   updated_at             DateTime? @updatedAt
   created_by             String?   @db.VarChar(100)
+  job_status             String?   @db.VarChar(100)
+  job_exp_date           String?   @db.VarChar(100)
+  job_scheduled_date     String?   @db.VarChar(100)
 }
 
 model candidate_list {
