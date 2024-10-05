@@ -137,19 +137,25 @@ const add_candidate = async (req, res) => {
     });
 
     // Qualification handling
-    if (Array.isArray(qualifications) && qualifications.length > 0) {
-      const qualificationData = qualifications.map((qual) => ({
-        candidate_id: candidate_id,
-        course: qual.course,
-        college_university: qual.college_university,
-        year_of_passing: qual.year_of_passing,
-        percentage_cgpa: qual.percentage_cgpa || null,
-      }));
-
-      await prisma.qualifications.createMany({
-        data: qualificationData,
-      });
+    try {
+      if (Array.isArray(qualifications) && qualifications.length > 0) {
+        const qualificationData = qualifications.map((qual) => ({
+          candidate_id: candidate_id,
+          course: qual.course,
+          college_university: qual.college_university,
+          year_of_passing: qual.year_of_passing,
+          percentage_cgpa: qual.percentage_cgpa || null,
+        }));
+    
+        await prisma.qualifications.createMany({
+          data: qualificationData,
+        });
+      }
+    } catch (error) {
+      console.log("Error inserting qualifications:", error);
+      throw new Error("Failed to insert qualifications.");
     }
+    
 
     // Return a success message
     return res.status(200).json({
