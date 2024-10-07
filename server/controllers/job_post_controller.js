@@ -149,4 +149,26 @@ const delete_posts = async(req,res)=>{
     }
 }
 
-export {display_posted_jobs,post_jobs,id_based_jobs,update_post_job,delete_posts}
+const latest_created_job = async(req,res) =>{
+    try {
+        const job = await prisma.job_post.findMany({
+            orderBy: {
+              id: 'desc',
+            },
+            take: 1,
+          })
+          res.status(200).send({
+            success: true,
+            data: job
+          })
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).send({
+            success:false,
+            message: "Error fetching latest created job"
+        })
+    }
+}
+
+export {display_posted_jobs,post_jobs,id_based_jobs,update_post_job,delete_posts,latest_created_job}
