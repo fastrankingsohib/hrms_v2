@@ -47,7 +47,12 @@ const post_jobs = async(req,res)=>{
 
 const display_posted_jobs = async (req,res) =>{
     try {
-        const jobs = await prisma.job_post.findMany()
+        const jobs = await prisma.job_post.findMany({
+            orderBy: {
+              id: 'desc',
+            }
+          });
+          
         if(jobs.length==0){
             res.status(404).send({
                 message: "No jobs posted yet",
