@@ -57,14 +57,28 @@ model modulesTouser {
 }
 
 model job_post {
-  id         Int       @id @default(autoincrement())
-  job_title  String?   @db.VarChar(255)
-  job_type   String?   @db.VarChar(100)
-  job_desc   String?
-  experience String?   @db.VarChar(50)
-  salary     String?   @db.VarChar(100)
-  created_at DateTime? @default(now())
-  updated_at DateTime? @updatedAt
+  id                     Int       @id @default(autoincrement())
+  job_title              String?   @db.VarChar(255)
+  job_type               String?   @db.VarChar(100)
+  job_location           String?
+  number_of_opening      String?   @db.VarChar(255)
+  interview_timing       String?   @db.VarChar(255)
+  job_timing             String?   @db.VarChar(255)
+  required_qualification String?   @db.VarChar(255)
+  min_offered_salary     String?   @db.VarChar(255)
+  max_offered_salary     String?   @db.VarChar(255)
+  job_shift              String?   @db.VarChar(255)
+  genders                String?   @db.VarChar(255)
+  job_desc               String?
+  experience             String?   @db.VarChar(50)
+  min_experience         String?   @db.VarChar(255)
+  max_experience         String?   @db.VarChar(255)
+  created_at             DateTime? @default(now())
+  updated_at             DateTime? @updatedAt
+  created_by             String?   @db.VarChar(100)
+  job_status             String?   @db.VarChar(100)
+  job_exp_date           String?   @db.VarChar(100)
+  job_scheduled_date     String?   @db.VarChar(100)
 }
 
 model candidate_list {

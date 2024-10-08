@@ -11,11 +11,12 @@ import UserView from "./components/pages/userView/UserView";
 import Layout from "./components/Layouts/Layout";
 import JobsLayout from "./components/Layouts/Job/JobsLayout";
 import NewJob from "./components/Commons/NewJob";
+import JobView from "./components/pages/JobView/JobView";
+import JobOverview from "./components/pages/JobView/JobOverview";
 
-const { BrowserRouter, Route, Routes } = require("react-router-dom")
-
+const { BrowserRouter, Route, Routes } = require("react-router-dom");
 const Application = () => {
-    return(
+    return (
         <BrowserRouter>
             <Routes>
                 <Route path="/" >
@@ -23,12 +24,13 @@ const Application = () => {
                     <Route path="" element={<Layout />}>
                         <Route path="jobs" element={<JobsLayout />}>
                             <Route path="new-job" element={<NewJob />} />
+                            <Route path="view/:jobId" element={<JobView />} />
                         </Route>
-                        
+
                         <Route path="/all-job-posts" element={<AllJobs />} />
                         <Route path="/all-job-posts/job/01" element={<JobOpening />} />
                         <Route path="/add-new-user" element={<NewUser />} />
-                        <Route path="/all-users" element={<AllUsers />} />
+                        <Route path="/all-users/" element={<AllUsers />} />
                         <Route path="/user/:userid" element={<UserView />} />
                         <Route path="/add-new-candidate" element={<NewCandidate />} />
                         <Route path="/my-candidates" element={<MyCandidates />} />
