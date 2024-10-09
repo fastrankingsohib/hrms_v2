@@ -39,76 +39,76 @@ function JobOverview(props) {
     if (loading) {
         // return <div className='p-4 pt-80 w-full flex justify-center items-center text-indigo-700'><AiOutlineLoading3Quarters className='reload-rounding' size={"30px"} /></div>;
     }
-    
+
     if (errorLoaded) {
         return <div className='p-4'>Error loading job details.</div>;
-    }    
+    }
 
     return (
         <div className='grid gap-4 p-4'>
             <div>
-                <span className='text-gray-400 font-medium mr-1 w-60 inline-block'>Job Position</span>
+                <span className='text-gray-400 w-60 inline-block'>Job Position</span>
                 <span>{jobDetails.job_title}</span>
             </div>
             <div>
-                <span className='text-gray-400 font-medium mr-1 w-60 inline-block'>Openings</span>
+                <span className='text-gray-400 w-60 inline-block'>Openings</span>
                 <span>{jobDetails.number_of_opening} Seats</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Job Type</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Job Type</span>
                 <span>{jobDetails.job_type}</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Job Genders</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Job Genders</span>
                 <span>{jobDetails.genders}</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Required Qualifications</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Required Qualifications</span>
                 <span>{jobDetails.required_qualification}</span>
             </div>
             {jobDetails.experience === "Experienced Only" ? (
                 <div className='grid gap-4'>
-                    <div className='text-gray-400 font-medium'>
-                        <span className='text-gray-400 font-medium min-w-60 inline-block'>Experience Level</span>
+                    <div className='text-gray-400'>
+                        <span className='text-gray-400 min-w-60 inline-block '>Experience Level</span>
                         <span className='text-black'>{jobDetails.min_experience} - {jobDetails.max_experience} years</span>
                     </div>
                 </div>
             ) : (
                 <div className='grid gap-4'>
-                    <div className='text-gray-400 font-medium'>
-                        <span className='text-gray-400 font-medium min-w-60 inline-block'>Experience Level</span>
+                    <div className='text-gray-400'>
+                        <span className='text-gray-400  min-w-60 inline-block '>Experience Level</span>
                         <span className='text-black'>{jobDetails.experience}</span>
                     </div>
                 </div>
             )}
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Job Shift</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Job Shift</span>
                 <span>{jobDetails.job_shift}</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Job Location</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Job Location</span>
                 <span>{jobDetails.job_location}</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Job Timing</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Job Timing</span>
                 <span>{jobDetails.job_timing}</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Salary Budget</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Salary Budget</span>
                 <span>₹{jobDetails.min_offered_salary} - ₹{jobDetails.max_offered_salary}</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Job Status</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Job Status</span>
                 <span className='inline-flex gap-1 items-center justify-center p-1 px-3 bg-green-500 rounded-full text-white capitalize'>
                     <GoDotFill className='text-green-200' /> {jobDetails.job_status}
                 </span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Job Description</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Job Description</span>
                 <span>{jobDetails.job_desc}</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 font-medium mr-1 min-w-60 inline-block'>Job Details (PDF)</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Job Details (PDF)</span>
                 <span className='min-w-80 bg-gray-50 border border-indigo-200 rounded-2xl inline-flex justify-between items-center p-5'>
                     <div className='flex'>
                         <FaFilePdf className='text-indigo-700 mr-2' size={"40px"} />

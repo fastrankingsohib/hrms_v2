@@ -13,6 +13,7 @@ import JobsLayout from "./components/Layouts/Job/JobsLayout";
 import NewJob from "./components/Commons/NewJob";
 import JobView from "./components/pages/JobView/JobView";
 import JobOverview from "./components/pages/JobView/JobOverview";
+import UpdateJobDetails from "./components/pages/JobView/UpdateJobDetails";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
 const Application = () => {
@@ -24,6 +25,7 @@ const Application = () => {
                     <Route path="" element={<Layout />}>
                         <Route path="jobs" element={<JobsLayout />}>
                             <Route path="new-job" element={<NewJob />} />
+                            <Route path="update/:jobId" element={<UpdateJobDetails />} />
                             <Route path="view/:jobId" element={<JobView />} />
                         </Route>
 

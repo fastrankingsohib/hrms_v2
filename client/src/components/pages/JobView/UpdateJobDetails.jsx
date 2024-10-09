@@ -2,10 +2,12 @@ import axios from 'axios';
 import React, { useState, useEffect, useRef } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { MdOutlineStarOutline, MdOutlineStarPurple500 } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
-function NewJob() {
+function UpdateJobDetails() {
     const navigate = useNavigate()
+    const { jobId } = useParams()
+    const [defaultData, setDefaultData] = useState({})
     const [jobDetails, setJobDetails] = useState({
         job_title: "",
         job_type: 'Full Time',
@@ -14,7 +16,7 @@ function NewJob() {
         max_experience: "5",
         skills: [],
         job_shift: 'Morning',
-        genders: "", // Store selected genders
+        genders: "", // Store selected Gender
         required_qualification: [],
         job_desc: "",
         job_location: "",
@@ -32,7 +34,44 @@ function NewJob() {
         job_scheduled_date: "",
     });
 
-    const createJobPost = () => {
+    useEffect(() => {
+        setJobDetails({
+            job_title: jobData.job_title || "",
+            job_type: jobData.job_type || "Full Time",
+            experience: jobData.experience || "Any",
+            min_experience: jobData.min_experience || "1",
+            max_experience: jobData.max_experience || "5",
+            skills: parsedSkills, // Updated skills array
+            job_shift: jobData.job_shift || 'Morning',
+            genders: jobData.genders || "", // Selected gender
+            required_qualification: jobData.required_qualification ? jobData.required_qualification.split(',') : [],
+            job_desc: jobData.job_desc || "",
+            job_location: jobData.job_location || "",
+            number_of_opening: jobData.number_of_opening || "",
+            interview_timing: jobData.interview_timing || "",
+            job_timing: jobData.job_timing || "",
+            min_offered_salary: jobData.min_offered_salary || "",
+            max_offered_salary: jobData.max_offered_salary || "",
+            created_by: jobData.created_by || "",
+            job_status: jobData.job_status || "",
+            job_exp_date: jobData.job_exp_date || "",
+            job_scheduled_date: jobData.job_scheduled_date || "",
+        });
+    }, [jobId])
+
+    useEffect(() => {
+        axios.get(`/id_based_jobs/${jobId}`)
+            .then((res) => {
+                console.log(res.data);
+                setDefaultData(res.data.job);
+                console.log(defaultData)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }, [])
+
+    const updateJobPost = () => {
         axios.post("/post_job", {
             job_title: jobDetails.job_title,
             job_type: jobDetails.job_type,
@@ -75,7 +114,6 @@ function NewJob() {
     // Gender Selection
     const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false); // State to manage dropdown visibility
     const genderDropdownRef = useRef(null); // Ref for dropdown
-
     const genderOptions = ['Male', 'Female']; // Gender options
 
     // Function to handle toggling gender selection
@@ -259,7 +297,7 @@ function NewJob() {
     // Job Location Handling
     const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
     const locationDropdownRef = useRef(null);
-    const locationOptions = ['Janakpuri, New Delhi'];
+    const locationOptions = ['Janakpuri, New Delhi', 'other'];
 
     const handleLocationToggle = (location) => {
         setJobDetails((prev) => ({
@@ -301,7 +339,7 @@ function NewJob() {
 
     return (
         <div className='p-4 bg-gray-100 h-full max-h-full overflow-auto'>
-            <h1 className='text-xl font-bold'>Job Details</h1>
+            <h1 className='text-xl font-bold'><button onClick={() => navigate(-1)} to={"/"} className='text-base font-normal h-10 bg-black text-white rounded-full px-5 mr-4'>Go Back</button> Update Job Details</h1>
             <div className='bg-white p-4 pt-8 mt-4 shadow-xl rounded-[8px]'>
                 <div className='flex items-center gap-4'>
                     <label className='font-semibold inline-block mb-2'>Job Type *</label>
@@ -330,6 +368,7 @@ function NewJob() {
                     <div>
                         <label className='font-semibold block mb-2'>Job Title</label>
                         <input type='text' className='p-2.5 border rounded-[8px] w-full'
+                            defaultValue={defaultData.job_title}
                             onChange={(e) => setJobDetails((values) => ({ ...values, job_title: e.target.value }))}
                         />
                     </div>
@@ -406,7 +445,7 @@ function NewJob() {
                                 onClick={() => setIsQualificationDropdownOpen(!isQualificationDropdownOpen)}
                             >
                                 {jobDetails.required_qualification.length > 0
-                                    ? jobDetails.required_qualification.join(', ') // Show selected qualifications
+                                    ? jobDetails.required_qualification.join(',') // Show selected qualifications
                                     : 'Select Qualification(s)'}
                             </div>
                             {isQualificationDropdownOpen && (
@@ -429,7 +468,6 @@ function NewJob() {
                     </div>
 
                 </div>
-
 
 
                 <h1 className='mt-6 mb-2 font-semibold'>Monthly In-hand Salary</h1>
@@ -499,9 +537,7 @@ function NewJob() {
                             )}
                         </div>
                     </div>
-
                 </div>
-
             </div>
 
 
@@ -647,32 +683,32 @@ function NewJob() {
                     Schedule Job
                 </button>
                 <button className='p-2.5 bg-indigo-700 rounded-[8px] text-white px-10'
-                    onClick={createJobPost} // Your existing job post function
-                    // onClick={() => {
-                    //     console.log({
-                    //         job_title: jobDetails.job_title,
-                    //         job_type: jobDetails.job_type,
-                    //         experience: jobDetails.experience,
-                    //         min_experience: jobDetails.min_experience,
-                    //         max_experience: jobDetails.max_experience,
-                    //         skills: "skills,kjhh",
-                    //         job_shift: jobDetails.job_shift,
-                    //         genders: jobDetails.genders, // Store selected genders
-                    //         required_qualification: "jobDetails.required_qualification",
-                    //         job_desc: jobDetails.job_desc,
-                    //         job_location: jobDetails.job_location,
-                    //         number_of_opening: jobDetails.number_of_opening,
-                    //         interview_timing: jobDetails.interview_timing,
-                    //         job_timing: jobDetails.job_timing,
-                    //         min_offered_salary: jobDetails.min_offered_salary,
-                    //         max_offered_salary: jobDetails.max_offered_salary,
-                    //         job_shift: jobDetails.job_shift,
-                    //         created_by: "jobDetails.created_by",
-                    //         job_status: jobDetails.job_status,
-                    //         job_exp_date: jobDetails.job_exp_date,
-                    //         job_scheduled_date: jobDetails.job_scheduled_date
-                    //     })
-                    // }}
+                    onClick={updateJobPost} // Your existing job post function
+                // onClick={() => {
+                //     console.log({
+                //         job_title: jobDetails.job_title,
+                //         job_type: jobDetails.job_type,
+                //         experience: jobDetails.experience,
+                //         min_experience: jobDetails.min_experience,
+                //         max_experience: jobDetails.max_experience,
+                //         skills: "skills,kjhh",
+                //         job_shift: jobDetails.job_shift,
+                //         genders: jobDetails.genders, // Store selected genders
+                //         required_qualification: "jobDetails.required_qualification",
+                //         job_desc: jobDetails.job_desc,
+                //         job_location: jobDetails.job_location,
+                //         number_of_opening: jobDetails.number_of_opening,
+                //         interview_timing: jobDetails.interview_timing,
+                //         job_timing: jobDetails.job_timing,
+                //         min_offered_salary: jobDetails.min_offered_salary,
+                //         max_offered_salary: jobDetails.max_offered_salary,
+                //         job_shift: jobDetails.job_shift,
+                //         created_by: "jobDetails.created_by",
+                //         job_status: jobDetails.job_status,
+                //         job_exp_date: jobDetails.job_exp_date,
+                //         job_scheduled_date: jobDetails.job_scheduled_date
+                //     })
+                // }}
                 >
                     Post Job
                 </button>
@@ -712,7 +748,7 @@ function NewJob() {
                                 className="p-2.5 px-8 bg-indigo-700 text-white rounded"
                                 onClick={() => {
                                     saveScheduleJob();
-                                    createJobPost();
+                                    updateJobPost();
                                 }}
                             >Schedule Job</button>
                         </div>
@@ -726,4 +762,4 @@ function NewJob() {
     );
 }
 
-export default NewJob;
+export default UpdateJobDetails;

@@ -7,7 +7,7 @@ function JobsLayout() {
     return (
         <div className='w-full flex items-start h-full overflow-auto'>
             <div className='w-1/4 h-full border-r border-b'>
-                <div className='border-b flex items-start justify-between gap-2 p-2'>
+                <div className='border-b flex items-start justify-between bg-white gap-2 p-2 sticky top-0 z-30'>
                     <button className={`h-12 p-2 w-full rounded-xl ${activeButton === "active" ? 'bg-indigo-700 text-white' : 'border-transparent'}`} onClick={() => setActiveButton("active")}>Active</button>
                     <button className={`h-12 p-2 w-full rounded-xl ${activeButton === "in-active" ? 'bg-indigo-700 text-white' : 'border-transparent'}`} onClick={() => setActiveButton("in-active")}>In-Active</button>
                     <button className={`h-12 p-2 w-full rounded-xl ${activeButton === "all" ? 'bg-indigo-700 text-white' : 'border-transparent'}`} onClick={() => setActiveButton("all")}>All</button>

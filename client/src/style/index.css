@@ -3,35 +3,37 @@
 @tailwind utilities;
 
 /* Font Family */
-*{
+* {
     font-family: "Inter", system-ui;
     font-size: 14px;
 }
 
 /* Tranistions */
-.component-rendering-tranistion{
+.component-rendering-tranistion {
     animation: 0.2s show-in ease-in;
 }
 
-@keyframes show-in{
-    from{
+@keyframes show-in {
+    from {
         opacity: 0;
     }
-    to{
+
+    to {
         opacity: 1;
     }
 }
 
-.reload-rounding{
+.reload-rounding {
     animation: reload-rounding infinite 0.4s linear;
 }
 
 
 @keyframes reload-rounding {
-    from{
+    from {
         rotate: 0;
     }
-    to{
+
+    to {
         rotate: 360deg;
     }
 }
@@ -39,18 +41,72 @@
 
 
 /* Sekeleton */
-.skeleton-line-animate{
+.skeleton-line-animate {
     animation: skeleton-line-animation infinite linear 1s;
 }
 
 @keyframes skeleton-line-animation {
-    0%{
+    0% {
         opacity: 0.6;
     }
-    50%{
+
+    50% {
         opacity: 1;
     }
-    100%{
+
+    100% {
         opacity: 0.6;
     }
+}
+
+
+
+/* Custom Checkbox */
+.custom-checkbox {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
+
+.custom-checkbox input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.checkbox-custom {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    height: 15px;
+    width: 15px;
+    background-color: #eee;
+    border-radius: 100px;
+    border: 1px solid rgb(164, 164, 164);
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox input[type="checkbox"]:checked+.checkbox-custom {
+    background-color: #4f46e5;
+    /* Indigo color when checked */
+    border-color: #4f46e5;
+    /* Border color when checked */
+}
+
+.checkbox-custom::after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 7px;
+    top: 4px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-checkbox input[type="checkbox"]:checked+.checkbox-custom::after {
+    display: block;
 }

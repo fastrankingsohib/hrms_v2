@@ -11,7 +11,7 @@ function AllApplicants(props) {
     ]);
 
     return (
-        <div className='p-4'>
+        <div className='p-4 h-full'>
             <div className='grid grid-cols-3 gap-4'>
                 <button
                     onClick={() => setSelectedTab("all")}
