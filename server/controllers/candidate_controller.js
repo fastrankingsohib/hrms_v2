@@ -70,9 +70,6 @@ const add_candidate = async (req, res) => {
       created_by,
     } = req.body;
 
-<<<<<<< HEAD
-    // Create candidate in the database without any validation checks
-=======
     
     if (!validator.isEmail(email_address)) {
       return res.status(400).send({ message: "Invalid email format." });
@@ -87,7 +84,6 @@ const add_candidate = async (req, res) => {
     if (emailOrContactCheck) return; 
 
     
->>>>>>> fff7f4a3c2fa7013ac7cfe44c1775518f8d2aa98
     const candidate = await prisma.candidate_list.create({
       data: {
         title,
@@ -123,28 +119,6 @@ const add_candidate = async (req, res) => {
 
     const candidate_id = candidate.candidate_id;
 
-<<<<<<< HEAD
-    // Experience handling: skip empty experience objects
-    if (Array.isArray(experiences) && experiences.length > 0) {
-      const experienceData = experiences
-        .filter((exp) => exp.organisation_name || exp.total_tenure || exp.last_designation || exp.last_drawn_salary) // Filter out empty objects
-        .map((exp) => ({
-          candidate_id: candidate_id,
-          organisation_name: exp.organisation_name || null,
-          total_tenure: exp.total_tenure || null,
-          last_designation: exp.last_designation || null,
-          last_drawn_salary: exp.last_drawn_salary || null,
-        }));
-
-      if (experienceData.length > 0) {
-        await prisma.work_experience.createMany({
-          data: experienceData,
-        });
-      }
-    }
-
-    // Qualification handling
-=======
     
     if (!Array.isArray(experiences) || experiences.length === 0) {
       throw new Error("Experience data is required and must be an array.");
@@ -164,7 +138,6 @@ const add_candidate = async (req, res) => {
     });
 
    
->>>>>>> fff7f4a3c2fa7013ac7cfe44c1775518f8d2aa98
     if (Array.isArray(qualifications) && qualifications.length > 0) {
       const qualificationData = qualifications.map((qual) => ({
         candidate_id: candidate_id,

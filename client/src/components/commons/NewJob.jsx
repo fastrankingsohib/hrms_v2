@@ -5,17 +5,24 @@ import { MdOutlineStarOutline, MdOutlineStarPurple500 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 
 function NewJob() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const userLoggedIn = JSON.parse(localStorage.getItem("userDetails"))
+
+    // State to store the list of skills
+    const [skills, setSkills] = useState([]);
+    const [skillInput, setSkillInput] = useState('');
+    const [jobExpiry, setJobExpiry] = useState("No Expiry")
+
     const [jobDetails, setJobDetails] = useState({
         job_title: "",
         job_type: 'Full Time',
         experience: 'Any',
         min_experience: "1",
         max_experience: "5",
-        skills: [],
+        skills: "",
         job_shift: 'Morning',
-        genders: "", // Store selected genders
-        required_qualification: [],
+        genders: "",
+        required_qualification: "",
         job_desc: "",
         job_location: "",
         number_of_opening: "",
@@ -32,6 +39,11 @@ function NewJob() {
         job_scheduled_date: "",
     });
 
+    useEffect(() => {
+        setJobDetails((values) => ({ ...values, skills: skills.join(', ') }))
+        console.log(jobDetails.skills)
+    }, [skills])
+
     const createJobPost = () => {
         axios.post("/post_job", {
             job_title: jobDetails.job_title,
@@ -39,10 +51,10 @@ function NewJob() {
             experience: jobDetails.experience,
             min_experience: jobDetails.min_experience,
             max_experience: jobDetails.max_experience,
-            skills: "skills,kjhh",
+            skills: jobDetails.skills,
             job_shift: jobDetails.job_shift,
-            genders: jobDetails.genders, // Store selected genders
-            required_qualification: "jobDetails.required_qualification",
+            genders: jobDetails.genders,
+            required_qualification: jobDetails.required_qualification,
             job_desc: jobDetails.job_desc,
             job_location: jobDetails.job_location,
             number_of_opening: jobDetails.number_of_opening,
@@ -51,8 +63,8 @@ function NewJob() {
             min_offered_salary: jobDetails.min_offered_salary,
             max_offered_salary: jobDetails.max_offered_salary,
             job_shift: jobDetails.job_shift,
-            created_by: "jobDetails.created_by",
-            job_status: jobDetails.job_status,
+            created_by: userLoggedIn ? userLoggedIn.username : "not defined",
+            job_status: jobDetails.job_scheduled_date === "" ? "Active" : "Scheduled",
             job_exp_date: jobDetails.job_exp_date,
             job_scheduled_date: jobDetails.job_scheduled_date
         }).then((res) => {
@@ -62,210 +74,24 @@ function NewJob() {
         }).catch((err) => console.log(err))
     }
 
-    const [isMinDropdownOpen, setIsMinDropdownOpen] = useState(false);
-    const [isMaxDropdownOpen, setIsMaxDropdownOpen] = useState(false);
-
-    const minDropdownRef = useRef(null);
-    const maxDropdownRef = useRef(null);
-
-    const experienceOptions = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]; // For years of experience
-    const daysOptions = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']; // Days for call availability
-
-
-    // Gender Selection
-    const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false); // State to manage dropdown visibility
-    const genderDropdownRef = useRef(null); // Ref for dropdown
-
-    const genderOptions = ['Male', 'Female']; // Gender options
-
-    // Function to handle toggling gender selection
-    const handleGenderToggle = (gender) => {
-        setJobDetails((prevDetails) => {
-            // Convert the CSV string to an array
-            const genderArray = prevDetails.genders ? prevDetails.genders.split(', ') : [];
-
-            // Check if the gender is already selected
-            const isGenderSelected = genderArray.includes(gender);
-
-            // Update the array by removing or adding the selected gender
-            const updatedGenders = isGenderSelected
-                ? genderArray.filter((g) => g !== gender) // Remove if selected
-                : [...genderArray, gender]; // Add if not selected
-
-            // Join the updated array back into a CSV string
-            const updatedGendersCSV = updatedGenders.join(', ');
-
-            // Update jobDetails with the new CSV string
-            return { ...prevDetails, genders: updatedGendersCSV };
-        });
-    };
-
-
-
-
-
-    // Close the dropdown if clicked outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (genderDropdownRef.current && !genderDropdownRef.current.contains(event.target)) {
-                setIsGenderDropdownOpen(false);
-            }
-        };
-
-        // Add event listener
-        document.addEventListener('mousedown', handleClickOutside);
-
-        // Cleanup the event listener on component unmount
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-
-
-
-    const handleExperienceSelect = (key, value) => {
-        setJobDetails((prev) => ({ ...prev, [key]: value }));
-    };
-
-    const handleDaySelect = (day) => {
-        setJobDetails((prev) => {
-            const newCustomCallDays = prev.customCallDays.includes(day)
-                ? prev.customCallDays.filter((d) => d !== day)
-                : [...prev.customCallDays, day];
-            return { ...prev, customCallDays: newCustomCallDays };
-        });
-    };
-
-    // Set predefined call days based on option selected
-    const handleCallDaysTypeSelect = (type) => {
-        let customCallDays = [];
-        if (type === 'Monday to Wednesday') {
-            customCallDays = ['Monday', 'Tuesday', 'Wednesday'];
-        } else if (type === 'Monday to Friday') {
-            customCallDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-        } else if (type === 'Monday to Saturday') {
-            customCallDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        }
-        setJobDetails((prev) => ({
-            ...prev,
-            callDaysType: type,
-            customCallDays: type === 'Custom' ? prev.customCallDays : customCallDays,
-        }));
-    };
-
-    // Effect to detect clicks outside the dropdown
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (minDropdownRef.current && !minDropdownRef.current.contains(event.target)) {
-                setIsMinDropdownOpen(false);
-            }
-            if (maxDropdownRef.current && !maxDropdownRef.current.contains(event.target)) {
-                setIsMaxDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-
-
-    const [skillInput, setSkillInput] = useState('');
-
-    // Function to handle adding a skill
+    // Function to handle adding a skill to the array
     const addSkill = () => {
-        if (skillInput && !jobDetails.skills.some(skill => skill.name === skillInput)) {
-            setJobDetails(prevDetails => ({
-                ...prevDetails,
-                skills: [...prevDetails.skills, { name: skillInput, required: false }], // Add skill as an object
-            }));
-            setSkillInput('');
+        if (skillInput && !skills.includes(skillInput)) {
+            setSkills(prevSkills => [...prevSkills, skillInput]); // Add new skill to array
+            setSkillInput(''); // Reset input field
         }
     };
 
-    // Function to handle removing a skill
+    // Function to handle removing a skill from the array
     const removeSkill = (skillToRemove) => {
-        setJobDetails(prevDetails => ({
-            ...prevDetails,
-            skills: prevDetails.skills.filter(skill => skill.name !== skillToRemove),
-        }));
+        setSkills(prevSkills => prevSkills.filter(skill => skill !== skillToRemove));
     };
 
-    // Function to toggle the required status of a skill
-    const toggleRequired = (skillName) => {
-        setJobDetails(prevDetails => ({
-            ...prevDetails,
-            skills: prevDetails.skills.map(skill =>
-                skill.name === skillName ? { ...skill, required: !skill.required } : skill
-            ),
-        }));
-    };
-
-    // Function to handle key press event
+    // Function to handle the Enter key to add skills
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
             addSkill();
         }
-    };
-
-
-
-
-
-    // Minimum Qualifications
-    const [isQualificationDropdownOpen, setIsQualificationDropdownOpen] = useState(false); // State for qualifications dropdown
-    const qualificationDropdownRef = useRef(null); // Ref for qualifications dropdown
-
-    // Qualification Selection
-    const qualificationOptions = ['10th', '12th', 'Graduation', 'Post-Graduation']; // Qualification options
-
-    // Function to handle toggling qualification selection
-    const handleQualificationToggle = (qualification) => {
-        setJobDetails((prevDetails) => {
-            const isQualificationSelected = prevDetails.required_qualification.includes(qualification);
-            const updatedrequired_qualification = isQualificationSelected
-                ? prevDetails.required_qualification.filter((q) => q !== qualification)
-                : [...prevDetails.required_qualification, qualification];
-
-            return { ...prevDetails, required_qualification: updatedrequired_qualification };
-        });
-    };
-
-    // Close the dropdown if clicked outside (existing code)
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (genderDropdownRef.current && !genderDropdownRef.current.contains(event.target)) {
-                setIsGenderDropdownOpen(false);
-            }
-            if (qualificationDropdownRef.current && !qualificationDropdownRef.current.contains(event.target)) {
-                setIsQualificationDropdownOpen(false);
-            }
-        };
-
-        // Add event listener
-        document.addEventListener('mousedown', handleClickOutside);
-
-        // Cleanup the event listener on component unmount
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-
-
-    // Job Location Handling
-    const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
-    const locationDropdownRef = useRef(null);
-    const locationOptions = ['Janakpuri, New Delhi'];
-
-    const handleLocationToggle = (location) => {
-        setJobDetails((prev) => ({
-            ...prev,
-            job_location: prev.job_location === location ? '' : location, // Toggle single selection for location
-        }));
     };
 
 
@@ -337,32 +163,12 @@ function NewJob() {
                     {/* Job Location Selection */}
                     <div className='bg-white select-none'>
                         <label className='font-semibold block mb-2'>Job Location</label>
-                        <div className='relative w-full' ref={locationDropdownRef}>
-                            <div
-                                className='p-2.5 border rounded-[8px] cursor-pointer'
-                                onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
-                            >
-                                {jobDetails.job_location
-                                    ? jobDetails.job_location // Show selected location
-                                    : 'Select Job Location'}
-                            </div>
-                            {isLocationDropdownOpen && (
-                                <div className='absolute z-10 bg-white border rounded-[8px] mt-1 max-h-40 overflow-auto w-full'>
-                                    {locationOptions.map((location) => (
-                                        <div
-                                            key={location}
-                                            className={`flex items-center p-2.5 mb-2 cursor-pointer ${jobDetails.job_location === location
-                                                ? 'bg-indigo-700 text-white'
-                                                : 'hover:bg-indigo-50'
-                                                }`}
-                                            onClick={() => handleLocationToggle(location)}
-                                        >
-                                            <label className='font-semibold'>{location}</label>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        <select onChange={(e) => setJobDetails((values) => ({ ...values, job_location: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option disabled={true}>--- Select Job Location ---</option>
+                            <option value={"Janakpuri"}>JanakPuri C-8, New Delhi - India</option>
+                            <option value={"Future House, Luton - England"}>Future House, Luton - England</option>
+                            <option value={"Time-Square, New-York - USA"}>Time-Square, New-York - USA</option>
+                        </select>
                     </div>
 
                     <div>
@@ -399,33 +205,14 @@ function NewJob() {
 
                     {/* Qualification Selection */}
                     <div className='bg-white select-none'>
-                        <label className='font-semibold block mb-2'>Select Qualification(s)</label>
-                        <div className='relative w-full' ref={qualificationDropdownRef}>
-                            <div
-                                className='p-2.5 border rounded-[8px] cursor-pointer'
-                                onClick={() => setIsQualificationDropdownOpen(!isQualificationDropdownOpen)}
-                            >
-                                {jobDetails.required_qualification.length > 0
-                                    ? jobDetails.required_qualification.join(', ') // Show selected qualifications
-                                    : 'Select Qualification(s)'}
-                            </div>
-                            {isQualificationDropdownOpen && (
-                                <div className='absolute z-10 bg-white border rounded-[8px] mt-1 max-h-40 overflow-auto w-full'>
-                                    {qualificationOptions.map((qualification) => (
-                                        <div
-                                            key={qualification}
-                                            className={`flex items-center p-2.5 mb-2 cursor-pointer ${jobDetails.required_qualification.includes(qualification)
-                                                ? 'bg-indigo-700 text-white'
-                                                : 'hover:bg-indigo-50'
-                                                }`}
-                                            onClick={() => handleQualificationToggle(qualification)}
-                                        >
-                                            <label className='font-semibold'>{qualification}</label>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        <label className='font-semibold block mb-2'>Select Required Qualification</label>
+                        <select onChange={(e) => setJobDetails((values) => ({ ...values, required_qualification: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option disabled={true}>--- Select Reuiqred Qualification ---</option>
+                            <option value={"10th"}>10th</option>
+                            <option value={"12th"}>12th</option>
+                            <option value={"Graduation"}>Graduation</option>
+                            <option value={"Post Graduation"}>Post - Graduation</option>
+                        </select>
                     </div>
 
                 </div>
@@ -471,33 +258,14 @@ function NewJob() {
 
 
                     <div className='bg-white p-4 mt-4 select-none'>
-                        <label className='font-semibold block mb-2'>Select Gender(s)</label>
-                        <div className='relative w-full' ref={genderDropdownRef}>
-                            <div
-                                className='p-2.5 border rounded-[8px] cursor-pointer'
-                                onClick={() => setIsGenderDropdownOpen(!isGenderDropdownOpen)}
-                            >
-                                {jobDetails.genders && jobDetails.genders.length > 0
-                                    ? jobDetails.genders // Show selected genders (already CSV)
-                                    : 'Select Gender(s)'}
-                            </div>
-                            {isGenderDropdownOpen && (
-                                <div className='absolute z-10 bg-white border rounded-[8px] mt-1 max-h-40 overflow-auto w-full'>
-                                    {genderOptions.map((gender) => (
-                                        <div
-                                            key={gender}
-                                            className={`flex items-center p-2.5 mb-2 cursor-pointer ${jobDetails.genders.includes(gender)
-                                                ? 'bg-indigo-700 text-white' // Selected state styles
-                                                : 'hover:bg-indigo-50' // Hover effect
-                                                }`}
-                                            onClick={() => handleGenderToggle(gender)}
-                                        >
-                                            <label className='font-semibold'>{gender}</label>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        <label className='font-semibold block mb-2'>Select Preffered Gender(s)</label>
+                        <select onChange={(e) => setJobDetails((values) => ({ ...values, required_qualification: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option disabled={true}>--- Select Preffered Gender(s) ---</option>
+                            <option value={"Male"}>Male</option>
+                            <option value={"Female"}>Female</option>
+                            <option value={"Both"}>Both</option>
+                            <option value={"Other"}>Other</option>
+                        </select>
                     </div>
 
                 </div>
@@ -540,54 +308,60 @@ function NewJob() {
                     <div className='mt-4 grid grid-cols-2 gap-4 cursor-default'>
                         <div className='w-full'>
                             <label className='font-semibold block mb-2'>Minimum Experience</label>
-                            <div className='relative w-full' ref={minDropdownRef}>
-                                <div
-                                    className='p-2.5 border rounded-[8px]'
-                                    onClick={() => setIsMinDropdownOpen(!isMinDropdownOpen)}>
-                                    {jobDetails.min_experience === 11 ? '10+ years' : `${jobDetails.min_experience} year(s)`}
-                                </div>
-                                {isMinDropdownOpen && (
-                                    <div className='w-full absolute z-10 bg-white border rounded-[8px] mt-1 max-h-40 overflow-auto'>
-                                        {experienceOptions.map((value) => (
-                                            <div
-                                                key={value}
-                                                className='p-2.5 hover:bg-indigo-50 rounded-[8px] w-full'
-                                                onClick={() => {
-                                                    handleExperienceSelect('min_experience', value);
-                                                    setIsMinDropdownOpen(false);
-                                                }}>
-                                                {value === 11 ? '10+ years' : `${value} year(s)`}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            <select defaultValue={jobDetails.min_experience}
+                                onChange={(e) => setJobDetails((values) => ({ ...values, min_experience: e.target.value }))}
+                                className='p-2.5 border rounded-[8px] w-full cursor-pointer'>
+                                <option value={"Select Miminum Qualification"} disabled={true}>-- Select Maximum Experience --</option>
+                                <option value={"1"}>1 Year</option>
+                                <option value={"2"}>2 Years</option>
+                                <option value={"3"}>3 Years</option>
+                                <option value={"4"}>4 Years</option>
+                                <option value={"5"}>5 Years</option>
+                                <option value={"6"}>6 Years</option>
+                                <option value={"7"}>7 Years</option>
+                                <option value={"8"}>8 Years</option>
+                                <option value={"9"}>9 Years</option>
+                                <option value={"10"}>10 Years</option>
+                                <option value={"11"}>11 Years</option>
+                                <option value={"12"}>12 Years</option>
+                                <option value={"13"}>13 Years</option>
+                                <option value={"14"}>14 Years</option>
+                                <option value={"15"}>15 Years</option>
+                                <option value={"16"}>16 Years</option>
+                                <option value={"17"}>17 Years</option>
+                                <option value={"18"}>18 Years</option>
+                                <option value={"19"}>19 Years</option>
+                                <option value={"20"}>20 Years</option>
+                            </select>
                         </div>
 
                         <div>
                             <label className='font-semibold block mb-2'>Maximum Experience</label>
-                            <div className='relative w-full' ref={maxDropdownRef}>
-                                <div
-                                    className='p-2.5 border rounded-[8px]'
-                                    onClick={() => setIsMaxDropdownOpen(!isMaxDropdownOpen)}>
-                                    {jobDetails.max_experience === 11 ? '10+ years' : `${jobDetails.max_experience} year(s)`}
-                                </div>
-                                {isMaxDropdownOpen && (
-                                    <div className='w-full absolute z-10 bg-white border rounded-[8px] mt-1 max-h-40 overflow-auto'>
-                                        {experienceOptions.map((value) => (
-                                            <div
-                                                key={value}
-                                                className='p-2.5 hover:bg-indigo-50 rounded-[8px] w-full'
-                                                onClick={() => {
-                                                    handleExperienceSelect('max_experience', value);
-                                                    setIsMaxDropdownOpen(false);
-                                                }}>
-                                                {value === 11 ? '10+ years' : `${value} year(s)`}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                            <select defaultValue={jobDetails.max_experience}
+                                onChange={(e) => setJobDetails((values) => ({ ...values, max_experience: e.target.value }))}
+                                className='p-2.5 border rounded-[8px] w-full cursor-pointer'>
+                                <option value={"Select Miminum Qualification"} disabled={true}>-- Select Maximum Experience --</option>
+                                <option value={"1"}>1 Year</option>
+                                <option value={"2"}>2 Years</option>
+                                <option value={"3"}>3 Years</option>
+                                <option value={"4"}>4 Years</option>
+                                <option value={"5"}>5 Years</option>
+                                <option value={"6"}>6 Years</option>
+                                <option value={"7"}>7 Years</option>
+                                <option value={"8"}>8 Years</option>
+                                <option value={"9"}>9 Years</option>
+                                <option value={"10"}>10 Years</option>
+                                <option value={"11"}>11 Years</option>
+                                <option value={"12"}>12 Years</option>
+                                <option value={"13"}>13 Years</option>
+                                <option value={"14"}>14 Years</option>
+                                <option value={"15"}>15 Years</option>
+                                <option value={"16"}>16 Years</option>
+                                <option value={"17"}>17 Years</option>
+                                <option value={"18"}>18 Years</option>
+                                <option value={"19"}>19 Years</option>
+                                <option value={"20"}>20 Years</option>
+                            </select>
                         </div>
                     </div>
                 )}
@@ -601,81 +375,63 @@ function NewJob() {
 
 
 
+            <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
+                <h1 className='text-xl font-semibold'>Skills</h1>
+                <div className='skills-manager mt-4'>
+                    <h1 className='mb-2 font-semibold'>Manage Skills</h1>
 
+                    {/* Input for new skills */}
+                    <div className='flex'>
+                        <input
+                            type='text'
+                            value={skillInput}
+                            onChange={(e) => setSkillInput(e.target.value)}
+                            onKeyPress={handleKeyPress} // Add skill on Enter key press
+                            placeholder='Add a skill'
+                            className='border rounded-lg p-2 px-4'
+                        />
+                    </div>
 
+                    {/* Display the list of skills */}
+                    <div className='mt-4 flex flex-wrap'>
+                        {skills.map((skill, index) => (
+                            <div key={index} className='skill-item bg-gray-200 px-4 py-2 rounded-full mr-2 mt-2'>
+                                {skill}
+                                <button
+                                    onClick={() => removeSkill(skill)}
+                                    className='ml-2 text-red-500'>
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
 
 
             <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
-                <h1 className='text-xl font-bold'>Skills</h1>
+                <h1 className='text-xl font-semibold mb-4'>Job Expiry</h1>
+                <button
+                    className={`h-[40px] rounded-[8px] px-4 min-w-32 ${jobExpiry === 'No Expiry' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                    onClick={() => setJobExpiry("No Expiry")}>
+                    No Expiry
+                </button>
+                <button
+                    className={`h-[40px] rounded-[8px] ml-4 px-4 min-w-32 ${jobExpiry === 'Set Expiry' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                    onClick={() => setJobExpiry("Set Expiry")}>
+                    Set Expiry
+                </button>
 
-                <div className='flex mt-4'>
-                    <input
-                        type='text'
-                        value={skillInput}
-                        onChange={(e) => setSkillInput(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder='Type to search for skills'
-                        className='border rounded-[8px] border-gray-300 p-2.5'
-                    />
-                </div>
-
-                <div className='mt-4 flex flex-wrap'>
-                    {jobDetails.skills.map((skill, index) => (
-                        <div key={index} className='flex items-center bg-gray-100 text-blue-800 overflow-hidden px-5 py-3 rounded-full mr-2 mt-2 pr-14 relative'>
-                            <button
-                                onClick={() => toggleRequired(skill.name)}
-                                className={`text-${skill.required ? 'green' : 'gray'}-500 -ml-2 mr-2`}
-                            >
-                                {skill.required ? <MdOutlineStarPurple500 size={'20px'} /> : <MdOutlineStarOutline size={'20px'} />}
-                            </button>
-
-                            {skill.name}
-
-                            <button onClick={() => removeSkill(skill.name)} className='ml-2 bg-red-500 text-white inline-flex items-center justify-center absolute right-2 h-7 w-7 rounded-full'>
-                                <IoMdClose size={'16px'} />
-                            </button>
-                        </div>
-                    ))}
+                <div className={`${jobExpiry === "Set Expiry" ? "block" : "hidden"} mt-4`}>
+                    <h1 className='mb-2 font-semibold'>Set Expiry Date</h1>
+                    <input type="date" className='p-2 px-6 border w-2/4 rounded-xl' onChange={(e) => setJobDetails((values) => ({...values, job_exp_date: e.target.value}))} />
                 </div>
             </div>
 
 
             <div className='py-4 text-right mt-10'>
-                <button className='p-2.5 bg-indigo-100 rounded-[8px] px-10 mr-4'
-                    onClick={openSchedulePopup} // This will open the popup
-                >
-                    Schedule Job
-                </button>
-                <button className='p-2.5 bg-indigo-700 rounded-[8px] text-white px-10'
-                    onClick={createJobPost} // Your existing job post function
-                    // onClick={() => {
-                    //     console.log({
-                    //         job_title: jobDetails.job_title,
-                    //         job_type: jobDetails.job_type,
-                    //         experience: jobDetails.experience,
-                    //         min_experience: jobDetails.min_experience,
-                    //         max_experience: jobDetails.max_experience,
-                    //         skills: "skills,kjhh",
-                    //         job_shift: jobDetails.job_shift,
-                    //         genders: jobDetails.genders, // Store selected genders
-                    //         required_qualification: "jobDetails.required_qualification",
-                    //         job_desc: jobDetails.job_desc,
-                    //         job_location: jobDetails.job_location,
-                    //         number_of_opening: jobDetails.number_of_opening,
-                    //         interview_timing: jobDetails.interview_timing,
-                    //         job_timing: jobDetails.job_timing,
-                    //         min_offered_salary: jobDetails.min_offered_salary,
-                    //         max_offered_salary: jobDetails.max_offered_salary,
-                    //         job_shift: jobDetails.job_shift,
-                    //         created_by: "jobDetails.created_by",
-                    //         job_status: jobDetails.job_status,
-                    //         job_exp_date: jobDetails.job_exp_date,
-                    //         job_scheduled_date: jobDetails.job_scheduled_date
-                    //     })
-                    // }}
-                >
-                    Post Job
-                </button>
+                <button className='p-2.5 bg-indigo-100 rounded-[8px] px-10 mr-4' onClick={openSchedulePopup}> Schedule Job </button>
+                <button className='p-2.5 bg-indigo-700 rounded-[8px] text-white px-10' onClick={createJobPost}> Post Job </button>
             </div>
 
 
@@ -691,7 +447,7 @@ function NewJob() {
                                 type="date"
                                 className="p-2.5 border rounded w-full"
                                 value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
+                                onChange={(e) => setJobDetails((values) => ({...values, job_scheduled_date: e.target.value}))}
                             />
                         </div>
                         <div className="mb-4">

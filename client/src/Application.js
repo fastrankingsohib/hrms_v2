@@ -6,13 +6,11 @@ import MyCandidates from "./components/pages/MyCandidates/MyCandidates";
 import NewCandidate from "./components/pages/NewCandidate/NewCandidate";
 import NewUser from "./components/pages/NewUser/NewUser";
 import PageNotFound from "./components/pages/PageNotFound";
-import PostNewJob from "./components/pages/PostNewJob/PostNewJob";
 import UserView from "./components/pages/userView/UserView";
 import Layout from "./components/Layouts/Layout";
 import JobsLayout from "./components/Layouts/Job/JobsLayout";
 import NewJob from "./components/Commons/NewJob";
 import JobView from "./components/pages/JobView/JobView";
-import JobOverview from "./components/pages/JobView/JobOverview";
 import UpdateJobDetails from "./components/pages/JobView/UpdateJobDetails";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom");

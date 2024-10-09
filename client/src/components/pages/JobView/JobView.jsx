@@ -90,20 +90,15 @@ function JobView() {
             <div className='h-full w-full overflow-auto relative'>
 
                 {/* Confirm Delete */}
-                <div style={{ display: popups.delete ? "flex" : "none" }} className='backdrop-blur-sm h-full w-full absolute flex items-center justify-center'>
+                <div style={{ display: popups.delete ? "flex" : "none" }} className='backdrop-blur-sm bg-indigo-700 bg-opacity-5 h-full z-50 w-full fixed  top-0 left-0 flex items-center justify-center'>
                     <div className='w-96 bg-white border p-4 text-center py-10 rounded-3xl relative'>
-                        <button className='inline-flex items-center justify-center h-10 w-10 bg-gray-100 rounded-full border absolute -top-4 -right-4'
-                            onClick={() => setPopups((values) => ({ ...values, delete: false }))}
-                        ><IoMdClose size={"15px"} /></button>
-                        <h1 className='text-red-500'>Do You Really <strong>Want to Delete</strong>?</h1>
-                        <button className='p-2 px-4 bg-red-500 text-white rounded-xl mt-4' onClick={handleDelete}>Delete Confirm</button>
+                        <h1 className='text-indigored-700 text-xl'>Do You Really <strong className='text-xl'>Want to Delete</strong>?</h1>
+                        <button className='p-2 px-4 bg-gray-50 border rounded-xl mt-4 mr-4' onClick={() => setPopups((values) => ({ ...values, delete: false }))}>Cancel Delete</button>
+                        <button className='p-2 px-4 bg-indigo-700 text-white rounded-xl mt-4' onClick={handleDelete}>Delete Confirm</button>
                     </div>
                 </div>
 
                 {/* Edit Details */}
-
-
-
                 <h1 className='px-4 h-[2.18em] text-3xl font-semibold border-b pb-0 flex justify-between items-center sticky top-0 bg-white z-30'>
                     {jobDetails.job_title}
 
@@ -120,35 +115,22 @@ function JobView() {
                         </button>
                     </div>
                 </h1>
-                {/* <div className='min-h-[20px] border-b flex items-center px-4 gap-4'>
-
-
-                    <button onClick={() => setSelectedTab("rejected candidates")}
-                        className={`${selectedTab === "rejected candidates" ? "bg-indigo-700 text-white" : "bg-gray-100"} inline-flex items-center justify-center rounded-full border h-10 px-4 min-w-32`}>
-                        Rejected Candidates
-                    </button>
-
-                    <button onClick={() => setSelectedTab("approved candidates")}
-                        className={`${selectedTab === "approved candidates" ? "bg-indigo-700 text-white" : "bg-gray-100"} inline-flex items-center justify-center rounded-full border h-10 px-4 min-w-32`}>
-                        Approved Candidates
-                    </button>
-                </div> */}
-                {/* Render your JobOverview or other components based on the selectedTab */}
-
-
 
                 <div className={`${selectedTab === "overview" ? "block" : "hidden"}`}>
                     <JobOverview jobDetails={jobDetails} />
-                    <div className='p-4'>
-                        <h1 className='font-semibold flex items-center mb-4'><span className='min-w-fit mr-4 text-2xl text-red-500'>Danger Zone</span> <div className='h-0.5 w-full bg-gray-200'></div></h1>
+                    <div className='p-16 pt-14 bg-gray-50 border-t mt-40 h-full'>
+                        <h1 className='font-semibold flex items-center mb-4'>
+                            <span className='min-w-fit mr-4 text-2xl text-red-500'>Danger Zone</span>
+                            {/* <div className='h-0.5 w-full bg-gray-200'></div> */}
+                        </h1>
                         <div className='flex gap-4'>
-                            <button className='h-10 px-4 border rounded-xl inline-flex gap-2 items-center'
+                            <button className='h-10 px-4 border border-indigo-700 text-indigo-700 rounded-xl inline-flex gap-2 items-center'
                                 onClick={() => {
                                     setPopups((values) => ({ ...values, editDetails: true }));
                                     Navigate(`/jobs/update/${jobId}`);
                                 }}
                             ><MdEdit /> Edit This Job</button>
-                            <button className='h-10 px-5 text-red-500  border border-red-500 rounded-xl'>Make it {jobDetails.job_status === "active" || jobDetails.job_status === "Active" ? "Inactive" : "Active"}</button>
+                            {/* <button className='h-10 px-5 text-red-500  border border-red-500 rounded-xl'>Make it {jobDetails.job_status === "active" || jobDetails.job_status === "Active" ? "Inactive" : "Active"}</button> */}
                             <button className='h-10 px-5 bg-red-500 text-white rounded-xl'
                                 onClick={() => setPopups((values) => ({ ...values, delete: true }))}
                             >Delete This Job</button>
@@ -160,7 +142,7 @@ function JobView() {
         );
     }
 
-    return null; // Default fallback in case none of the above conditions match
+    return null;
 }
 
 export default JobView;

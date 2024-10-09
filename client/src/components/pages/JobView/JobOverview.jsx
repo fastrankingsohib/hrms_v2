@@ -99,8 +99,8 @@ function JobOverview(props) {
             </div>
             <div className="flex">
                 <span className='text-gray-400 min-w-60 inline-block'>Job Status</span>
-                <span className='inline-flex gap-1 items-center justify-center p-1 px-3 bg-green-500 rounded-full text-white capitalize'>
-                    <GoDotFill className='text-green-200' /> {jobDetails.job_status}
+                <span className={`inline-flex gap-1 items-center justify-center p-1 px-3 rounded-full text-white capitalize ${jobDetails.job_status === "Active" ? "bg-green-500" : "bg-red-500"}`}>
+                    <GoDotFill className={`${jobDetails.job_status === "Active" ? "text-green-200" : "text-red-200"}`} /> {jobDetails.job_status}
                 </span>
             </div>
             <div className="flex">
