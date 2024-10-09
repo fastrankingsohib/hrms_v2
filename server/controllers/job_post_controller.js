@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 const post_jobs = async(req,res)=>{
     try {
         const { job_title, job_type, job_desc, experience, job_location, number_of_opening, interview_timing, job_timing, required_qualification, min_offered_salary,
-            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date, skills
+            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date, skills, job_scheduled_time
          } = req.body;
     
         await prisma.job_post.create({
@@ -29,6 +29,7 @@ const post_jobs = async(req,res)=>{
                 job_status: job_status,
                 job_exp_date: job_exp_date,
                 job_scheduled_date: job_scheduled_date,
+                job_scheduled_time:job_scheduled_time
             }
         })
 
@@ -77,7 +78,7 @@ const display_posted_jobs = async (req,res) =>{
 const id_based_jobs = async(req,res)=>{
     try{
         const id = req.params.id;
-        const job = await prisma.job_post.findUnique({where:{id:Number(id)}})
+        const job = await prisma.job_post.findMany({where:{id:Number(id)}})
         res.status(200).send({
             success:true,
             message: "Job fetched successfully",
@@ -99,7 +100,7 @@ const update_post_job = async (req,res)=>{
         
         const id = req.params.id;
         const { job_title, job_type, job_desc, experience, job_location, number_of_opening, interview_timing, job_timing, required_qualification, min_offered_salary,
-            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date,skills
+            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date,skills,job_scheduled_time
          } = req.body;
 
         await prisma.job_post.update({where:{id:Number(id)}, data: {
@@ -123,6 +124,7 @@ const update_post_job = async (req,res)=>{
                 job_status: job_status,
                 job_exp_date: job_exp_date,
                 job_scheduled_date: job_scheduled_date,
+                job_scheduled_time:job_scheduled_time
         }})
         res.status(200).send({
             success:true,
