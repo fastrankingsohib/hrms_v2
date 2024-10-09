@@ -144,7 +144,7 @@ const inactive_job_posts = async(req,res)=>{
 const id_based_jobs = async(req,res)=>{
     try{
         const id = req.params.id;
-        const job = await prisma.job_post.findMany({where:{id:Number(id)}})
+        const job = await prisma.job_post.findUnique({where:{id:Number(id)}})
         res.status(200).send({
             success:true,
             message: "Job fetched successfully",

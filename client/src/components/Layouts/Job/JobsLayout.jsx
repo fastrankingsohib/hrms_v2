@@ -40,11 +40,11 @@ function JobsLayout() {
                         </div>
                     </div>
 
-                    <Link to={"/jobs/new-job"} className='h-12 inline-flex items-center justify-center p-2 w-full bg-black text-white text-2xl max-w-12 rounded-xl'>+</Link>
+                    <Link to={"/jobs/new-job"} className='h-12 inline-flex items-center justify-center p-2 w-full bg-indigo-700 text-white text-2xl max-w-12 rounded-xl'>+</Link>
                 </div>
 
                 <div className='grid'>
-                    <AllJobPosts />
+                    <AllJobPosts activeSelection={activeButton} />
                 </div>
             </div>
             <div className='w-3/4 h-full'>

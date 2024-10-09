@@ -45,9 +45,7 @@ function UpdateJobDetails() {
     useEffect(() => {
         axios.get(`/id_based_jobs/${jobId}`)
             .then((res) => {
-                console.log(res.data);
                 setDefaultData(res.data.job);
-                console.log(defaultData)
             })
             .catch((err) => {
                 console.log(err)
@@ -56,7 +54,6 @@ function UpdateJobDetails() {
 
     const updateJobPost = () => {
         axios.post(`/update_job_post/${jobId}`, defaultData).then((res) => {
-            console.log(res.data);
             navigate(-1);
         }).catch((err) => console.log(err))
     }

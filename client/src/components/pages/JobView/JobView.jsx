@@ -46,7 +46,6 @@ function JobView() {
         e.preventDefault();
         axios.get(`/delete/${jobId}`)
             .then((res) => {
-                console.log(res.data)
                 Navigate("/jobs")
             })
             .catch((err) => {

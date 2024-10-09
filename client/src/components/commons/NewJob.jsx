@@ -4,6 +4,8 @@ import { IoMdClose } from 'react-icons/io';
 import { MdOutlineStarOutline, MdOutlineStarPurple500 } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 
+import { PiUploadSimple } from "react-icons/pi";
+
 function NewJob() {
     const navigate = useNavigate();
     const userLoggedIn = JSON.parse(localStorage.getItem("userDetails"))
@@ -424,9 +426,19 @@ function NewJob() {
 
                 <div className={`${jobExpiry === "Set Expiry" ? "block" : "hidden"} mt-4`}>
                     <h1 className='mb-2 font-semibold'>Set Expiry Date</h1>
-                    <input type="date" className='p-2 px-6 border w-2/4 rounded-xl' onChange={(e) => setJobDetails((values) => ({...values, job_exp_date: e.target.value}))} />
+                    <input type="date" className='p-2 px-6 border w-2/4 rounded-xl' onChange={(e) => setJobDetails((values) => ({ ...values, job_exp_date: e.target.value }))} />
                 </div>
             </div>
+
+
+            <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
+                <h1 className='text-xl font-semibold mb-4'>Upload Job Description - PDF</h1>
+                <label htmlFor="uploadPDF" className='inline-flex gap-4 items-center justify-center cursor-pointer h-28 w-80 rounded-xl bg-gray-100'>
+                    <PiUploadSimple size={"20px"} /> Click Here To Upload
+                </label>
+                <input type="file" id='uploadPDF' className='hidden' accept="application/pdf" />
+            </div>
+
 
 
             <div className='py-4 text-right mt-10'>
@@ -447,7 +459,7 @@ function NewJob() {
                                 type="date"
                                 className="p-2.5 border rounded w-full"
                                 value={selectedDate}
-                                onChange={(e) => setJobDetails((values) => ({...values, job_scheduled_date: e.target.value}))}
+                                onChange={(e) => setJobDetails((values) => ({ ...values, job_scheduled_date: e.target.value }))}
                             />
                         </div>
                         <div className="mb-4">
