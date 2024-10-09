@@ -382,6 +382,7 @@ const update_candidate = async (req, res) => {
       other2,
       other3,
       status,
+      current_status,
       qualifications,
       experiences,
       jobs 
@@ -419,6 +420,7 @@ const update_candidate = async (req, res) => {
         other2,
         other3,
         status,
+        current_status
       },
     });
 
