@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 const post_jobs = async(req,res)=>{
     try {
         const { job_title, job_type, job_desc, experience, job_location, number_of_opening, interview_timing, job_timing, required_qualification, min_offered_salary,
-            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date
+            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date, skills
          } = req.body;
     
         await prisma.job_post.create({
@@ -16,6 +16,7 @@ const post_jobs = async(req,res)=>{
                 interview_timing: interview_timing,
                 job_timing: job_timing,
                 required_qualification: required_qualification,
+                skills: skills,
                 min_offered_salary: min_offered_salary,
                 max_offered_salary: max_offered_salary,
                 job_shift: job_shift,
@@ -46,7 +47,12 @@ const post_jobs = async(req,res)=>{
 
 const display_posted_jobs = async (req,res) =>{
     try {
-        const jobs = await prisma.job_post.findMany()
+        const jobs = await prisma.job_post.findMany({
+            orderBy: {
+              id: 'desc',
+            }
+          });
+          
         if(jobs.length==0){
             res.status(404).send({
                 message: "No jobs posted yet",
@@ -93,7 +99,7 @@ const update_post_job = async (req,res)=>{
         
         const id = req.params.id;
         const { job_title, job_type, job_desc, experience, job_location, number_of_opening, interview_timing, job_timing, required_qualification, min_offered_salary,
-            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date
+            max_offered_salary, job_shift, genders, min_experience, max_experience, created_by, job_status, job_exp_date, job_scheduled_date,skills
          } = req.body;
 
         await prisma.job_post.update({where:{id:Number(id)}, data: {
@@ -104,6 +110,7 @@ const update_post_job = async (req,res)=>{
                 interview_timing: interview_timing,
                 job_timing: job_timing,
                 required_qualification: required_qualification,
+                skills: skills,
                 min_offered_salary: min_offered_salary,
                 max_offered_salary: max_offered_salary,
                 job_shift: job_shift,
@@ -147,4 +154,26 @@ const delete_posts = async(req,res)=>{
     }
 }
 
-export {display_posted_jobs,post_jobs,id_based_jobs,update_post_job,delete_posts}
+const latest_created_job = async(req,res) =>{
+    try {
+        const job = await prisma.job_post.findMany({
+            orderBy: {
+              id: 'desc',
+            },
+            take: 1,
+          })
+          res.status(200).send({
+            success: true,
+            data: job
+          })
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).send({
+            success:false,
+            message: "Error fetching latest created job"
+        })
+    }
+}
+
+export {display_posted_jobs,post_jobs,id_based_jobs,update_post_job,delete_posts,latest_created_job}

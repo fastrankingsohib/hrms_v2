@@ -66,10 +66,28 @@ const add_candidate = async (req, res) => {
       status,
       qualifications,
       experiences,
+      jobs, 
       created_by,
     } = req.body;
 
+<<<<<<< HEAD
     // Create candidate in the database without any validation checks
+=======
+    
+    if (!validator.isEmail(email_address)) {
+      return res.status(400).send({ message: "Invalid email format." });
+    }
+
+    if (!validator.isMobilePhone(contact_number, 'any', { strictMode: false })) {
+      return res.status(400).send({ message: "Invalid mobile number." });
+    }
+
+    
+    const emailOrContactCheck = await check_email_contact(req, res);
+    if (emailOrContactCheck) return; 
+
+    
+>>>>>>> fff7f4a3c2fa7013ac7cfe44c1775518f8d2aa98
     const candidate = await prisma.candidate_list.create({
       data: {
         title,
@@ -87,7 +105,7 @@ const add_candidate = async (req, res) => {
         email_address,
         alt_email_address,
         date_of_birth,
-        job_title,
+        job_title, 
         department,
         work_experience: work_experience || null, // Handle empty work_experience
         hobbies,
@@ -105,6 +123,7 @@ const add_candidate = async (req, res) => {
 
     const candidate_id = candidate.candidate_id;
 
+<<<<<<< HEAD
     // Experience handling: skip empty experience objects
     if (Array.isArray(experiences) && experiences.length > 0) {
       const experienceData = experiences
@@ -125,6 +144,27 @@ const add_candidate = async (req, res) => {
     }
 
     // Qualification handling
+=======
+    
+    if (!Array.isArray(experiences) || experiences.length === 0) {
+      throw new Error("Experience data is required and must be an array.");
+    }
+
+    const experienceData = experiences.map((exp) => ({
+      candidate_id: candidate_id,
+      organisation_name: exp.organisation_name,
+      total_tenure: exp.total_tenure || null,
+      last_designation: exp.last_designation || null,
+      last_drawn_salary: exp.last_drawn_salary || null,
+    }));
+
+    
+    await prisma.work_experience.createMany({
+      data: experienceData,
+    });
+
+   
+>>>>>>> fff7f4a3c2fa7013ac7cfe44c1775518f8d2aa98
     if (Array.isArray(qualifications) && qualifications.length > 0) {
       const qualificationData = qualifications.map((qual) => ({
         candidate_id: candidate_id,
@@ -133,16 +173,27 @@ const add_candidate = async (req, res) => {
         year_of_passing: qual.year_of_passing,
         percentage_cgpa: qual.percentage_cgpa || null,
       }));
-
+    
       await prisma.qualifications.createMany({
         data: qualificationData,
       });
     }
 
-    // Return a success message
+    if (Array.isArray(jobs) && jobs.length > 0) {
+      const jobData = jobs.map((jobId) => ({
+        candidate_id: candidate_id,
+        job_id: jobId, 
+      }));
+
+      await prisma.candidate_applied_jobs.createMany({
+        data: jobData,
+      });
+    }
+
+  
     return res.status(200).json({
       success: true,
-      message: "Candidate, experiences, and qualifications added successfully.",
+      message: "Candidate, experiences, qualifications, and jobs added successfully.",
       candidate_id: candidate_id,
     });
   } catch (error) {
@@ -150,7 +201,7 @@ const add_candidate = async (req, res) => {
 
     res.status(500).send({
       success: false,
-      message: "Some error occurred while adding candidate, experiences, and qualifications.",
+      message: "Some error occurred while adding candidate, experiences, qualifications, and jobs.",
     });
   }
 };
@@ -181,11 +232,20 @@ const reporting_to_users = async(req, res) => {
 
 const all_candidates = async (req, res) => {
   try {
-    // Fetch all candidates with work experience and qualifications
+    
     const candidates = await prisma.candidate_list.findMany({
       include: {
-        workExperiences: true,  // Include related work experiences
-        qualifications: true,   // Include related qualifications
+        workExperiences: true, 
+        qualifications: true,  
+        candidate_applied_jobs: {
+          include: {
+            job: { // Include the related job_post to retrieve job_title
+              select: {
+                job_title: true, // Retrieve job_title from the job_post
+              },
+            },
+          },
+        },
       },
     });
 
@@ -206,7 +266,6 @@ const all_candidates = async (req, res) => {
 
 const my_candidates = async (req, res) => {
   try {
-    // Fetch all candidates with work experience and qualifications
     const candidates = await prisma.candidate_list.findMany({
       where: {
         created_by : 'Sohib'
@@ -269,35 +328,57 @@ const delete_candidate = async(req,res) =>{
   }
 }
 
-const send_data_by_id =async(req,res) =>{
+const send_data_by_id = async (req, res) => {
   try {
-    const candidate_id = req.params.id
-    const candidate = await prisma.candidate_list.findMany({
-      where:{
-        candidate_id:Number(candidate_id)
+    const candidate_id = Number(req.params.id); // Ensure candidate_id is a number
+
+    // Fetch candidate data including work experiences, qualifications, and applied jobs with job titles
+    const candidate = await prisma.candidate_list.findUnique({
+      where: {
+        candidate_id: candidate_id,
       },
       include: {
-        workExperiences: true,  // Include related work experiences
-        qualifications: true,   // Include related qualifications
+        workExperiences: true, // Include work experiences
+        qualifications: true, // Include qualifications
+        candidate_applied_jobs: {
+          include: {
+            job: { // Include the related job_post to retrieve job_title
+              select: {
+                job_title: true, // Retrieve job_title from the job_post
+              },
+            },
+          },
+        },
       },
-    })
+    });
+
+    // Check if candidate data exists
+    if (!candidate) {
+      return res.status(404).send({
+        success: false,
+        message: "Candidate not found",
+      });
+    }
+
+    // Send the candidate data with the job titles
     res.status(200).send({
-      success:true,
-      message:"data successfully retrieved",
-      candidate:candidate
-    })
+      success: true,
+      message: "Data successfully retrieved",
+      candidate: candidate,
+    });
   } catch (error) {
-    console.log(error)
+    console.error(error);
     res.status(500).send({
-      success:false,
-      message: 'Error sending data'
-    })
+      success: false,
+      message: "Error sending data",
+    });
   }
-}
+};
+
 
 
 const update_candidate = async (req, res) => {
-  const candidateId = parseInt(req.params.id); // Get candidate ID from URL params
+  const candidateId = parseInt(req.params.id); 
 
   try {
     const {
@@ -330,9 +411,9 @@ const update_candidate = async (req, res) => {
       status,
       qualifications,
       experiences,
+      jobs 
     } = req.body;
 
-    // Update candidate data
     const updatedCandidate = await prisma.candidate_list.update({
       where: {
         candidate_id: candidateId,
@@ -368,14 +449,12 @@ const update_candidate = async (req, res) => {
       },
     });
 
-    // Delete existing work experiences for the candidate
     await prisma.work_experience.deleteMany({
       where: {
         candidate_id: candidateId,
       },
     });
 
-    // Insert new work experiences
     if (Array.isArray(experiences) && experiences.length > 0) {
       const experienceData = experiences.map((exp) => ({
         candidate_id: candidateId,
@@ -390,14 +469,12 @@ const update_candidate = async (req, res) => {
       });
     }
 
-    // Delete existing qualifications for the candidate
     await prisma.qualifications.deleteMany({
       where: {
         candidate_id: candidateId,
       },
     });
 
-    // Insert new qualifications
     if (Array.isArray(qualifications) && qualifications.length > 0) {
       const qualificationData = qualifications.map((qual) => ({
         candidate_id: candidateId,
@@ -412,10 +489,26 @@ const update_candidate = async (req, res) => {
       });
     }
 
-    // Return a success message
+    await prisma.candidate_applied_jobs.deleteMany({
+      where: {
+        candidate_id: candidateId,
+      },
+    });
+
+    if (Array.isArray(jobs) && jobs.length > 0) {
+      const jobData = jobs.map((jobId) => ({
+        candidate_id: candidateId,
+        job_id: jobId, 
+      }));
+
+      await prisma.candidate_applied_jobs.createMany({
+        data: jobData,
+      });
+    }
+
     return res.status(200).json({
       success: true,
-      message: "Candidate, experiences, and qualifications updated successfully.",
+      message: "Candidate, experiences, qualifications, and job titles updated successfully.",
       candidate_id: candidateId,
     });
   } catch (error) {
@@ -423,10 +516,11 @@ const update_candidate = async (req, res) => {
 
     res.status(500).send({
       success: false,
-      message: "Some error occurred while updating candidate, experiences, and qualifications.",
+      message: "Some error occurred while updating candidate, experiences, qualifications, and job titles.",
     });
   }
 };
+
 
 const module_data = async(req,res)=>{
   try {
