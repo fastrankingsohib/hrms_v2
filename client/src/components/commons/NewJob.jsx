@@ -431,13 +431,13 @@ function NewJob() {
             </div>
 
 
-            <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
+            {/* <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
                 <h1 className='text-xl font-semibold mb-4'>Upload Job Description - PDF</h1>
                 <label htmlFor="uploadPDF" className='inline-flex gap-4 items-center justify-center cursor-pointer h-28 w-80 rounded-xl bg-gray-100'>
                     <PiUploadSimple size={"20px"} /> Click Here To Upload
                 </label>
                 <input type="file" id='uploadPDF' className='hidden' accept="application/pdf" />
-            </div>
+            </div> */}
 
 
 

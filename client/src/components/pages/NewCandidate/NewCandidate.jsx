@@ -5,6 +5,7 @@ import useNewCandidate from "../../../helpers/useNewCandidate";
 import { FaTimes } from "react-icons/fa";
 import { MdDone } from "react-icons/md";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
+import axios from "axios";
 
 const NewCandidate = () => {
     const { registerCandidate, loading, success, error } = useNewCandidate()
@@ -35,7 +36,21 @@ const NewCandidate = () => {
         "other1": "Additional info 1",
         "other2": "Additional info 2",
         "other3": "Additional info 3",
+        "jobs": [35, 38, 43],
+        "created_by": "recruiter@example.com"
     })
+
+    const [allJobs, setAllJobs] = useState([]);
+    useEffect(() => {
+        axios.get("/display_jobs")
+            .then((res) => {
+                console.log(res.data);
+                setAllJobs(res.data.jobs);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }, [])
 
     // Experience Handlings
     const initialExperienceField = {
@@ -473,45 +488,15 @@ const NewCandidate = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Job Title</label>
 
-                        <select className="primary-input"
-                            onChange={(e) => setCandidate((values) => ({ ...values, job_title: e.target.value }))}
-                        >
+                        <select className="primary-input" onChange={(e) => setCandidate((values) => ({ ...values, job_title: e.target.value }))}>
                             <option value="" selected disabled>-- Job Title --</option>
-
-                            <optgroup label="Sales">
-                                <option value="Telesales">Telesales</option>
-                                <option value="Sales Manager">Sales Manager</option>
-                                <option value="Account Executive">Account Executive</option>
-                                <option value="Business Development Manager">Business Development Manager</option>
-                            </optgroup>
-
-                            <optgroup label="Development">
-                                <option value="Frontend Developer">Frontend Developer</option>
-                                <option value="Backend Developer">Backend Developer</option>
-                                <option value="Full Stack Developer">Full Stack Developer</option>
-                                <option value="Mobile App Developer">Mobile App Developer</option>
-                            </optgroup>
-
-                            <optgroup label="Design">
-                                <option value="UI/UX Designer">UI/UX Designer</option>
-                                <option value="Graphic Designer">Graphic Designer</option>
-                                <option value="Product Designer">Product Designer</option>
-                                <option value="Web Designer">Web Designer</option>
-                            </optgroup>
-
-                            <optgroup label="Marketing">
-                                <option value="Digital Marketing Specialist">Digital Marketing Specialist</option>
-                                <option value="Content Strategist">Content Strategist</option>
-                                <option value="SEO Specialist">SEO Specialist</option>
-                                <option value="Social Media Manager">Social Media Manager</option>
-                            </optgroup>
-
-                            <optgroup label="Management">
-                                <option value="Project Manager">Project Manager</option>
-                                <option value="Operations Manager">Operations Manager</option>
-                                <option value="Product Manager">Product Manager</option>
-                                <option value="Human Resources Manager">Human Resources Manager</option>
-                            </optgroup>
+                            {
+                                allJobs ? allJobs.map((value, index) => {
+                                    return (
+                                        <option value={value.id} onClick={() => setCandidate((values) => ({...values, jobs: [value]}))}>{value.job_title}</option>
+                                    )
+                                }) : <option value="Telesales">No Jobs Found</option>
+                            }
                         </select>
                     </div>
 

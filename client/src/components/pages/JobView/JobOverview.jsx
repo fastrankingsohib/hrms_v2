@@ -66,6 +66,10 @@ function JobOverview(props) {
                 <span className='text-gray-400 min-w-60 inline-block'>Required Qualifications</span>
                 <span>{jobDetails.required_qualification}</span>
             </div>
+            <div className="flex">
+                <span className='text-gray-400 min-w-60 inline-block'>Required Skills</span>
+                <span>{jobDetails.skills}</span>
+            </div>
             {jobDetails.experience === "Experienced Only" ? (
                 <div className='grid gap-4'>
                     <div className='text-gray-400'>

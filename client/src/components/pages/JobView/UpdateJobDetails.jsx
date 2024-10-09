@@ -7,7 +7,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 function UpdateJobDetails() {
     const navigate = useNavigate();
     const { jobId } = useParams();
-    const [defaultData, setDefaultData] = useState({})
+
+
     // const [allStatus, setAllStatus] = useState({
     //   error
     // })
@@ -37,6 +38,41 @@ function UpdateJobDetails() {
         job_scheduled_date: "",
     });
 
+    // State to store the list of skills
+    const [skillInput, setSkillInput] = useState('');
+    const [defaultData, setDefaultData] = useState({})
+    const [skills, setSkills] = useState(defaultData.skills ? defaultData.skills.split(",") : []);
+    useEffect(() => {
+        setSkills(defaultData.skills ? defaultData.skills.split(",") : [])
+    }, [defaultData])
+
+    // setDefaultData((values) => ({ ...values, skills: skills.join(', ') }))
+    useEffect(() => {
+        // console.log(skills)
+        // setDefaultData((values) => ({...values, skills: skills}))
+    }, [skills])
+
+
+    // Function to handle adding a skill to the array
+    const addSkill = () => {
+        if (skillInput && !skills.includes(skillInput)) {
+            setSkills(prevSkills => [...prevSkills, skillInput]); // Add new skill to array
+            setSkillInput(''); // Reset input field
+        }
+    };
+
+    // Function to handle removing a skill from the array
+    const removeSkill = (skillToRemove) => {
+        setSkills(prevSkills => prevSkills.filter(skill => skill !== skillToRemove));
+    };
+
+    // Function to handle the Enter key to add skills
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            addSkill();
+        }
+    };
+
     const [lastSkills, setLastSkills] = useState()
     useEffect(() => {
         setLastSkills(defaultData.skills ? defaultData.skills.split(",") : []);
@@ -46,6 +82,8 @@ function UpdateJobDetails() {
         axios.get(`/id_based_jobs/${jobId}`)
             .then((res) => {
                 setDefaultData(res.data.job);
+                console.log(res.data.job)
+                setDefaultData((values) => ({ ...values, skills: res.data.job.skills }));
             })
             .catch((err) => {
                 console.log(err)
@@ -292,10 +330,10 @@ function UpdateJobDetails() {
                     {/* Job Location Selection */}
                     <div className='bg-white'>
                         <label className='font-semibold block mb-2'>Job Location</label>
-                        <select value={defaultData.job_location}
+                        <select value={defaultData.job_location ? defaultData.job_location : "--"}
                             onChange={(e) => setDefaultData((values) => ({ ...values, job_location: e.target.value }))}
                             className='p-2.5 border rounded-[8px] w-full'>
-                            <option disabled={true}>--- Select Job Location ---</option>
+                            <option disabled={true} value={"--"}>--- Select Job Location ---</option>
                             <option value={"Janakpuri"}>JanakPuri C-8, New Delhi - India</option>
                             <option value={"Future House, Luton - England"}>Future House, Luton - England</option>
                             <option value={"Time-Square, New-York - USA"}>Time-Square, New-York - USA</option>
@@ -312,8 +350,8 @@ function UpdateJobDetails() {
 
                     <div>
                         <label className='font-semibold block mb-2'>Interview Timings</label>
-                        <select onChange={(e) => setDefaultData((values) => ({ ...values, interview_timing: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
-                            <option disabled={true}>-- Interview Timings --</option>
+                        <select value={defaultData.interview_timing ? defaultData.interview_timing : "--"} onChange={(e) => setDefaultData((values) => ({ ...values, interview_timing: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option disabled={true} value={"--"}>-- Interview Timings --</option>
                             <option value={"Mon - Fri || Regular Time"}>Mon - Fri || Regular Time</option>
                             <option value={"Mon - Sat || Regular Time"}>Mon - Sat || Regular Time</option>
                             <option value={"Sat Only || Regular Time"}>Sat Only || Regular Time</option>
@@ -323,8 +361,8 @@ function UpdateJobDetails() {
 
                     <div>
                         <label className='font-semibold block mb-2'>Job Timings</label>
-                        <select value={defaultData.job_timing} onChange={(e) => setDefaultData((values) => ({ ...values, job_timing: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
-                            <option disabled={true}>-- Select Minimum Qualification --</option>
+                        <select value={defaultData.job_timing ? defaultData.job_timing : "--"} onChange={(e) => setDefaultData((values) => ({ ...values, job_timing: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option disabled={true} value={"--"}>-- Select Minimum Qualification --</option>
                             <option value={"Regular Shift"}>Regular Shift</option>
                             <option value={"Shift 2"}>Shift 2</option>
                             <option value={"Shift 3"}>Shift 3</option>
@@ -333,10 +371,10 @@ function UpdateJobDetails() {
 
                     <div className='bg-white select-none'>
                         <label className='font-semibold block mb-2'>Minimum Qualification</label>
-                        <select value={defaultData.required_qualification}
+                        <select value={defaultData.required_qualification ? defaultData.required_qualification : "--"}
                             onChange={(e) => setDefaultData((values) => ({ ...values, required_qualification: e.target.value }))}
                             className='p-2.5 border rounded-[8px] w-full '>
-                            <option disabled={true}>-- Select Minimum Qualification --</option>
+                            <option value={"--"} disabled={true}>-- Select Minimum Qualification --</option>
                             <option value={"10th Pass"}>10th Pass</option>
                             <option value={"12th Pass"}>12th Pass</option>
                             <option value={"Graduation"}>Graduation</option>
@@ -389,10 +427,10 @@ function UpdateJobDetails() {
 
                     <div className='bg-white p-4 mt-4'>
                         <label className='font-semibold block mb-2'>Select Gender(s)</label>
-                        <select value={defaultData.genders}
+                        <select value={defaultData.genders ? defaultData.genders : "--"}
                             onChange={(e) => setDefaultData((values) => ({ ...values, genders: e.target.value }))}
                             className='p-2.5 border rounded-[8px] w-full'>
-                            <option value={"Select Miminum Qualification"} disabled={true}>-- Select Genders --</option>
+                            <option value={"--"} disabled={true}>-- Select Genders --</option>
                             <option value={"Only Male"}>Only Male</option>
                             <option value={"Only Female"}>Only Female</option>
                             <option value={"Both"}>Both</option>
@@ -516,6 +554,39 @@ function UpdateJobDetails() {
                             onClick={() => setDefaultData((values) => ({ ...values, job_status: 'Inactive' }))}>
                             In-Active
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
+                <h1 className='text-xl font-semibold'>Skills</h1>
+                <div className='skills-manager mt-4'>
+                    <h1 className='mb-2 font-semibold'>Manage Skills</h1>
+
+                    {/* Input for new skills */}
+                    <div className='flex'>
+                        <input
+                            type='text'
+                            value={skillInput}
+                            onChange={(e) => setSkillInput(e.target.value)}
+                            onKeyPress={handleKeyPress} // Add skill on Enter key press
+                            placeholder='Add a skill'
+                            className='border rounded-lg p-2 px-4'
+                        />
+                    </div>
+
+                    {/* Display the list of skills */}
+                    <div className='mt-4 flex flex-wrap'>
+                        {skills.map((skill, index) => (
+                            <div key={index} className='skill-item bg-gray-200 px-4 py-2 rounded-full mr-2 mt-2'>
+                                {skill}
+                                <button
+                                    onClick={() => removeSkill(skill)}
+                                    className='ml-2 text-red-500'>
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
