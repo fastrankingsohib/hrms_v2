@@ -1,5 +1,5 @@
 import express from 'express'
-import { delete_posts, display_posted_jobs, id_based_jobs, latest_created_job, post_jobs, update_post_job } from '../controllers/job_post_controller.js'
+import { active_job_posts, delete_posts, display_posted_jobs, id_based_jobs, inactive_job_posts, latest_created_job, post_jobs, update_post_job } from '../controllers/job_post_controller.js'
 import { authenticateToken } from '../controllers/auth_controller.js'
 import multer from 'multer'
 import path from 'path'
@@ -42,6 +42,8 @@ router.get('/id_based_jobs/:id',authenticateToken,id_based_jobs)
 router.post('/update_job_post/:id',update_post_job)
 router.get('/delete/:id',authenticateToken,delete_posts)
 router.get('/latest_job_post',authenticateToken,latest_created_job)
+router.get('/active_jobs',authenticateToken,active_job_posts)
+router.get('/inactive_jobs',authenticateToken,inactive_job_posts)
 
 export default router
 

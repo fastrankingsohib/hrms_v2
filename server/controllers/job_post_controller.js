@@ -102,6 +102,45 @@ const display_posted_jobs = async (req,res) =>{
     
 }
 
+const active_job_posts = async(req,res) =>{
+    try {
+        const data = await prisma.job_post.findMany({
+            where:{
+                job_status: "Active"
+            }
+        })
+        res.status(200).send({
+            success:true,
+            message: "successfully fetched active jobs",
+            jobs: data
+        })
+        
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: "Error fetching active job posts",
+        })
+    }
+}
+const inactive_job_posts = async(req,res)=>{
+    try {
+        const data = await prisma.job_post.findMany({
+            where:{
+                job_status: "Inactive"
+            }
+        })
+        res.status(200).send({
+            success:true,
+            message: "successfully fetched inactive jobs",
+            jobs: data
+        })
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: "Error fetching inactive job posts",
+        })
+    }
+}
 const id_based_jobs = async(req,res)=>{
     try{
         const id = req.params.id;
@@ -204,4 +243,6 @@ const latest_created_job = async(req,res) =>{
         })
     }
 }
-export {display_posted_jobs,post_jobs,id_based_jobs,update_post_job,delete_posts,latest_created_job}
+
+
+export {display_posted_jobs,post_jobs,id_based_jobs,update_post_job,delete_posts,latest_created_job,active_job_posts,inactive_job_posts}
