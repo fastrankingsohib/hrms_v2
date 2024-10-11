@@ -36,6 +36,14 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 } 
 });
 
+
+
+//ROUTES
+//ROUTES
+//ROUTES
+//ROUTES
+//ROUTES
+
 router.post('/post_job', upload.single('file'), post_jobs);
 router.get('/display_jobs',authenticateToken,display_posted_jobs)
 router.get('/id_based_jobs/:id',authenticateToken,id_based_jobs)

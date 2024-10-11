@@ -168,7 +168,7 @@ model interview_details {
   interview_round String?         @db.VarChar(50)
   remarks         String?
   created_at      DateTime        @default(now())
-  updated_at      DateTime?
+  updated_at      DateTime?       @updatedAt
   job_id          Int?
   candidate       candidate_list? @relation(fields: [candidate_id], references: [candidate_id])
   job_post        job_post?       @relation(fields: [job_id], references: [id])

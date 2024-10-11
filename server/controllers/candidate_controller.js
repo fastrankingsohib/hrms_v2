@@ -3,7 +3,6 @@ const prisma = new PrismaClient();
 import validator from 'validator';
 
 
-// Check if email or contact number already exists
 const check_email_contact = async (req, res) => {
   const { email_address, contact_number } = req.body;
 
@@ -31,7 +30,7 @@ const check_email_contact = async (req, res) => {
     });
   }
 
-  return null; // If both checks pass, return null
+  return null; 
 };
 
 const add_candidate = async (req, res) => {
@@ -301,21 +300,21 @@ const delete_candidate = async(req,res) =>{
 
 const send_data_by_id = async (req, res) => {
   try {
-    const candidate_id = Number(req.params.id); // Ensure candidate_id is a number
+    const candidate_id = Number(req.params.id); 
 
-    // Fetch candidate data including work experiences, qualifications, and applied jobs with job titles
+   
     const candidate = await prisma.candidate_list.findUnique({
       where: {
         candidate_id: candidate_id,
       },
       include: {
-        workExperiences: true, // Include work experiences
-        qualifications: true, // Include qualifications
+        workExperiences: true, 
+        qualifications: true, 
         candidate_applied_jobs: {
           include: {
-            job: { // Include the related job_post to retrieve job_title
+            job: { 
               select: {
-                job_title: true, // Retrieve job_title from the job_post
+                job_title: true, 
               },
             },
           },
@@ -323,7 +322,6 @@ const send_data_by_id = async (req, res) => {
       },
     });
 
-    // Check if candidate data exists
     if (!candidate) {
       return res.status(404).send({
         success: false,
@@ -331,7 +329,6 @@ const send_data_by_id = async (req, res) => {
       });
     }
 
-    // Send the candidate data with the job titles
     res.status(200).send({
       success: true,
       message: "Data successfully retrieved",
