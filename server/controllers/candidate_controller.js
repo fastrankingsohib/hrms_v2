@@ -69,6 +69,7 @@ const add_candidate = async (req, res) => {
       experiences,
       jobs, 
       created_by,
+      work_tenure
     } = req.body;
 
     // Log all uploaded files
@@ -136,6 +137,7 @@ const add_candidate = async (req, res) => {
         candidate_aadhar,
         candidate_pan,
         candidate_highest_qualification,
+        work_tenure
       },
     });
 
@@ -224,16 +226,15 @@ const reporting_to_users = async(req, res) => {
 
 const all_candidates = async (req, res) => {
   try {
-    
     const candidates = await prisma.candidate_list.findMany({
       include: {
-        workExperiences: true, 
-        qualifications: true,  
+        workExperiences: true,
+        qualifications: true,
         candidate_applied_jobs: {
           include: {
-            job: { 
+            job: {
               select: {
-                job_title: true, 
+                job_title: true,
               },
             },
           },
@@ -241,20 +242,31 @@ const all_candidates = async (req, res) => {
       },
     });
 
-    
+    // Add experience in years and months to each candidate
+    const candidatesWithExperience = candidates.map(candidate => {
+      const years = Math.floor(candidate.work_tenure / 12);  // Calculate years
+      const months = candidate.work_tenure % 12;  // Calculate remaining months
+
+      return {
+        ...candidate,
+        experience_in_years: `${years} years and ${months} months`, // Add formatted experience
+      };
+    });
+
     res.status(200).send({
       message: 'Candidates fetched successfully',
       success: true,
-      candidates: candidates
-    })
+      candidates: candidatesWithExperience,
+    });
   } catch (error) {
     console.error('Error fetching candidates:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Internal server error',
-      success: false
+      success: false,
     });
   }
 };
+
 
 const my_candidates = async (req, res) => {
   try {
