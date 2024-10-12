@@ -186,28 +186,28 @@ function CandidateView() {
                                                         value={experience.company}
                                                         onChange={(e) => handleInputChange(index, 'company', e.target.value)}
                                                         placeholder='Company Name'
-                                                        className='border p-2 rounded mr-2'
+                                                        className='border p-2 px-4 mr-2'
                                                     />
                                                     <input
                                                         type='text'
                                                         value={experience.role}
                                                         onChange={(e) => handleInputChange(index, 'role', e.target.value)}
                                                         placeholder='Role'
-                                                        className='border p-2 rounded mr-2'
+                                                        className='border p-2 px-4 mr-2'
                                                     />
                                                     <input
                                                         type='number'
                                                         value={experience.years}
                                                         onChange={(e) => handleInputChange(index, 'years', e.target.value)}
                                                         placeholder='Years'
-                                                        className='border p-2 rounded mr-2'
+                                                        className='border p-2 px-4 mr-2'
                                                     />
                                                     <input
                                                         type='number'
                                                         value={experience.years}
                                                         onChange={(e) => handleInputChange(index, 'years', e.target.value)}
                                                         placeholder='Years'
-                                                        className='border p-2 rounded mr-2'
+                                                        className='border p-2 px-4 mr-2'
                                                     />
                                                     <button onClick={() => removeExperience(experience.id)} className='text-red-500'>
                                                         <MdDelete />
@@ -223,7 +223,7 @@ function CandidateView() {
                                 </div>
 
                                 {isEditing && (
-                                    <button onClick={addExperience} className='mt-4 bg-blue-500 text-white p-2 rounded'>
+                                    <button onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4'>
                                         + Add More Experience
                                     </button>
                                 )}
