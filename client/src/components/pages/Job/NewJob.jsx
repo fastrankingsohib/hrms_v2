@@ -38,7 +38,7 @@ function NewJob() {
         job_exp_date: "",
         job_scheduled_date: "",
         job_location: "",
-        job_scheduled_date: "",
+        job_scheduled_time: "",
     });
 
     useEffect(() => {
@@ -68,7 +68,8 @@ function NewJob() {
             created_by: userLoggedIn ? userLoggedIn.username : "not defined",
             job_status: jobDetails.job_scheduled_date === "" ? "Active" : "Scheduled",
             job_exp_date: jobDetails.job_exp_date,
-            job_scheduled_date: jobDetails.job_scheduled_date
+            job_scheduled_date: jobDetails.job_scheduled_date,
+            job_scheduled_time: jobDetails.job_scheduled_time
         }).then((res) => {
             console.log(res.data);
             navigate("/jobs")
@@ -128,8 +129,8 @@ function NewJob() {
 
 
     return (
-        <div className='p-4 bg-gray-100 h-full max-h-full overflow-auto'>
-            <h1 className='text-xl font-bold'>Job Details</h1>
+        <div className='p-6 bg-gray-100 h-full max-h-full overflow-auto'>
+            <h1 className='text-2xl font-bold py-5'>Create New Job</h1>
             <div className='bg-white p-4 pt-8 mt-4 shadow-xl rounded-[8px]'>
                 <div className='flex items-center gap-4'>
                     <label className='font-semibold inline-block mb-2'>Job Type *</label>
@@ -165,8 +166,8 @@ function NewJob() {
                     {/* Job Location Selection */}
                     <div className='bg-white select-none'>
                         <label className='font-semibold block mb-2'>Job Location</label>
-                        <select onChange={(e) => setJobDetails((values) => ({ ...values, job_location: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
-                            <option disabled={true}>--- Select Job Location ---</option>
+                        <select defaultValue={"--"} onChange={(e) => setJobDetails((values) => ({ ...values, job_location: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option value={"--"} defaultValue={true} disabled={true}>--- Select Job Location ---</option>
                             <option value={"Janakpuri"}>JanakPuri C-8, New Delhi - India</option>
                             <option value={"Future House, Luton - England"}>Future House, Luton - England</option>
                             <option value={"Time-Square, New-York - USA"}>Time-Square, New-York - USA</option>
@@ -185,17 +186,18 @@ function NewJob() {
                         {/* <input type='text' className='p-2.5 border rounded-[8px] w-full'
                             onChange={(e) => setJobDetails((values) => ({ ...values, interview_timing: e.target.value }))}
                         /> */}
-                        <select onChange={(e) => setJobDetails((values) => ({ ...values, interview_timing: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                        <select defaultValue={"--"} onChange={(e) => setJobDetails((values) => ({ ...values, interview_timing: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option value={"--"} defaultValue={true} disabled={true}>-- Please Select Interview Timing --</option>
                             <option value={"Mon - Fri || Regular Time"}>Mon - Fri || Regular Time</option>
                             <option value={"Mon - Sat || Regular Time"}>Mon - Sat || Regular Time</option>
                             <option value={"Sat Only || Regular Time"}>Sat Only || Regular Time</option>
                         </select>
                     </div>
 
-
                     <div>
                         <label className='font-semibold block mb-2'>Job Timings</label>
-                        <select onChange={(e) => setJobDetails((values) => ({ ...values, job_timing: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                        <select defaultValue={"--"} onChange={(e) => setJobDetails((values) => ({ ...values, job_timing: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option value={"--"} defaultValue={true} disabled={true}>-- Please Select Job Shift/ Timing --</option>
                             <option value={"Regular Shift"}>Regular Shift</option>
                             <option value={"Shift 2"}>Shift 2</option>
                             <option value={"Shift 3"}>Shift 3</option>
@@ -208,8 +210,8 @@ function NewJob() {
                     {/* Qualification Selection */}
                     <div className='bg-white select-none'>
                         <label className='font-semibold block mb-2'>Select Required Qualification</label>
-                        <select onChange={(e) => setJobDetails((values) => ({ ...values, required_qualification: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
-                            <option disabled={true}>--- Select Reuiqred Qualification ---</option>
+                        <select defaultValue={"--"} onChange={(e) => setJobDetails((values) => ({ ...values, required_qualification: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option value={"--"} defaultValue={true} disabled={true}>-- Please Select Minimum Qualification --</option>
                             <option value={"10th"}>10th</option>
                             <option value={"12th"}>12th</option>
                             <option value={"Graduation"}>Graduation</option>
@@ -261,8 +263,8 @@ function NewJob() {
 
                     <div className='bg-white p-4 mt-4 select-none'>
                         <label className='font-semibold block mb-2'>Select Preffered Gender(s)</label>
-                        <select onChange={(e) => setJobDetails((values) => ({ ...values, required_qualification: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
-                            <option disabled={true}>--- Select Preffered Gender(s) ---</option>
+                        <select defaultValue={"--"} onChange={(e) => setJobDetails((values) => ({ ...values, genders: e.target.value }))} className='p-2.5 border rounded-[8px] w-full'>
+                            <option value={"--"} defaultValue={true} disabled={true}>--- Select Preffered Gender(s) ---</option>
                             <option value={"Male"}>Male</option>
                             <option value={"Female"}>Female</option>
                             <option value={"Both"}>Both</option>
@@ -310,10 +312,11 @@ function NewJob() {
                     <div className='mt-4 grid grid-cols-2 gap-4 cursor-default'>
                         <div className='w-full'>
                             <label className='font-semibold block mb-2'>Minimum Experience</label>
-                            <select defaultValue={jobDetails.min_experience}
+                            <select
+                                defaultValue={"--"}
                                 onChange={(e) => setJobDetails((values) => ({ ...values, min_experience: e.target.value }))}
                                 className='p-2.5 border rounded-[8px] w-full cursor-pointer'>
-                                <option value={"Select Miminum Qualification"} disabled={true}>-- Select Maximum Experience --</option>
+                                <option value={"--"} defaultValue={true} disabled={true}>-- Select Maximum Experience --</option>
                                 <option value={"1"}>1 Year</option>
                                 <option value={"2"}>2 Years</option>
                                 <option value={"3"}>3 Years</option>
@@ -339,10 +342,11 @@ function NewJob() {
 
                         <div>
                             <label className='font-semibold block mb-2'>Maximum Experience</label>
-                            <select defaultValue={jobDetails.max_experience}
+                            <select 
+                                defaultValue={"--"}
                                 onChange={(e) => setJobDetails((values) => ({ ...values, max_experience: e.target.value }))}
                                 className='p-2.5 border rounded-[8px] w-full cursor-pointer'>
-                                <option value={"Select Miminum Qualification"} disabled={true}>-- Select Maximum Experience --</option>
+                                <option value={"--"} defaultValue={true} disabled={true}>-- Select Maximum Experience --</option>
                                 <option value={"1"}>1 Year</option>
                                 <option value={"2"}>2 Years</option>
                                 <option value={"3"}>3 Years</option>
@@ -458,7 +462,7 @@ function NewJob() {
                             <input
                                 type="date"
                                 className="p-2.5 border rounded w-full"
-                                value={selectedDate}
+                                defaultValue={selectedDate}
                                 onChange={(e) => setJobDetails((values) => ({ ...values, job_scheduled_date: e.target.value }))}
                             />
                         </div>
@@ -468,7 +472,10 @@ function NewJob() {
                                 type="time"
                                 className="p-2.5 border rounded w-full"
                                 value={selectedTime}
-                                onChange={(e) => setSelectedTime(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedTime(e.target.value);
+                                    setJobDetails((values) => ({...values, job_scheduled_time: e.target.value}))
+                                }}
                             />
                         </div>
                         <div className="flex justify-end">

@@ -12,6 +12,7 @@ function UpdateJobDetails() {
     // const [allStatus, setAllStatus] = useState({
     //   error
     // })
+    const [jobExpiry, setJobExpiry] = useState("No Expiry")
     const [jobDetails, setJobDetails] = useState({
         job_title: "",
         job_type: 'Full Time',
@@ -40,43 +41,51 @@ function UpdateJobDetails() {
 
     // State to store the list of skills
     const [skillInput, setSkillInput] = useState('');
-    const [defaultData, setDefaultData] = useState({})
-    const [skills, setSkills] = useState(defaultData.skills ? defaultData.skills.split(",") : []);
+    const [defaultData, setDefaultData] = useState({});
+    const [skills, setSkills] = useState([]); // Initialize without defaultData
+
+    // Effect to sync skills from defaultData
     useEffect(() => {
-        setSkills(defaultData.skills ? defaultData.skills.split(",") : [])
-    }, [defaultData])
+        setSkills(defaultData.skills ? defaultData.skills.split(",") : []);
+    }, [defaultData]);
 
-    // setDefaultData((values) => ({ ...values, skills: skills.join(', ') }))
-    useEffect(() => {
-        // console.log(skills)
-        // setDefaultData((values) => ({...values, skills: skills}))
-    }, [skills])
-
-
-    // Function to handle adding a skill to the array
+    // Function to handle adding a skill to both the skills array and defaultData
     const addSkill = () => {
         if (skillInput && !skills.includes(skillInput)) {
-            setSkills(prevSkills => [...prevSkills, skillInput]); // Add new skill to array
-            setSkillInput(''); // Reset input field
+            // Update the local skills state
+            setSkills(prevSkills => [...prevSkills, skillInput]);
+
+            // Update the defaultData state with the new skill
+            setDefaultData(prevData => ({
+                ...prevData,
+                skills: prevData.skills ? [...prevData.skills.split(","), skillInput].join(",") : skillInput,
+            }));
+
+            // Reset input field
+            setSkillInput('');
         }
     };
 
-    // Function to handle removing a skill from the array
+    // Function to remove a skill from both the skills array and defaultData
     const removeSkill = (skillToRemove) => {
+        // Update the local skills state
         setSkills(prevSkills => prevSkills.filter(skill => skill !== skillToRemove));
+
+        // Update the defaultData state to reflect removed skill
+        setDefaultData(prevData => ({
+            ...prevData,
+            skills: prevData.skills ? prevData.skills.split(",").filter(skill => skill !== skillToRemove).join(",") : "",
+        }));
     };
 
-    // Function to handle the Enter key to add skills
+    // Handle the Enter key press for adding a skill
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
             addSkill();
         }
     };
 
-    const [lastSkills, setLastSkills] = useState()
-    useEffect(() => {
-        setLastSkills(defaultData.skills ? defaultData.skills.split(",") : []);
-    }, [defaultData])
+
 
     useEffect(() => {
         axios.get(`/id_based_jobs/${jobId}`)
@@ -262,7 +271,7 @@ function UpdateJobDetails() {
 
     // Schedule the Job
     // Schedule the Job
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(defaultData.job_status === "Scheduled" ? true : false);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
 
@@ -290,8 +299,8 @@ function UpdateJobDetails() {
 
 
     return (
-        <div className='p-4 bg-gray-100 h-full max-h-full overflow-auto'>
-            <h1 className='text-xl font-bold'>
+        <div className='p-6 bg-gray-100 h-full max-h-full overflow-auto'>
+            <h1 className='text-2xl font-bold py-4'>
                 Update Job Details
             </h1>
             <div className='bg-white p-4 pt-8 mt-4 shadow-xl rounded-[8px]'>
@@ -299,19 +308,19 @@ function UpdateJobDetails() {
                     <label className='font-semibold inline-block mb-2'>Job Type *</label>
                     <div className='flex gap-4'>
                         <button
-                            className={`h-[40px] rounded-[8px] w-32 ${defaultData.job_type === 'Full Time' || defaultData.job_type === 'Full-Time' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                            className={`h-[40px] rounded-[8px] w-48 ${defaultData.job_type === 'Full Time' || defaultData.job_type === 'Full-Time' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                             onClick={() => {
                                 setDefaultData((values) => ({ ...values, job_type: 'Full Time' }));
                             }}>
                             Full Time
                         </button>
                         <button
-                            className={`h-[40px] rounded-[8px] w-32 ${defaultData.job_type === 'Part Time' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                            className={`h-[40px] rounded-[8px] w-48 ${defaultData.job_type === 'Part Time' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                             onClick={() => setDefaultData((values) => ({ ...values, job_type: 'Part Time' }))}>
                             Part Time
                         </button>
                         <button
-                            className={`h-[40px] rounded-[8px] w-32 ${defaultData.job_type === 'Internship' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                            className={`h-[40px] rounded-[8px] w-48 ${defaultData.job_type === 'Internship' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                             onClick={() => setDefaultData((values) => ({ ...values, job_type: 'Internship' }))}>
                             Internship
                         </button>
@@ -407,17 +416,17 @@ function UpdateJobDetails() {
                         <label className='font-semibold inline-block mb-2 mt-4'>Job Shift *</label>
                         <div className='flex gap-4'>
                             <button
-                                className={`h-[40px] w-32 rounded-[8px] ${defaultData.job_shift === 'Morning' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                                className={`h-[40px] w-48 rounded-[8px] ${defaultData.job_shift === 'Morning' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                                 onClick={() => setDefaultData((values) => ({ ...values, job_shift: 'Morning' }))}>
                                 Morning
                             </button>
                             <button
-                                className={`h-[40px] w-32 rounded-[8px] ${defaultData.job_shift === 'Afternoon' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                                className={`h-[40px] w-48 rounded-[8px] ${defaultData.job_shift === 'Afternoon' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                                 onClick={() => setDefaultData((values) => ({ ...values, job_shift: 'Afternoon' }))}>
                                 Afternoon
                             </button>
                             <button
-                                className={`h-[40px] w-32 rounded-[8px] ${defaultData.job_shift === 'Night' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                                className={`h-[40px] w-48 rounded-[8px] ${defaultData.job_shift === 'Night' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                                 onClick={() => setDefaultData((values) => ({ ...values, job_shift: 'Night' }))}>
                                 Night
                             </button>
@@ -425,15 +434,16 @@ function UpdateJobDetails() {
                     </div>
 
 
-                    <div className='bg-white p-4 mt-4'>
+                    <div className='bg-white p-4'>
                         <label className='font-semibold block mb-2'>Select Gender(s)</label>
                         <select value={defaultData.genders ? defaultData.genders : "--"}
                             onChange={(e) => setDefaultData((values) => ({ ...values, genders: e.target.value }))}
                             className='p-2.5 border rounded-[8px] w-full'>
                             <option value={"--"} disabled={true}>-- Select Genders --</option>
-                            <option value={"Only Male"}>Only Male</option>
-                            <option value={"Only Female"}>Only Female</option>
+                            <option value={"Male"}>Male</option>
+                            <option value={"Female"}>Female</option>
                             <option value={"Both"}>Both</option>
+                            <option value={"Other"}>Other</option>
                         </select>
                     </div>
                 </div>
@@ -456,17 +466,17 @@ function UpdateJobDetails() {
                 <label className='font-semibold inline-block mb-2'>Total Experience Required *</label>
                 <div className='flex gap-4'>
                     <button
-                        className={`h-[40px] rounded-[8px] px-4 min-w-32 ${defaultData.experience === 'Any' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                        className={`h-[40px] w-48 rounded-[8px] px-4 min-w-32 ${defaultData.experience === 'Any' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                         onClick={() => setDefaultData((values) => ({ ...values, experience: 'Any' }))}>
                         Any
                     </button>
                     <button
-                        className={`h-[40px] rounded-[8px] px-4 min-w-32 ${defaultData.experience === 'Freshers Only' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                        className={`h-[40px] w-48 rounded-[8px] px-4 min-w-32 ${defaultData.experience === 'Freshers Only' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                         onClick={() => setDefaultData((values) => ({ ...values, experience: 'Freshers Only' }))}>
                         Freshers Only
                     </button>
                     <button
-                        className={`h-[40px] rounded-[8px] px-4 min-w-32 ${defaultData.experience === 'Experienced Only' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                        className={`h-[40px] w-48 rounded-[8px] px-4 min-w-32 ${defaultData.experience === 'Experienced Only' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                         onClick={() => setDefaultData((values) => ({ ...values, experience: 'Experienced Only' }))}>
                         Experienced Only
                     </button>
@@ -545,16 +555,52 @@ function UpdateJobDetails() {
                     <label className='font-semibold inline-block mb-2 mt-4'>Job Status *</label>
                     <div className='flex gap-4'>
                         <button
-                            className={`h-[40px] w-32 rounded-[8px] ${defaultData.job_status === 'Active' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                            className={`h-[40px] w-48 rounded-[8px] ${defaultData.job_status === 'Active' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
                             onClick={() => setDefaultData((values) => ({ ...values, job_status: 'Active' }))}>
                             Active
                         </button>
                         <button
-                            className={`h-[40px] w-32 rounded-[8px] ${defaultData.job_status === 'Inactive' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                            className={`h-[40px] w-48 rounded-[8px] ${defaultData.job_status === 'Scheduled' ? 'bg-orange-600 text-white' : 'bg-gray-100'}`}
+                            onClick={() => setDefaultData((values) => ({ ...values, job_status: 'Scheduled' }))}>
+                            Schedule
+                        </button>
+                        <button
+                            className={`h-[40px] w-48 rounded-[8px] ${defaultData.job_status === 'Inactive' ? 'bg-red-600 text-white' : 'bg-gray-100'}`}
                             onClick={() => setDefaultData((values) => ({ ...values, job_status: 'Inactive' }))}>
                             In-Active
                         </button>
+
                     </div>
+
+                    <div className={`${defaultData.job_status === "Scheduled" ? "block" : "hidden"} flex gap-4`}>
+                        <div className='grid mt-4'>
+                            <label htmlFor="#" className='inline-block pb-1.5 font-semibold'>Update Schedule Date</label>
+                            <input type="date" defaultValue={defaultData.job_scheduled_date} onChange={(e) => setDefaultData((values) => ({ ...values, job_scheduled_date: e.target.value }))} className='p-2.5 border rounded-lg w-48' />
+                        </div>
+                        <div className='grid mt-4'>
+                            <label htmlFor="#" className='inline-block pb-1.5 font-semibold'>Update Schedule Time</label>
+                            <input type="time" defaultValue={defaultData.job_scheduled_time} onChange={(e) => setDefaultData((values) => ({ ...values, job_scheduled_time: e.target.value }))} className='p-2.5 border rounded-lg w-48' />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
+                <h1 className='text-xl font-semibold mb-4'>Job Expiry</h1>
+                <button
+                    className={`h-[40px] rounded-[8px] px-4 min-w-32 ${jobExpiry === 'No Expiry' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                    onClick={() => setJobExpiry("No Expiry")}>
+                    No Expiry
+                </button>
+                <button
+                    className={`h-[40px] rounded-[8px] ml-4 px-4 min-w-32 ${jobExpiry === 'Set Expiry' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                    onClick={() => setJobExpiry("Set Expiry")}>
+                    Set Expiry
+                </button>
+
+                <div className={`${jobExpiry === "Set Expiry" ? "block" : "hidden"} mt-4`}>
+                    <h1 className='mb-2 font-semibold'>Set Expiry Date</h1>
+                    <input type="date" className='p-2 px-6 border w-2/4 rounded-xl' defaultValue={defaultData.job_exp_date} onChange={(e) => setDefaultData((values) => ({ ...values, job_exp_date: e.target.value }))} />
                 </div>
             </div>
 
@@ -569,16 +615,21 @@ function UpdateJobDetails() {
                             type='text'
                             value={skillInput}
                             onChange={(e) => setSkillInput(e.target.value)}
-                            onKeyPress={handleKeyPress} // Add skill on Enter key press
+                            onKeyDown={handleKeyPress} // Use onKeyDown instead of onKeyPress
                             placeholder='Add a skill'
                             className='border rounded-lg p-2 px-4'
                         />
+                        {/* <button
+                            onClick={addSkill}
+                            className='ml-2 bg-blue-500 text-white px-4 py-2 rounded-lg'>
+                            Add Skill
+                        </button> */}
                     </div>
 
                     {/* Display the list of skills */}
                     <div className='mt-4 flex flex-wrap'>
                         {skills.map((skill, index) => (
-                            <div key={index} className='skill-item bg-gray-200 px-4 py-2 rounded-full mr-2 mt-2'>
+                            <div key={index} className='skill-item bg-gray-200 px-4 py-2 rounded-full mr-2 mt-2 flex items-center'>
                                 {skill}
                                 <button
                                     onClick={() => removeSkill(skill)}
@@ -592,6 +643,7 @@ function UpdateJobDetails() {
             </div>
 
 
+
             <div className='py-4 text-right mt-10'>
                 {/* <button className='p-2.5 bg-indigo-100 rounded-[8px] px-10 mr-4' onClick={openSchedulePopup} >
           Schedule Job
@@ -603,44 +655,44 @@ function UpdateJobDetails() {
             </div>
 
             {/* Schedule Popup */}
-            {/* {isPopupOpen && (
-        <div className="fixed z-30 inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white w-[30em] p-10 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Schedule Job</h2>
-            <div className="mb-4">
-              <label className="block mb-2 font-semibold">Select Date</label>
-              <input
-                type="date"
-                className="p-2.5 border rounded w-full"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 font-semibold">Select Time</label>
-              <input
-                type="time"
-                className="p-2.5 border rounded w-full"
-                value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-              />
-            </div>
-            <div className="flex justify-end">
-              <button
-                className="p-2.5 px-8 bg-gray-200 rounded mr-4"
-                onClick={closePopup} // Function to close the popup
-              >Cancel</button>
-              <button
-                className="p-2.5 px-8 bg-indigo-700 text-white rounded"
-                onClick={() => {
-                  saveScheduleJob();
-                  updateJobPost();
-                }}
-              >Schedule Job</button>
-            </div>
-          </div>
-        </div>
-      )} */}
+            {isPopupOpen && (
+                <div className="fixed z-30 inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white w-[30em] p-10 rounded-lg shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Schedule Job</h2>
+                        <div className="mb-4">
+                            <label className="block mb-2 font-semibold">Select Date</label>
+                            <input
+                                type="date"
+                                className="p-2.5 border rounded w-full"
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block mb-2 font-semibold">Select Time</label>
+                            <input
+                                type="time"
+                                className="p-2.5 border rounded w-full"
+                                value={selectedTime}
+                                onChange={(e) => setSelectedTime(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                className="p-2.5 px-8 bg-gray-200 rounded mr-4"
+                                onClick={closePopup} // Function to close the popup
+                            >Cancel</button>
+                            <button
+                                className="p-2.5 px-8 bg-indigo-700 text-white rounded"
+                                onClick={() => {
+                                    saveScheduleJob();
+                                    updateJobPost();
+                                }}
+                            >Schedule Job</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
 
             <br /><br />

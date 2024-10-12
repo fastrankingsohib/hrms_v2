@@ -59,7 +59,7 @@ function JobOverview(props) {
                 <span>{jobDetails.job_type}</span>
             </div>
             <div className="flex">
-                <span className='text-gray-400 min-w-60 inline-block'>Job Genders</span>
+                <span className='text-gray-400 min-w-60 inline-block'>Genders</span>
                 <span>{jobDetails.genders}</span>
             </div>
             <div className="flex">
@@ -103,8 +103,8 @@ function JobOverview(props) {
             </div>
             <div className="flex">
                 <span className='text-gray-400 min-w-60 inline-block'>Job Status</span>
-                <span className={`inline-flex gap-1 items-center justify-center p-1 px-3 rounded-full text-white capitalize ${jobDetails.job_status === "Active" ? "bg-green-500" : "bg-red-500"}`}>
-                    <GoDotFill className={`${jobDetails.job_status === "Active" ? "text-green-200" : "text-red-200"}`} /> {jobDetails.job_status}
+                <span className={`capitalize inline-flex gap-1 items-center justify-center p-1 px-3 rounded-full text-white ${jobDetails.job_status === "Active" ? "bg-green-500" : jobDetails.job_status === "Scheduled" ? "bg-orange-500" : "bg-red-500"}`}>
+                    {jobDetails.job_status}
                 </span>
             </div>
             <div className="flex">

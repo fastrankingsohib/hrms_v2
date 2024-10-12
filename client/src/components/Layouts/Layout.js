@@ -3,6 +3,7 @@ import Sidebar from "../Requires/Sidebar";
 import TopBar from "../Requires/TopBar";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import axios from "axios";
 
 const Layout = () => {
     const Navigate = useNavigate();
@@ -12,6 +13,16 @@ const Layout = () => {
         if(!user.loggedIn){
             Navigate('/login');
         }
+    })
+    useEffect(() => {
+        axios.get("/all-candidates")
+        .then((res) => {
+        })
+        .catch((err) => {
+            if(err.status == 401){
+                Navigate("/login")
+            }
+        })
     })
     return(
         <section className="flex h-screen max-h-screen overflow-auto">

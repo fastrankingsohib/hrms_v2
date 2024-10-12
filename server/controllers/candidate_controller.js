@@ -212,9 +212,9 @@ const all_candidates = async (req, res) => {
         qualifications: true,  
         candidate_applied_jobs: {
           include: {
-            job: { // Include the related job_post to retrieve job_title
+            job: { 
               select: {
-                job_title: true, // Retrieve job_title from the job_post
+                job_title: true, 
               },
             },
           },
@@ -388,7 +388,7 @@ const update_candidate = async (req, res) => {
       jobs 
     } = req.body;
 
-    const updatedCandidate = await prisma.candidate_list.update({
+    await prisma.candidate_list.update({
       where: {
         candidate_id: candidateId,
       },
@@ -515,7 +515,30 @@ const module_data = async(req,res)=>{
 }
 
 
+const id_based_jobs_applicants = async(req,res) =>{
+  try {
+    const job_id = req.params.id;
+    const data = await prisma.candidate_applied_jobs.findMany({
+      where: {
+        job_id: Number(job_id),
+      },
+      include: {
+        candidate: true, // This includes the related candidate_list data
+      },
+    });
+  res.status(200).send({
+    success: true,
+    message: "job applicants successfully sent",
+    data:data
+  })    
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      success:false,
+      message:"cannot fetch applicants data"
+    })
+  }
+}
 
 
-
-export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data}
+export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants}

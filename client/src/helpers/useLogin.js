@@ -7,6 +7,9 @@ import useSidebarAuth from "./useSidebarLink";
 
 const useLogin = () => {
     const [isUserLoggedin, setIsUserLoggedin] = useState();
+    const [loginLoading, setLoginLoading] = useState(false)
+    const [loginError, setLoginError] = useState(false)
+
     const { ValidateSidebar } = useSidebarAuth();
     const dispatch = useDispatch();
 
@@ -16,40 +19,43 @@ const useLogin = () => {
             "username": username,
             "password": password
         }
+        setLoginLoading(true);
         axios.post("/login", credentials)
-        .then((response) => {
-            if(response.data.success){
-                console.log(response.data);
-                setIsUserLoggedin(true);
-                Navigate('/post-new-job');
-                
-                dispatch(
-                    userLoggedIn(
-                        {
-                            status: true, 
-                            access: "admin",
-                            username: response.data.user.username,
-                            data: response.data
-                        }
-                    )
-                )
+            .then((response) => {
+                if (response.data.success) {
+                    setIsUserLoggedin(true);
+                    setLoginError(false);
+                    setLoginLoading(false);
 
-                ValidateSidebar()
-            }
-        })
-        .catch((err) => {
-            console.log(`Error is: ${err.status}`);
-            if(err.status == '401'){
+                    Navigate('/jobs');
+                    
+                    dispatch(
+                        userLoggedIn(
+                            {
+                                status: true,
+                                access: "admin",
+                                username: response.data.user.username,
+                                data: response.data
+                            }
+                        )
+                    )
+                    ValidateSidebar()
+                }
+            })
+            .catch((err) => {
+                setLoginError(true)
                 setIsUserLoggedin(false);
-                setTimeout(() => {
-                    setIsUserLoggedin(null)
-                }, 2900)
-            }
-        });
+                setLoginLoading(false)
+                if (err.status == '401') {
+                    setTimeout(() => {
+                        setIsUserLoggedin(null)
+                    }, 2900)
+                }
+            });
     }
 
 
-    return { login, isUserLoggedin }
+    return { login, isUserLoggedin, loginLoading, loginError }
 }
 
 export default useLogin;

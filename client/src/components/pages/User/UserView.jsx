@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useUpdateUser from "../../../helpers/useUpadateUser"; // Ensure this hook is defined correctly
-import allModules from "../NewUser/AllModules"; // Import any required modules
+import allModules from "./AllModules"; // Import any required modules
 import UserModule from "../../Commons/UserModule";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";

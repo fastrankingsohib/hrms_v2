@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import { MdOutlineError } from "react-icons/md";
 import useLogin from "../../../helpers/useLogin";
 import { useSelector } from "react-redux";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const Login = () => {
     const [seePassword, setSeePassword] = useState(false);
     const [credentials, setCredentials] = useState({username: '', password: ''});
-    const { login, isUserLoggedin } = useLogin();
+    const { login, isUserLoggedin, loginLoading, loginError } = useLogin();
     const userLoggedIn = useSelector((state) => state.user_auth);
     return(
         <section className="h-screen w-screen flex justify-center items-center bg-gray-50">
@@ -55,7 +56,10 @@ const Login = () => {
                     <div className="text-right select-none"><Link>Forget Password?</Link></div>
 
 
-                    <button className="w-full mt-4 p-3.5 rounded-full bg-blue-800 text-white">Login</button>
+                    <button className={`relative w-full mt-4 p-3.5 rounded-full bg-blue-800 text-white flex items-center gap-4 justify-center ${loginLoading ? "bg-opacity-60 cursor-not-allowed" : ""}`} disabled={loginLoading}>
+                        <span className="absolute left-[35%] top-[30%]">{loginLoading ? <span className="reload-rounding inline-block"><AiOutlineLoading3Quarters /></span> : ""}</span>
+                        <span>Login</span>
+                    </button>
                 </div>
                 
                 

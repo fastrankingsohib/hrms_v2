@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import allModules from "../../components/pages/NewUser/AllModules";
+import allModules from "../../components/pages/User/AllModules";
 
 const initialState = {
     user_auth: {

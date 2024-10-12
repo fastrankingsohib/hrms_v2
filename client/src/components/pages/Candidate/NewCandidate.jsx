@@ -341,7 +341,7 @@ const NewCandidate = () => {
 
 
     return (
-        <section className="p-4 component-rendering-tranistion">
+        <section className="p-4 component-rendering-tranistion h-full overflow-auto">
             <h1 className="text-2xl font-semibold">Create New Candidate</h1>
             <span className={`inline-flex items-center gap-2 fixed top-28 p-3 min-w-60 bg-green-600 text-white transition-small ${success ? 'right-12' : '-right-[100%]'}`}><IoIosCheckmarkCircleOutline size={'18px'} />User Created Successfully</span>
             <span className={`inline-flex items-center gap-2 fixed top-28 p-3 min-w-60 bg-red-600 text-white transition-small ${error ? 'right-12' : '-right-[100%]'}`}><IoIosCheckmarkCircleOutline size={'18px'} />User Creation Failed</span>

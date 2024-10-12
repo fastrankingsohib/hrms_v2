@@ -1,17 +1,19 @@
-import AllJobs from "./components/pages/AllJobs/AllJobs";
-import AllUsers from "./components/pages/AllUsers/AllUsers";
-import JobOpening from "./components/pages/JobOpening/JobOpening";
+import AllJobPosts from "./components/pages/Job/AllJobPosts";
+import AllUsers from "./components/pages/User/AllUsers";
 import Login from "./components/pages/Login/Login";
-import MyCandidates from "./components/pages/MyCandidates/MyCandidates";
-import NewCandidate from "./components/pages/NewCandidate/NewCandidate";
-import NewUser from "./components/pages/NewUser/NewUser";
+// import MyCandidates from "./components/pages/MyCandidates/MyCandidates";
+import NewCandidate from "./components/pages/Candidate/NewCandidate";
+import NewUser from "./components/pages/User/NewUser";
 import PageNotFound from "./components/pages/PageNotFound";
-import UserView from "./components/pages/userView/UserView";
+import UserView from "./components/pages/User/UserView";
 import Layout from "./components/Layouts/Layout";
-import JobsLayout from "./components/Layouts/Job/JobsLayout";
-import NewJob from "./components/Commons/NewJob";
-import JobView from "./components/pages/JobView/JobView";
-import UpdateJobDetails from "./components/pages/JobView/UpdateJobDetails";
+import JobsLayout from "./components/pages/Job/JobsLayout";
+import NewJob from "./components/pages/Job/NewJob";
+import JobView from "./components/pages/Job/JobView";
+import UpdateJobDetails from "./components/pages/Job/UpdateJobDetails";
+import CandidateLayout from "./components/pages/Candidate/CandidateLayout";
+import CandidateView from "./components/pages/Candidate/CandidateView";
+// import AllJobPosts from "./components/pages/Job/AllJobPosts";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
 const Application = () => {
@@ -27,13 +29,19 @@ const Application = () => {
                             <Route path="view/:jobId" element={<JobView />} />
                         </Route>
 
-                        <Route path="/all-job-posts" element={<AllJobs />} />
-                        <Route path="/all-job-posts/job/01" element={<JobOpening />} />
+                        <Route path="candidates" element={<CandidateLayout />}>
+                            <Route path="new-candidate" element={<NewCandidate />} />
+                            <Route path="view/:candidate_id" element={<CandidateView />} />
+                        </Route>
+                        
+                        <Route path="candidates" element={<CandidateLayout />}></Route>
+
+                        {/* <Route path="/all-job-posts" element={<AllJobPosts />} /> */}
                         <Route path="/add-new-user" element={<NewUser />} />
                         <Route path="/all-users/" element={<AllUsers />} />
                         <Route path="/user/:userid" element={<UserView />} />
-                        <Route path="/add-new-candidate" element={<NewCandidate />} />
-                        <Route path="/my-candidates" element={<MyCandidates />} />
+                        {/* <Route path="/add-new-candidate" element={<NewCandidate />} /> */}
+                        {/* <Route path="/my-candidates" element={<MyCandidates />} /> */}
                         <Route path="*" element={<PageNotFound />} />
                     </Route>
                 </Route>

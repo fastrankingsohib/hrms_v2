@@ -107,6 +107,9 @@ const active_job_posts = async(req,res) =>{
         const data = await prisma.job_post.findMany({
             where:{
                 job_status: "Active"
+            },
+            orderBy:{
+                id: 'desc'
             }
         })
         res.status(200).send({
@@ -127,6 +130,9 @@ const inactive_job_posts = async(req,res)=>{
         const data = await prisma.job_post.findMany({
             where:{
                 job_status: "Inactive"
+            },
+            orderBy:{
+                id: 'desc'
             }
         })
         res.status(200).send({
