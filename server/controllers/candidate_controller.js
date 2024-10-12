@@ -33,6 +33,8 @@ const check_email_contact = async (req, res) => {
   return null; 
 };
 
+
+
 const add_candidate = async (req, res) => {
   try {
     const {
@@ -69,7 +71,23 @@ const add_candidate = async (req, res) => {
       created_by,
     } = req.body;
 
-    
+    // Log all uploaded files
+    console.log('Uploaded files:', req.files);
+
+    // Ensure files exist before accessing paths
+    const candidate_image = req.files['candidate_image'] && req.files['candidate_image'][0] ? req.files['candidate_image'][0].path : null;
+    const candidate_resume = req.files['candidate_resume'] && req.files['candidate_resume'][0] ? req.files['candidate_resume'][0].path : null;
+    const candidate_aadhar = req.files['candidate_aadhar'] && req.files['candidate_aadhar'][0] ? req.files['candidate_aadhar'][0].path : null;
+    const candidate_pan = req.files['candidate_pan'] && req.files['candidate_pan'][0] ? req.files['candidate_pan'][0].path : null;
+    const candidate_highest_qualification = req.files['candidate_highest_qualification'] && req.files['candidate_highest_qualification'][0] ? req.files['candidate_highest_qualification'][0].path : null;
+
+    // Log paths to debug if files are saved correctly
+    console.log('Resume path:', candidate_resume);
+    console.log('Aadhar path:', candidate_aadhar);
+    console.log('PAN path:', candidate_pan);
+    console.log('Qualification path:', candidate_highest_qualification);
+
+    // Validate email and phone number
     if (!validator.isEmail(email_address)) {
       return res.status(400).send({ message: "Invalid email format." });
     }
@@ -78,11 +96,11 @@ const add_candidate = async (req, res) => {
       return res.status(400).send({ message: "Invalid mobile number." });
     }
 
-    
+    // Check for existing email or contact
     const emailOrContactCheck = await check_email_contact(req, res);
     if (emailOrContactCheck) return; 
 
-    
+    // Create candidate
     const candidate = await prisma.candidate_list.create({
       data: {
         title,
@@ -113,12 +131,17 @@ const add_candidate = async (req, res) => {
         other3,
         status,
         created_by,
+        candidate_image,
+        candidate_resume,
+        candidate_aadhar,
+        candidate_pan,
+        candidate_highest_qualification,
       },
     });
 
     const candidate_id = candidate.candidate_id;
 
-    
+    // Handle experiences
     if (!Array.isArray(experiences) || experiences.length === 0) {
       throw new Error("Experience data is required and must be an array.");
     }
@@ -131,12 +154,11 @@ const add_candidate = async (req, res) => {
       last_drawn_salary: exp.last_drawn_salary || null,
     }));
 
-    
     await prisma.work_experience.createMany({
       data: experienceData,
     });
 
-   
+    // Handle qualifications
     if (Array.isArray(qualifications) && qualifications.length > 0) {
       const qualificationData = qualifications.map((qual) => ({
         candidate_id: candidate_id,
@@ -151,6 +173,7 @@ const add_candidate = async (req, res) => {
       });
     }
 
+    // Handle applied jobs
     if (Array.isArray(jobs) && jobs.length > 0) {
       const jobData = jobs.map((jobId) => ({
         candidate_id: candidate_id,
@@ -162,21 +185,20 @@ const add_candidate = async (req, res) => {
       });
     }
 
-  
     return res.status(200).json({
       success: true,
-      message: "Candidate, experiences, qualifications, and jobs added successfully.",
-      candidate_id: candidate_id,
+      message: "Candidate and related data successfully added.",
     });
   } catch (error) {
-    console.log(error);
-
-    res.status(500).send({
+    console.error(error);
+    return res.status(500).json({
       success: false,
-      message: "Some error occurred while adding candidate, experiences, qualifications, and jobs.",
+      message: "An error occurred while adding candidate, experiences, qualifications, and jobs.",
     });
   }
 };
+
+
 
 const reporting_to_users = async(req, res) => {
   try {
@@ -383,6 +405,13 @@ const update_candidate = async (req, res) => {
       jobs 
     } = req.body;
 
+    const candidate_image = req.files['candidate_image'] && req.files['candidate_image'][0] ? req.files['candidate_image'][0].path : null;
+    const candidate_resume = req.files['candidate_resume'] && req.files['candidate_resume'][0] ? req.files['candidate_resume'][0].path : null;
+    const candidate_aadhar = req.files['candidate_aadhar'] && req.files['candidate_aadhar'][0] ? req.files['candidate_aadhar'][0].path : null;
+    const candidate_pan = req.files['candidate_pan'] && req.files['candidate_pan'][0] ? req.files['candidate_pan'][0].path : null;
+    const candidate_highest_qualification = req.files['candidate_highest_qualification'] && req.files['candidate_highest_qualification'][0] ? req.files['candidate_highest_qualification'][0].path : null;
+
+
     await prisma.candidate_list.update({
       where: {
         candidate_id: candidateId,
@@ -415,7 +444,12 @@ const update_candidate = async (req, res) => {
         other2,
         other3,
         status,
-        current_status
+        current_status,
+        candidate_image,
+        candidate_resume,
+        candidate_aadhar,
+        candidate_pan,
+        candidate_highest_qualification,
       },
     });
 

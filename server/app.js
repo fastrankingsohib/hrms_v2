@@ -24,6 +24,9 @@ app.use('/',auth_routes)
 app.use('/',hr_routes)
 app.use('/',candidate_routes)
 app.use('/',interview_routes)
+app.get('/home',(req,res)=>{
+    res.render('home')
+})
 
 
 app.listen(port, () => {
