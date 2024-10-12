@@ -69,38 +69,47 @@ const add_candidate = async (req, res) => {
       experiences,
       jobs, 
       created_by,
+      work_tenure
     } = req.body;
 
-    // Log all uploaded files
     console.log('Uploaded files:', req.files);
 
-    // Ensure files exist before accessing paths
-    const candidate_image = req.files['candidate_image'] && req.files['candidate_image'][0] ? req.files['candidate_image'][0].path : null;
-    const candidate_resume = req.files['candidate_resume'] && req.files['candidate_resume'][0] ? req.files['candidate_resume'][0].path : null;
-    const candidate_aadhar = req.files['candidate_aadhar'] && req.files['candidate_aadhar'][0] ? req.files['candidate_aadhar'][0].path : null;
-    const candidate_pan = req.files['candidate_pan'] && req.files['candidate_pan'][0] ? req.files['candidate_pan'][0].path : null;
-    const candidate_highest_qualification = req.files['candidate_highest_qualification'] && req.files['candidate_highest_qualification'][0] ? req.files['candidate_highest_qualification'][0].path : null;
+    // Handle the uploaded files safely, making them nullable
+    const candidate_image = req.files['candidate_image'] && req.files['candidate_image'][0] 
+      ? req.files['candidate_image'][0].path 
+      : null;
+    const candidate_resume = req.files['candidate_resume'] && req.files['candidate_resume'][0] 
+      ? req.files['candidate_resume'][0].path 
+      : null;
+    const candidate_aadhar = req.files['candidate_aadhar'] && req.files['candidate_aadhar'][0] 
+      ? req.files['candidate_aadhar'][0].path 
+      : null;
+    const candidate_pan = req.files['candidate_pan'] && req.files['candidate_pan'][0] 
+      ? req.files['candidate_pan'][0].path 
+      : null;
+    const candidate_highest_qualification = req.files['candidate_highest_qualification'] && req.files['candidate_highest_qualification'][0] 
+      ? req.files['candidate_highest_qualification'][0].path 
+      : null;
 
-    // Log paths to debug if files are saved correctly
     console.log('Resume path:', candidate_resume);
     console.log('Aadhar path:', candidate_aadhar);
     console.log('PAN path:', candidate_pan);
     console.log('Qualification path:', candidate_highest_qualification);
 
     // Validate email and phone number
-    // if (!validator.isEmail(email_address)) {
-    //   return res.status(400).send({ message: "Invalid email format." });
-    // }
+    if (!validator.isEmail(email_address)) {
+      return res.status(400).send({ message: "Invalid email format." });
+    }
 
-    // if (!validator.isMobilePhone(contact_number, 'any', { strictMode: false })) {
-    //   return res.status(400).send({ message: "Invalid mobile number." });
-    // }
+    if (!validator.isMobilePhone(contact_number, 'any', { strictMode: false })) {
+      return res.status(400).send({ message: "Invalid mobile number." });
+    }
 
-    // // Check for existing email or contact
-    // const emailOrContactCheck = await check_email_contact(req, res);
-    // if (emailOrContactCheck) return; 
+    // Check for existing email or contact
+    const emailOrContactCheck = await check_email_contact(req, res);
+    if (emailOrContactCheck) return;
 
-    // Create candidate
+    // Create candidate entry
     const candidate = await prisma.candidate_list.create({
       data: {
         title,
@@ -111,7 +120,7 @@ const add_candidate = async (req, res) => {
         address_line2,
         city,
         state,
-        pin_code: pin_code || null, // Handle empty pin_code
+        pin_code,
         country,
         contact_number,
         alt_contact_number,
@@ -120,7 +129,7 @@ const add_candidate = async (req, res) => {
         date_of_birth,
         job_title, 
         department,
-        work_experience: work_experience || null, // Handle empty work_experience
+        work_experience,
         hobbies,
         interests,
         skills,
@@ -131,59 +140,58 @@ const add_candidate = async (req, res) => {
         other3,
         status,
         created_by,
-        candidate_image,
-        candidate_resume,
-        candidate_aadhar,
-        candidate_pan,
-        candidate_highest_qualification,
+        candidate_image,  
+        candidate_resume, // Nullable field
+        candidate_aadhar, // Nullable field
+        candidate_pan, // Nullable field
+        candidate_highest_qualification, // Nullable field
+        work_tenure
       },
     });
 
     const candidate_id = candidate.candidate_id;
 
-    // Handle experiences
-    // if (!Array.isArray(experiences) || experiences.length === 0) {
-    //   throw new Error("Experience data is required and must be an array.");
-    // }
+    // Handle experiences if provided
+    if (Array.isArray(experiences) && experiences.length > 0) {
+      const experienceData = experiences.map((exp) => ({
+        candidate_id: candidate_id,
+        organisation_name: exp.organisation_name,
+        total_tenure: exp.total_tenure || null,
+        last_designation: exp.last_designation || null,
+        last_drawn_salary: exp.last_drawn_salary || null,
+      }));
 
-    // const experienceData = experiences.map((exp) => ({
-    //   candidate_id: candidate_id,
-    //   organisation_name: exp.organisation_name,
-    //   total_tenure: exp.total_tenure || null,
-    //   last_designation: exp.last_designation || null,
-    //   last_drawn_salary: exp.last_drawn_salary || null,
-    // }));
+      await prisma.work_experience.createMany({
+        data: experienceData,
+      });
+    }
 
-    // await prisma.work_experience.createMany({
-    //   data: experienceData,
-    // });
+    // Handle qualifications if provided
+    if (Array.isArray(qualifications) && qualifications.length > 0) {
+      const qualificationData = qualifications.map((qual) => ({
+        candidate_id: candidate_id,
+        course: qual.course,
+        college_university: qual.college_university,
+        year_of_passing: qual.year_of_passing,
+        percentage_cgpa: qual.percentage_cgpa || null,
+      }));
 
-    // // Handle qualifications
-    // if (Array.isArray(qualifications) && qualifications.length > 0) {
-    //   const qualificationData = qualifications.map((qual) => ({
-    //     candidate_id: candidate_id,
-    //     course: qual.course,
-    //     college_university: qual.college_university,
-    //     year_of_passing: qual.year_of_passing,
-    //     percentage_cgpa: qual.percentage_cgpa || null,
-    //   }));
-    
-    //   await prisma.qualifications.createMany({
-    //     data: qualificationData,
-    //   });
-    // }
+      await prisma.qualifications.createMany({
+        data: qualificationData,
+      });
+    }
 
-    // // Handle applied jobs
-    // if (Array.isArray(jobs) && jobs.length > 0) {
-    //   const jobData = jobs.map((jobId) => ({
-    //     candidate_id: candidate_id,
-    //     job_id: jobId, 
-    //   }));
+    // Handle job applications if provided
+    if (Array.isArray(jobs) && jobs.length > 0) {
+      const jobData = jobs.map((jobId) => ({
+        candidate_id: candidate_id,
+        job_id: jobId, 
+      }));
 
-    //   await prisma.candidate_applied_jobs.createMany({
-    //     data: jobData,
-    //   });
-    // }
+      await prisma.candidate_applied_jobs.createMany({
+        data: jobData,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -224,16 +232,15 @@ const reporting_to_users = async(req, res) => {
 
 const all_candidates = async (req, res) => {
   try {
-    
     const candidates = await prisma.candidate_list.findMany({
       include: {
-        workExperiences: true, 
-        qualifications: true,  
+        workExperiences: true,
+        qualifications: true,
         candidate_applied_jobs: {
           include: {
-            job: { 
+            job: {
               select: {
-                job_title: true, 
+                job_title: true,
               },
             },
           },
@@ -241,20 +248,30 @@ const all_candidates = async (req, res) => {
       },
     });
 
-    
+    const candidatesWithExperience = candidates.map(candidate => {
+      const years = Math.floor(candidate.work_tenure / 12);  
+      const months = candidate.work_tenure % 12;
+
+      return {
+        ...candidate,
+        experience_in_years: `${years}y ${months}m`, 
+      };
+    });
+
     res.status(200).send({
       message: 'Candidates fetched successfully',
       success: true,
-      candidates: candidates
-    })
+      candidates: candidatesWithExperience,
+    });
   } catch (error) {
     console.error('Error fetching candidates:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Internal server error',
-      success: false
+      success: false,
     });
   }
 };
+
 
 const my_candidates = async (req, res) => {
   try {
@@ -350,11 +367,18 @@ const send_data_by_id = async (req, res) => {
         message: "Candidate not found",
       });
     }
+    const years = Math.floor(candidate.work_tenure / 12);  
+    const months = candidate.work_tenure % 12;
+
+   
+     const  experience_in_years= `${years} years and ${months} months`;
+   
 
     res.status(200).send({
       success: true,
       message: "Data successfully retrieved",
       candidate: candidate,
+      experience_in_years: experience_in_years
     });
   } catch (error) {
     console.error(error);

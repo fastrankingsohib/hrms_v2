@@ -71,60 +71,66 @@ const post_jobs = async (req, res) => {
     }
 };
 
-const display_posted_jobs = async (req,res) =>{
+const display_posted_jobs = async (req, res) => {
     try {
-        const update_schedule_active = await prisma.job_post.updateMany({
-            where: {
-              job_scheduled_date: {
-                gt: new Date(),  
-              },
-              job_scheduled_time: {
-                gt: new Date(),  
+      const currentDate = new Date().toISOString().slice(0, 10);
+      const [jobs, updateScheduleActive, updateJobExpiry] = await prisma.$transaction([
+     
+        prisma.job_post.findMany({
+          orderBy: {
+            id: 'desc',
+          },
+        }),
+        
+       
+        prisma.job_post.updateMany({
+          where: {
+            job_scheduled_date: {
+              gt: currentDate, 
+            },
+            job_scheduled_time: {
+              gt: currentDate,  
             },
           },
-          data:{
+          data: {
             job_status: "Active",
-          }
-    });
-
-    const update_job_expiry = await prisma.job_post.updateMany({
-        where: {
-            job_exp_date:{
-                gt: new Date()
+          },
+        }),
+  
+        prisma.job_post.updateMany({
+          where: {
+            job_exp_date: {
+              lt: currentDate, 
             },
-            data:{
-                job_status: "Inactive",
-            }
-        }
-    })
-
-          
-        const jobs = await prisma.job_post.findMany({
-            orderBy: {
-              id: 'desc',
-            }
-          });
-          
-        if(jobs.length==0){
-            res.status(404).send({
-                message: "No jobs posted yet",
-            })
-        }
-        res.status(200).send({
-            success:true,
-            message:"successfully fetched posted jobs",
-            jobs: jobs
-        })
-
-    }
-    catch(error){
-        res.status(500).send({
-            success:false,
-            message: "Error fetching jobs",
-        })
-    };
+          },
+          data: {
+            job_status: "Inactive",
+          },
+        }),
+      ]);
+  
+      if (jobs.length === 0) {
+        return res.status(404).send({
+          message: "No jobs posted yet",
+        });
+      }
+  
     
-}
+      res.status(200).send({
+        success: true,
+        message: "Successfully fetched posted jobs",
+        jobs: jobs,
+      });
+  
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      res.status(500).send({
+        success: false,
+        message: "Error fetching jobs",
+      });
+    }
+  };
+  
 
 const active_job_posts = async(req,res) =>{
     try {

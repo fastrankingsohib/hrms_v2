@@ -13,60 +13,6 @@ function CandidateView() {
     const [candidateSuccess, setCandidateSuccess] = useState(false);
     const [candidateError, setCandidateError] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState("Overview");
-    const [candidateUpdate, setCanidateUpdate] = useState(
-        {
-            "state": "",
-            "pin_code": "",
-            "country": "",
-            "contact_number": "",
-            "alt_contact_number": "",
-            "email_address": "",
-            "alt_email_address": "",
-            "date_of_birth": "",
-            "job_title": "",
-            "department": "",
-            "work_experience": "",
-            "hobbies": "",
-            "interests": "",
-            "skills": "",
-            "recruiter_comments": "",
-            "communication_skills": "",
-            "other1": "",
-            "other2": "",
-            "other3": "",
-            "status": "",
-            "qualifications": [
-                {
-                    "course": "B.Sc. in Computer Science",
-                    "college_university": "XYZ University",
-                    "year_of_passing": "2011",
-                    "percentage_cgpa": "8.5"
-                },
-                {
-                    "course": "M.Sc. in Software Engineering",
-                    "college_university": "ABC Institute",
-                    "year_of_passing": "2014",
-                    "percentage_cgpa": "9.0"
-                }
-            ],
-            "experiences": [
-                {
-                    "organisation_name": "Tech Corp",
-                    "total_tenure": "3 years",
-                    "last_designation": "Senior Developer",
-                    "last_drawn_salary": "$80,000"
-                },
-                {
-                    "organisation_name": "Code Masters",
-                    "total_tenure": "2 years",
-                    "last_designation": "Software Engineer",
-                    "last_drawn_salary": "$70,000"
-                }
-            ],
-            "jobs": [35, 40, 43],
-            "created_by": "recruiter@example.com"
-        }
-    )
     const [alerts, setAlerts] = useState({
         delete: false,
     });
@@ -76,14 +22,16 @@ function CandidateView() {
         legalDetails: false
     });
     useEffect(() => {
+        console.log(candidate)
+    }, [candidate])
+    useEffect(() => {
         setCandidateLoading(true);
         axios.get(`/candidate-info/${candidate_id}`)
             .then((res) => {
-                console.log(res.data)
                 if (res.data.success) {
-                    setCandidateSuccess(true)
+                    setCandidateSuccess(true);
                     setCandidateLoading(false);
-                    setCandidateError(false)
+                    setCandidateError(false);
                     setCandidate(res.data.candidate);
                 }
             })
@@ -93,38 +41,6 @@ function CandidateView() {
                 setCandidateLoading(false);
             })
     }, [candidate_id]);
-
-
-
-
-
-    // Hanldling Experience ------------------------------------------------------------------------------------------------------
-    // Hanldling Experience ------------------------------------------------------------------------------------------------------
-    const [experienceList, setExperienceList] = useState([
-        { id: 1, company: "Company A", role: "Developer", tenure: 2, salary: 30000 },
-        { id: 2, company: "Company B", role: "Senior Developer", tenure: 3, salary: 38000 }
-    ]);
-
-    // State to manage the edit mode
-    const [isExperienceEditing, setIsExperienceEditing] = useState(false);
-
-    // Handle input change for editing experience
-    const handleInputChange = (index, field, value) => {
-        const newExperienceList = [...experienceList];
-        newExperienceList[index][field] = value;
-        setExperienceList(newExperienceList);
-    };
-
-    // Handle add new experience entry
-    const addExperience = () => {
-        setExperienceList([...experienceList, { id: Date.now(), company: '', role: '', years: 0 }]);
-    };
-
-    // Handle remove experience entry
-    const removeExperience = (id) => {
-        setExperienceList(experienceList.filter(experience => experience.id !== id));
-    };
-
 
     // Candidate Education -------------------------------------------------------------------------------------------------------
     // Candidate Education -------------------------------------------------------------------------------------------------------
@@ -157,7 +73,7 @@ function CandidateView() {
                     <span className="ml-2">Loading Candidate Details ...</span>
                 </div>
             </div>
-        )
+        );
     }
     if (candidateError) {
         return (
@@ -238,75 +154,16 @@ function CandidateView() {
                         <div className='grid gap-2 p-6 bg-white w-full border'>
                             <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
                                 <span className='text-xl'>Professional Details</span>
-                                {/* <button className='inline-flex gap-2 items-center' onClick={() => setIsExperienceEditing(!isExperienceEditing)}>
-                                    <MdEdit /> {isExperienceEditing ? 'Save' : 'Edit'} Professional Details
-                                </button> */}
                             </h1>
 
                             <div>
-                                <h1 className='text-lg font-semibold'>
-                                    Experience
-                                </h1>
-
-                                <div className='grid gap-4'>
-                                    {experienceList.map((experience, index) => (
-                                        <div key={experience.id} className='p-4 border mt-4 flex justify-between items-center'>
-                                            {isExperienceEditing ? (
-                                                <>
-                                                    <input
-                                                        type='text'
-                                                        value={experience.company}
-                                                        onChange={(e) => handleInputChange(index, 'company', e.target.value)}
-                                                        placeholder='Company Name'
-                                                        className='border p-2 px-4 mr-2'
-                                                    />
-                                                    <input
-                                                        type='text'
-                                                        value={experience.role}
-                                                        onChange={(e) => handleInputChange(index, 'role', e.target.value)}
-                                                        placeholder='Role'
-                                                        className='border p-2 px-4 mr-2'
-                                                    />
-                                                    <input
-                                                        type='number'
-                                                        value={experience.tenure}
-                                                        onChange={(e) => handleInputChange(index, 'tenure', e.target.value)}
-                                                        placeholder='Years'
-                                                        className='border p-2 px-4 mr-2'
-                                                    />
-                                                    <input
-                                                        type='text'
-                                                        value={experience.salary}
-                                                        onChange={(e) => handleInputChange(index, 'salary', e.target.value)}
-                                                        placeholder='Salary'
-                                                        className='border p-2 px-4 mr-2'
-                                                    />
-                                                    <button onClick={() => removeExperience(experience.id)} className='text-red-500'>
-                                                        <MdDelete />
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span>{experience.company} - {experience.role} ({experience.years} years)</span>
-                                                </>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {isExperienceEditing && (
-                                    <button onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
-                                        + Add More Experience
-                                    </button>
-                                )}
-
-
-                                <button
-                                    onClick={() => setIsExperienceEditing(!isExperienceEditing)}
-                                    className='mt-4 bg-indigo-700 text-white p-2 px-4'
-                                >
-                                    {isExperienceEditing ? 'Save Experience' : 'Edit Experience'}
-                                </button>
+                                {
+                                    candidate.workExperiences ? 
+                                    candidate.workExperiences.map(() => {
+                                        return("")
+                                    }) :
+                                    console.log("0 Work Experience Found!")
+                                }
                             </div>
 
 
@@ -404,7 +261,7 @@ function CandidateView() {
                             </div>
 
                             {/* Delete Alert */}
-                            <div stye className={`${alerts.delete ? "flex" : "hidden"} fixed top-0 left-0 z-40 items-center justify-center h-full w-full backdrop-blur-lg bg-indigo-700 bg-opacity-10`}>
+                            <div className={`${alerts.delete ? "flex" : "hidden"} fixed top-0 left-0 z-40 items-center justify-center h-full w-full backdrop-blur-lg bg-indigo-700 bg-opacity-10`}>
                                 <div className='w-96 min-h-32 p-10 text-center bg-white border rounded-xl'>
                                     <h1 className='text-xl font-semibold text-red-500'>Do You Want To Delete The User</h1>
                                     <button className='bg-gray-100 rounded-lg p-2.5 px-5 mt-4 mr-4'
