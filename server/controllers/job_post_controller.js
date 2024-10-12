@@ -103,7 +103,7 @@ const display_posted_jobs = async (req, res) => {
         prisma.job_post.updateMany({
           where: {
             job_exp_date: {
-              lt: currentDate,  // Expired jobs (less than current date)
+              lt: currentDatey,  // Expired jobs (less than current date)
             },
           },
           data: {
