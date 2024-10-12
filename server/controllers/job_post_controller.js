@@ -73,25 +73,23 @@ const post_jobs = async (req, res) => {
 
 const display_posted_jobs = async (req, res) => {
     try {
-      const currentDate = new Date().toISOString().slice(0, 10);  // Get current date in YYYY-MM-DD format
-  
-      // Start transaction
+      const currentDate = new Date().toISOString().slice(0, 10);
       const [jobs, updateScheduleActive, updateJobExpiry] = await prisma.$transaction([
-        // Fetch jobs ordered by descending ID
+     
         prisma.job_post.findMany({
           orderBy: {
             id: 'desc',
           },
         }),
         
-        // Update job status to "Active" for jobs with a scheduled date/time in the future
+       
         prisma.job_post.updateMany({
           where: {
             job_scheduled_date: {
-              gt: currentDate,  // Compare only date
+              gt: currentDate, 
             },
             job_scheduled_time: {
-              gt: currentDate,  // Compare only date
+              gt: currentDate,  
             },
           },
           data: {
@@ -99,11 +97,10 @@ const display_posted_jobs = async (req, res) => {
           },
         }),
   
-        // Update job status to "Inactive" for jobs with an expired date
         prisma.job_post.updateMany({
           where: {
             job_exp_date: {
-              lt: currentDatey,  // Expired jobs (less than current date)
+              lt: currentDate, 
             },
           },
           data: {
@@ -118,7 +115,7 @@ const display_posted_jobs = async (req, res) => {
         });
       }
   
-      // Return success response with the fetched jobs
+    
       res.status(200).send({
         success: true,
         message: "Successfully fetched posted jobs",

@@ -72,23 +72,19 @@ const add_candidate = async (req, res) => {
       work_tenure
     } = req.body;
 
-    // Log all uploaded files
     console.log('Uploaded files:', req.files);
 
-    // Ensure files exist before accessing paths
     const candidate_image = req.files['candidate_image'] && req.files['candidate_image'][0] ? req.files['candidate_image'][0].path : null;
     const candidate_resume = req.files['candidate_resume'] && req.files['candidate_resume'][0] ? req.files['candidate_resume'][0].path : null;
     const candidate_aadhar = req.files['candidate_aadhar'] && req.files['candidate_aadhar'][0] ? req.files['candidate_aadhar'][0].path : null;
     const candidate_pan = req.files['candidate_pan'] && req.files['candidate_pan'][0] ? req.files['candidate_pan'][0].path : null;
     const candidate_highest_qualification = req.files['candidate_highest_qualification'] && req.files['candidate_highest_qualification'][0] ? req.files['candidate_highest_qualification'][0].path : null;
 
-    // Log paths to debug if files are saved correctly
     console.log('Resume path:', candidate_resume);
     console.log('Aadhar path:', candidate_aadhar);
     console.log('PAN path:', candidate_pan);
     console.log('Qualification path:', candidate_highest_qualification);
 
-    // Validate email and phone number
     if (!validator.isEmail(email_address)) {
       return res.status(400).send({ message: "Invalid email format." });
     }
@@ -97,11 +93,9 @@ const add_candidate = async (req, res) => {
       return res.status(400).send({ message: "Invalid mobile number." });
     }
 
-    // Check for existing email or contact
     const emailOrContactCheck = await check_email_contact(req, res);
     if (emailOrContactCheck) return; 
 
-    // Create candidate
     const candidate = await prisma.candidate_list.create({
       data: {
         title,
@@ -160,7 +154,6 @@ const add_candidate = async (req, res) => {
       data: experienceData,
     });
 
-    // Handle qualifications
     if (Array.isArray(qualifications) && qualifications.length > 0) {
       const qualificationData = qualifications.map((qual) => ({
         candidate_id: candidate_id,
@@ -175,7 +168,6 @@ const add_candidate = async (req, res) => {
       });
     }
 
-    // Handle applied jobs
     if (Array.isArray(jobs) && jobs.length > 0) {
       const jobData = jobs.map((jobId) => ({
         candidate_id: candidate_id,
@@ -242,14 +234,13 @@ const all_candidates = async (req, res) => {
       },
     });
 
-    // Add experience in years and months to each candidate
     const candidatesWithExperience = candidates.map(candidate => {
-      const years = Math.floor(candidate.work_tenure / 12);  // Calculate years
-      const months = candidate.work_tenure % 12;  // Calculate remaining months
+      const years = Math.floor(candidate.work_tenure / 12);  
+      const months = candidate.work_tenure % 12;
 
       return {
         ...candidate,
-        experience_in_years: `${years} years and ${months} months`, // Add formatted experience
+        experience_in_years: `${years}y ${months}m`, 
       };
     });
 
@@ -362,11 +353,18 @@ const send_data_by_id = async (req, res) => {
         message: "Candidate not found",
       });
     }
+    const years = Math.floor(candidate.work_tenure / 12);  
+    const months = candidate.work_tenure % 12;
+
+   
+     const  experience_in_years= `${years} years and ${months} months`;
+   
 
     res.status(200).send({
       success: true,
       message: "Data successfully retrieved",
       candidate: candidate,
+      experience_in_years: experience_in_years
     });
   } catch (error) {
     console.error(error);
