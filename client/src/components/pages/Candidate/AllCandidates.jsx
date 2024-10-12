@@ -42,11 +42,11 @@ function AllCandidates() {
                     // If not loading, show candidate list or a message if empty
                     allCandidates.length > 0 ? (
                         allCandidates.map((value, index) => (
-                            <NavLink to={`/candidates/view/${value.candidate_id}`} key={index} className={({isActive}) => `${isActive ? "bg-indigo-50 border-indigo-700" : "bg-white border-l-transparent border-b"} p-4 h-20 border-l-4 block w-full`}>
+                            <NavLink to={`/candidates/view/${value.candidate_id}`} key={index} className={({ isActive }) => `${isActive ? "bg-indigo-50 border-indigo-700" : "bg-white border-l-transparent border-b"} p-4 h-20 border-l-4 block w-full`}>
                                 <div className='w-full'>
                                     <div className='w-full flex items-center justify-between'>
                                         <span className='text-xl inline-block -mt-1 font-bold'>{`${value.title} ${value.first_name} ${value.last_name}`}</span>
-                                        <span><span className='text-gray-400'>Status:</span> <strong className='inline-block w-20 text-right'>{value.status}</strong></span>
+                                        <span><div className={`${value.status === "Active" ? "text-green-500" : value.status === "Inactive" ? "bg-orange-500" : "text-red-500"}`}>{`${value.status}`}</div></span>
                                     </div>
                                     <div className='w-full flex items-center justify-between'>
                                         <span>{`${value.contact_number}`}</span>

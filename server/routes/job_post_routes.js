@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename)
 const router = express.Router()
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../public/uploadedpdf/')); 
+        cb(null, path.join(__dirname, '../public/uploaded_job_post_pdf/')); 
     },
     filename: function (req, file, cb) {
         const filename = file.fieldname + "-" + Date.now() + path.extname(file.originalname);
@@ -35,6 +35,14 @@ const upload = multer({
     fileFilter: fileFilter,
     limits: { fileSize: 10 * 1024 * 1024 } 
 });
+
+
+
+//ROUTES
+//ROUTES
+//ROUTES
+//ROUTES
+//ROUTES
 
 router.post('/post_job', upload.single('file'), post_jobs);
 router.get('/display_jobs',authenticateToken,display_posted_jobs)

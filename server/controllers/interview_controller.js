@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 const create_interview = async(req,res)=>{
     try {
         const {
+            job_id,
             candidate_id,
             interview_date,
             interview_time,
@@ -12,12 +13,17 @@ const create_interview = async(req,res)=>{
             }= req.body;
         await prisma.interview_details.create({
             data:{
+                job_id:job_id,
                 candidate_id:candidate_id,
                 interview_date:interview_date,
                 interview_time:interview_time,
                 interviewer:interviewer,
                 interview_round:interview_round,
                 }
+        })
+        res.status(200).send({
+            success:true,
+            message:"Interview created successfully",
         })
     } catch (error) {
         console.log(error)
@@ -94,25 +100,29 @@ const update_interview = async(req,res)=>{
     try {
         
         const {
-            interview_id,
-            candidate_id,
+            
             interview_date,
             interview_time,
             interviewer,
             interview_round,
             }= req.body;
+            const interview_id = parseInt(req.params.id);
 
             await prisma.interview_details.update({
                 where: {
                     id:interview_id
                 },
                 data:{
-                    candidate_id:candidate_id,
+                    
                     interview_date:interview_date,
                     interview_time:interview_time,
                     interview_round:interview_round,
                     interviewer:interviewer
                 }
+            })
+            res.status(200).send({
+                success:true,
+                message:"interview successfully updated."
             })
     } catch (error) {
         console.log(error)
@@ -126,7 +136,7 @@ const update_interview = async(req,res)=>{
 const update_interview_status = async(req,res)=>{
     try {
         const {candidate_id , job_id , job_status , attempted , remarks} = req.body;
-        const {interview_id} = req.params.id
+        const interview_id = parseInt(req.params.id)
         await prisma.interview_details.update({
             where: {
                 id:interview_id
@@ -136,7 +146,7 @@ const update_interview_status = async(req,res)=>{
                 remarks:remarks
             }
         })
-        await prisma.candidate_applied_jobs.update({
+        await prisma.candidate_applied_jobs.updateMany({
             where:{
                 candidate_id:candidate_id,
                 job_id:job_id

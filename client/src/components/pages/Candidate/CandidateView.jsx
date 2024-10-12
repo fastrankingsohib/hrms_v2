@@ -12,19 +12,74 @@ function CandidateView() {
     const [candidateLoading, setCandidateLoading] = useState(false);
     const [candidateSuccess, setCandidateSuccess] = useState(false);
     const [candidateError, setCandidateError] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState("Overview")
+    const [selectedFilter, setSelectedFilter] = useState("Overview");
+    const [candidateUpdate, setCanidateUpdate] = useState(
+        {
+            "state": "",
+            "pin_code": "",
+            "country": "",
+            "contact_number": "",
+            "alt_contact_number": "",
+            "email_address": "",
+            "alt_email_address": "",
+            "date_of_birth": "",
+            "job_title": "",
+            "department": "",
+            "work_experience": "",
+            "hobbies": "",
+            "interests": "",
+            "skills": "",
+            "recruiter_comments": "",
+            "communication_skills": "",
+            "other1": "",
+            "other2": "",
+            "other3": "",
+            "status": "",
+            "qualifications": [
+                {
+                    "course": "B.Sc. in Computer Science",
+                    "college_university": "XYZ University",
+                    "year_of_passing": "2011",
+                    "percentage_cgpa": "8.5"
+                },
+                {
+                    "course": "M.Sc. in Software Engineering",
+                    "college_university": "ABC Institute",
+                    "year_of_passing": "2014",
+                    "percentage_cgpa": "9.0"
+                }
+            ],
+            "experiences": [
+                {
+                    "organisation_name": "Tech Corp",
+                    "total_tenure": "3 years",
+                    "last_designation": "Senior Developer",
+                    "last_drawn_salary": "$80,000"
+                },
+                {
+                    "organisation_name": "Code Masters",
+                    "total_tenure": "2 years",
+                    "last_designation": "Software Engineer",
+                    "last_drawn_salary": "$70,000"
+                }
+            ],
+            "jobs": [35, 40, 43],
+            "created_by": "recruiter@example.com"
+        }
+    )
     const [alerts, setAlerts] = useState({
         delete: false,
-    })
+    });
     const [editDetails, setEditDetails] = useState({
         personalDetails: false,
         professionalDetails: false,
         legalDetails: false
-    })
+    });
     useEffect(() => {
         setCandidateLoading(true);
         axios.get(`/candidate-info/${candidate_id}`)
             .then((res) => {
+                console.log(res.data)
                 if (res.data.success) {
                     setCandidateSuccess(true)
                     setCandidateLoading(false);
@@ -46,12 +101,12 @@ function CandidateView() {
     // Hanldling Experience ------------------------------------------------------------------------------------------------------
     // Hanldling Experience ------------------------------------------------------------------------------------------------------
     const [experienceList, setExperienceList] = useState([
-        { id: 1, company: "Company A", role: "Developer", years: 2 },
-        { id: 2, company: "Company B", role: "Senior Developer", years: 3 }
+        { id: 1, company: "Company A", role: "Developer", tenure: 2, salary: 30000 },
+        { id: 2, company: "Company B", role: "Senior Developer", tenure: 3, salary: 38000 }
     ]);
 
     // State to manage the edit mode
-    const [isEditing, setIsEditing] = useState(false);
+    const [isExperienceEditing, setIsExperienceEditing] = useState(false);
 
     // Handle input change for editing experience
     const handleInputChange = (index, field, value) => {
@@ -71,9 +126,26 @@ function CandidateView() {
     };
 
 
+    // Candidate Education -------------------------------------------------------------------------------------------------------
+    // Candidate Education -------------------------------------------------------------------------------------------------------
+    const [educationList, setEducationList] = useState([
+        { id: 1, institution: 'ABC University', degree: 'B.Sc.', year: 2020, grade: 'A' }
+    ]);
+    const [isEducationEditing, setIsEducationEditing] = useState(false);
 
+    const handleEducationInputChange = (index, field, value) => {
+        const updatedEducation = [...educationList];
+        updatedEducation[index][field] = value;
+        setEducationList(updatedEducation);
+    };
 
+    const addEducation = () => {
+        setEducationList([...educationList, { id: Date.now(), institution: '', degree: '', year: '', grade: '' }]);
+    };
 
+    const removeEducation = (id) => {
+        setEducationList(educationList.filter((education) => education.id !== id));
+    };
 
     // Component Rendering -------------------------------------------------------------------------------------------------------
     // Component Rendering -------------------------------------------------------------------------------------------------------
@@ -104,7 +176,7 @@ function CandidateView() {
                             <div>
                                 <div className='text-xl font-bold'>{`${candidate.title} ${candidate.first_name} ${candidate.last_name}`}</div>
                                 <div>Experience: {candidate.work_experience}</div>
-                                <div className={`${candidate.status === "Active" ? "text-green-500" : candidate.status === "Inactive" ? "bg-red-500" : "bg-orange-500"}`}>{`${candidate.status}`}</div>
+                                <div className={`${candidate.status === "Active" ? "text-green-500" : candidate.status === "Inactive" ? "bg-orange-500" : "text-red-500"}`}>{`${candidate.status}`}</div>
                             </div>
                         </div>
                     </div>
@@ -166,9 +238,9 @@ function CandidateView() {
                         <div className='grid gap-2 p-6 bg-white w-full border'>
                             <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
                                 <span className='text-xl'>Professional Details</span>
-                                <button className='inline-flex gap-2 items-center' onClick={() => setIsEditing(!isEditing)}>
-                                    <MdEdit /> {isEditing ? 'Save' : 'Edit'} Professional Details
-                                </button>
+                                {/* <button className='inline-flex gap-2 items-center' onClick={() => setIsExperienceEditing(!isExperienceEditing)}>
+                                    <MdEdit /> {isExperienceEditing ? 'Save' : 'Edit'} Professional Details
+                                </button> */}
                             </h1>
 
                             <div>
@@ -179,7 +251,7 @@ function CandidateView() {
                                 <div className='grid gap-4'>
                                     {experienceList.map((experience, index) => (
                                         <div key={experience.id} className='p-4 border mt-4 flex justify-between items-center'>
-                                            {isEditing ? (
+                                            {isExperienceEditing ? (
                                                 <>
                                                     <input
                                                         type='text'
@@ -197,16 +269,16 @@ function CandidateView() {
                                                     />
                                                     <input
                                                         type='number'
-                                                        value={experience.years}
-                                                        onChange={(e) => handleInputChange(index, 'years', e.target.value)}
+                                                        value={experience.tenure}
+                                                        onChange={(e) => handleInputChange(index, 'tenure', e.target.value)}
                                                         placeholder='Years'
                                                         className='border p-2 px-4 mr-2'
                                                     />
                                                     <input
-                                                        type='number'
-                                                        value={experience.years}
-                                                        onChange={(e) => handleInputChange(index, 'years', e.target.value)}
-                                                        placeholder='Years'
+                                                        type='text'
+                                                        value={experience.salary}
+                                                        onChange={(e) => handleInputChange(index, 'salary', e.target.value)}
+                                                        placeholder='Salary'
                                                         className='border p-2 px-4 mr-2'
                                                     />
                                                     <button onClick={() => removeExperience(experience.id)} className='text-red-500'>
@@ -222,11 +294,88 @@ function CandidateView() {
                                     ))}
                                 </div>
 
-                                {isEditing && (
-                                    <button onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4'>
+                                {isExperienceEditing && (
+                                    <button onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
                                         + Add More Experience
                                     </button>
                                 )}
+
+
+                                <button
+                                    onClick={() => setIsExperienceEditing(!isExperienceEditing)}
+                                    className='mt-4 bg-indigo-700 text-white p-2 px-4'
+                                >
+                                    {isExperienceEditing ? 'Save Experience' : 'Edit Experience'}
+                                </button>
+                            </div>
+
+
+
+
+
+                            {/* Educations And Qualifications Records Editing */}
+                            {/* Educations And Qualifications Records Editing */}
+                            <div>
+                                <h1 className='text-lg font-semibold mt-4'>
+                                    Education
+                                </h1>
+
+                                <div className='grid gap-4'>
+                                    {educationList.map((education, index) => (
+                                        <div key={education.id} className='p-4 border mt-4 flex justify-between items-center'>
+                                            {isEducationEditing ? (
+                                                <>
+                                                    <input
+                                                        type='text'
+                                                        value={education.institution}
+                                                        onChange={(e) => handleEducationInputChange(index, 'institution', e.target.value)}
+                                                        placeholder='Institution'
+                                                        className='border p-2 px-4 mr-2'
+                                                    />
+                                                    <input
+                                                        type='text'
+                                                        value={education.degree}
+                                                        onChange={(e) => handleEducationInputChange(index, 'degree', e.target.value)}
+                                                        placeholder='Degree'
+                                                        className='border p-2 px-4 mr-2'
+                                                    />
+                                                    <input
+                                                        type='number'
+                                                        value={education.year}
+                                                        onChange={(e) => handleEducationInputChange(index, 'year', e.target.value)}
+                                                        placeholder='Year'
+                                                        className='border p-2 px-4 mr-2'
+                                                    />
+                                                    <input
+                                                        type='text'
+                                                        value={education.grade}
+                                                        onChange={(e) => handleEducationInputChange(index, 'grade', e.target.value)}
+                                                        placeholder='Grade'
+                                                        className='border p-2 px-4 mr-2'
+                                                    />
+                                                    <button onClick={() => removeEducation(education.id)} className='text-red-500'>
+                                                        <MdDelete />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <span>{education.institution} - {education.degree} ({education.year}) - Grade: {education.grade}</span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {isEducationEditing && (
+                                    <button onClick={addEducation} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
+                                        + Add More Education
+                                    </button>
+                                )}
+
+                                <button
+                                    onClick={() => setIsEducationEditing(!isEducationEditing)}
+                                    className='mt-4 bg-indigo-700 text-white p-2 px-4'
+                                >
+                                    {isEducationEditing ? 'Save Education' : 'Edit Education'}
+                                </button>
                             </div>
                         </div>
 

@@ -27,10 +27,8 @@ const post_jobs = async (req, res) => {
             job_scheduled_time
         } = req.body;
 
-        // Check if file was uploaded and set file_path accordingly
         const file_path = req.file ? req.file.path : null;
 
-        // Insert job post into the database with file_path (can be null if no file)
         await prisma.job_post.create({
             data: {
                 job_title,
@@ -54,27 +52,53 @@ const post_jobs = async (req, res) => {
                 job_exp_date,
                 job_scheduled_date,
                 job_scheduled_time,
-                job_pdf_file_path: file_path // File path or null
+                job_pdf_file_path: file_path 
             }
         });
 
-        // Send success response
+       
         res.status(200).send({
             success: true,
             message: "Job posted successfully",
         });
     } catch (error) {
-        console.error(error); // Log the error for debugging
+        console.error(error); 
         res.status(500).send({
             success: false,
             message: "Error creating job post",
-            error: error.message // Include the error message for better debugging
+            error: error.message 
         });
     }
 };
 
 const display_posted_jobs = async (req,res) =>{
     try {
+        const update_schedule_active = await prisma.job_post.updateMany({
+            where: {
+              job_scheduled_date: {
+                gt: new Date(),  
+              },
+              job_scheduled_time: {
+                gt: new Date(),  
+            },
+          },
+          data:{
+            job_status: "Active",
+          }
+    });
+
+    const update_job_expiry = await prisma.job_post.updateMany({
+        where: {
+            job_exp_date:{
+                gt: new Date()
+            },
+            data:{
+                job_status: "Inactive",
+            }
+        }
+    })
+
+          
         const jobs = await prisma.job_post.findMany({
             orderBy: {
               id: 'desc',
