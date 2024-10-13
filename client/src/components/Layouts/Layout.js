@@ -1,9 +1,9 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "../Requires/Sidebar";
-import TopBar from "../Requires/TopBar";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import axios from "axios";
+import Sidebar from './../requires/Sidebar';
+import TopBar from './../requires/TopBar';
 
 const Layout = () => {
     const Navigate = useNavigate();

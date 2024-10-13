@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import useRegisterUser from "../../../helpers/useRegisterUser";
 import allModules from "./AllModules";
-import UserModule from "../../Commons/UserModule";
 import { useSelector } from "react-redux";
+import UserModule from './../../commons/UserModule';
 
 // Icons
 import { GoEyeClosed, GoEye, GoTriangleUp } from "react-icons/go";
@@ -297,7 +297,7 @@ const NewUser = () => {
                                 } else if (sanitizedValue > 1999999999) {
                                     setMobileError(true);
                                 }
-                                else{
+                                else {
                                     setMobileError(false)
                                 }
                             }}
@@ -527,7 +527,7 @@ const NewUser = () => {
                     <div className="w-1/4 pl-4 relative">
                         <button
                             className="primary-button justify-center"
-                            disabled={ mobileError ||submitError || warnDefault > 0} // Simplified condition
+                            disabled={mobileError || submitError || warnDefault > 0} // Simplified condition
                             style={{
                                 opacity: mobileError || submitError || warnDefault > 0 ? 0.8 : 1,
                                 cursor: mobileError || submitError || warnDefault > 0 ? 'not-allowed' : 'pointer'
