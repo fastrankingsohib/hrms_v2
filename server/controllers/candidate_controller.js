@@ -67,29 +67,20 @@ const add_candidate = async (req, res) => {
       status,
       qualifications,
       experiences,
-      jobs, 
+      jobs,
       created_by,
-      work_tenure
+      work_tenure,
     } = req.body;
 
-    console.log('Uploaded files:', req.files);
+    // Ensure req.files is handled even when it's undefined
+    const files = req.files || {};
 
     // Handle the uploaded files safely, making them nullable
-    const candidate_image = req.files['candidate_image'] && req.files['candidate_image'][0] 
-      ? req.files['candidate_image'][0].path 
-      : null;
-    const candidate_resume = req.files['candidate_resume'] && req.files['candidate_resume'][0] 
-      ? req.files['candidate_resume'][0].path 
-      : null;
-    const candidate_aadhar = req.files['candidate_aadhar'] && req.files['candidate_aadhar'][0] 
-      ? req.files['candidate_aadhar'][0].path 
-      : null;
-    const candidate_pan = req.files['candidate_pan'] && req.files['candidate_pan'][0] 
-      ? req.files['candidate_pan'][0].path 
-      : null;
-    const candidate_highest_qualification = req.files['candidate_highest_qualification'] && req.files['candidate_highest_qualification'][0] 
-      ? req.files['candidate_highest_qualification'][0].path 
-      : null;
+    const candidate_image = files['candidate_image']?.[0]?.path || null;
+    const candidate_resume = files['candidate_resume']?.[0]?.path || null;
+    const candidate_aadhar = files['candidate_aadhar']?.[0]?.path || null;
+    const candidate_pan = files['candidate_pan']?.[0]?.path || null;
+    const candidate_highest_qualification = files['candidate_highest_qualification']?.[0]?.path || null;
 
     console.log('Resume path:', candidate_resume);
     console.log('Aadhar path:', candidate_aadhar);
@@ -98,11 +89,11 @@ const add_candidate = async (req, res) => {
 
     // Validate email and phone number
     if (!validator.isEmail(email_address)) {
-      return res.status(400).send({ message: "Invalid email format." });
+      return res.status(400).send({ message: 'Invalid email format.' });
     }
 
     if (!validator.isMobilePhone(contact_number, 'any', { strictMode: false })) {
-      return res.status(400).send({ message: "Invalid mobile number." });
+      return res.status(400).send({ message: 'Invalid mobile number.' });
     }
 
     // Check for existing email or contact
@@ -127,7 +118,7 @@ const add_candidate = async (req, res) => {
         email_address,
         alt_email_address,
         date_of_birth,
-        job_title, 
+        job_title,
         department,
         work_experience,
         hobbies,
@@ -140,12 +131,12 @@ const add_candidate = async (req, res) => {
         other3,
         status,
         created_by,
-        candidate_image,  
+        candidate_image, // Nullable field
         candidate_resume, // Nullable field
         candidate_aadhar, // Nullable field
         candidate_pan, // Nullable field
         candidate_highest_qualification, // Nullable field
-        work_tenure
+        work_tenure,
       },
     });
 
@@ -185,7 +176,7 @@ const add_candidate = async (req, res) => {
     if (Array.isArray(jobs) && jobs.length > 0) {
       const jobData = jobs.map((jobId) => ({
         candidate_id: candidate_id,
-        job_id: jobId, 
+        job_id: jobId,
       }));
 
       await prisma.candidate_applied_jobs.createMany({
@@ -195,16 +186,18 @@ const add_candidate = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Candidate and related data successfully added.",
+      message: 'Candidate and related data successfully added.',
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
       success: false,
-      message: "An error occurred while adding candidate, experiences, qualifications, and jobs.",
+      message: 'An error occurred while adding candidate, experiences, qualifications, and jobs.',
     });
   }
 };
+
+
 
 
 
