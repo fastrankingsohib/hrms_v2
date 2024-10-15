@@ -1,13 +1,16 @@
 import axios from "axios"
 import { useState } from "react"
+import { Navigate, useNavigate } from "react-router-dom";
 
 const useCandidateUpdate = () => {
-    const [deleteEvents, setDeleteEvents] = useState({
+    const navigate = useNavigate()
+    const [updateEvents, setUpdateEvents] = useState({
         loading: false,
         error: false,
         success: false,
     });
-    const updateCanidate = (candidateId, candidateEducation, candidateExperience, personalDetails, candidateSkills, candidateHobbies, candidateComment) => {
+    const updateCandidate = (candidateId, candidateEducation, candidateExperience, personalDetails, candidateSkills, candidateHobbies, candidateComment) => {
+        setUpdateEvents({loading: true, error: false, success: false})
         axios.post(`/update-candidate/${candidateId}`,
             {
                 "title": personalDetails.title,
@@ -27,7 +30,7 @@ const useCandidateUpdate = () => {
                 "date_of_birth": personalDetails.date_of_birth,
                 "job_title": personalDetails.job_title,
                 "department": personalDetails.department,
-                "work_experience": candidateEducation,
+                "work_experience": "",
                 "hobbies": personalDetails.hobbies,
                 "interests": personalDetails.interests,
                 "skills": personalDetails.skills,
@@ -46,12 +49,15 @@ const useCandidateUpdate = () => {
             .then((res) => {
                 // Event Hanling
                 console.log(res.data)
-                setDeleteEvents({ loading: false, error: false, success: true });
+                setUpdateEvents({ loading: false, error: false, success: true });
+                setTimeout(() => {
+                    setUpdateEvents({ loading: false, error: false, success: false });
+                }, 5000)
             })
             .catch((err) => {
                 console.log(err)
                 // Event Hanling
-                setDeleteEvents({ loading: false, error: true, success: false });
+                setUpdateEvents({ loading: false, error: true, success: false });
             })
 
 
@@ -93,6 +99,6 @@ const useCandidateUpdate = () => {
         //     }
         // )
     }
-    return ({ deleteEvents, updateCanidate })
+    return ({ updateEvents, updateCandidate })
 }
 export default useCandidateUpdate;

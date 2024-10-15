@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Qualifications from "../../Commons/Qualifications";
 import { useSelector } from "react-redux";
 import useNewCandidate from "../../../helpers/useNewCandidate";
 import { FaTimes } from "react-icons/fa";
@@ -493,7 +492,7 @@ const NewCandidate = () => {
                             {
                                 allJobs ? allJobs.map((value, index) => {
                                     return (
-                                        <option value={value.id} onClick={() => setCandidate((values) => ({...values, jobs: [value]}))}>{value.job_title}</option>
+                                        <option value={value.id} onClick={() => setCandidate((values) => ({ ...values, jobs: [value] }))}>{value.job_title}</option>
                                     )
                                 }) : <option value="Telesales">No Jobs Found</option>
                             }

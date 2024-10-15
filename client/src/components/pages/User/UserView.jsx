@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import useUpdateUser from "../../../helpers/useUpadateUser"; // Ensure this hook is defined correctly
 import allModules from "./AllModules"; // Import any required modules
-import UserModule from "../../Commons/UserModule";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -12,6 +11,7 @@ import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 
 // icons
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import UserModule from './../../Commons/UserModule';
 
 const UpdateUser = () => {
     const { userid } = useParams();
@@ -601,10 +601,10 @@ const UpdateUser = () => {
                                 updateUser(user, userid);
                                 console.log('update user')
                             }}
-                            disabled={mobileError ||submitError || warnDefault > 0 ? true : false}
+                            disabled={mobileError || submitError || warnDefault > 0 ? true : false}
                             style={{
-                                opacity: mobileError ||submitError || warnDefault > 0 ? 0.8 : 1,
-                                cursor: mobileError ||submitError || warnDefault > 0 ? 'not-allowed' : 'pointer',
+                                opacity: mobileError || submitError || warnDefault > 0 ? 0.8 : 1,
+                                cursor: mobileError || submitError || warnDefault > 0 ? 'not-allowed' : 'pointer',
                                 backgroundColor: loading === true ? '#313131' : '#000000',
                             }}
                         >
