@@ -97,7 +97,7 @@ router.post('/add-candidate', upload, add_candidate);
 router.get('/reporting-user', authenticateToken, reporting_to_users);
 router.get('/all-candidates', authenticateToken, all_candidates);
 router.get('/my-candidates', authenticateToken, my_candidates);
-router.delete('/delete-candidate/:id', authenticateToken, delete_candidate);
+router.get('/delete-candidate/:id', authenticateToken, delete_candidate);
 router.get('/candidate-info/:id', authenticateToken, send_data_by_id);
 router.post('/update-candidate/:id', authenticateToken, update_candidate);
 router.get("/all-modules", module_data);
