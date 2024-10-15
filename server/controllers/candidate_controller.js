@@ -420,11 +420,11 @@ const update_candidate = async (req, res) => {
       jobs 
     } = req.body;
 
-    const candidate_image = req.files['candidate_image'] && req.files['candidate_image'][0] ? req.files['candidate_image'][0].path : null;
-    const candidate_resume = req.files['candidate_resume'] && req.files['candidate_resume'][0] ? req.files['candidate_resume'][0].path : null;
-    const candidate_aadhar = req.files['candidate_aadhar'] && req.files['candidate_aadhar'][0] ? req.files['candidate_aadhar'][0].path : null;
-    const candidate_pan = req.files['candidate_pan'] && req.files['candidate_pan'][0] ? req.files['candidate_pan'][0].path : null;
-    const candidate_highest_qualification = req.files['candidate_highest_qualification'] && req.files['candidate_highest_qualification'][0] ? req.files['candidate_highest_qualification'][0].path : null;
+    //const candidate_image = req.files['candidate_image'] && req.files['candidate_image'][0] ? req.files['candidate_image'][0].path : null;
+    //const candidate_resume = req.files['candidate_resume'] && req.files['candidate_resume'][0] ? req.files['candidate_resume'][0].path : null;
+    //const candidate_aadhar = req.files['candidate_aadhar'] && req.files['candidate_aadhar'][0] ? req.files['candidate_aadhar'][0].path : null;
+    //const candidate_pan = req.files['candidate_pan'] && req.files['candidate_pan'][0] ? req.files['candidate_pan'][0].path : null;
+    //const candidate_highest_qualification = req.files['candidate_highest_qualification'] && req.files['candidate_highest_qualification'][0] ? req.files['candidate_highest_qualification'][0].path : null;
 
 
     await prisma.candidate_list.update({
@@ -460,11 +460,11 @@ const update_candidate = async (req, res) => {
         other3,
         status,
         current_status,
-        candidate_image,
-        candidate_resume,
-        candidate_aadhar,
-        candidate_pan,
-        candidate_highest_qualification,
+        candidate_image: null,
+        candidate_resume: null,
+        candidate_aadhar: null,
+        candidate_pan: null,
+        candidate_highest_qualification: null,
       },
     });
 

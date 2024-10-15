@@ -10,12 +10,17 @@ import {
   send_data_by_id,
   update_candidate
 } from '../controllers/candidate_controller.js';
-import { authenticateToken } from '../controllers/auth_controller.js';
+import {
+  authenticateToken
+} from '../controllers/auth_controller.js';
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {
+  fileURLToPath
+} from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(
+  import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
@@ -47,20 +52,42 @@ const storage = multer.diskStorage({
 });
 
 // Configure Multer to accept multiple files for each field, files are optional
-const upload = multer({ storage: storage }).fields([
-  { name: 'candidate_image', maxCount: 5 }, // Optional
-  { name: 'candidate_aadhar', maxCount: 5 }, // Optional
-  { name: 'candidate_pan', maxCount: 5 }, // Optional
-  { name: 'candidate_highest_qualification', maxCount: 5 }, // Optional
-  { name: 'candidate_resume', maxCount: 5 } // Optional
+const upload = multer({
+  storage: storage
+}).fields([{
+    name: 'candidate_image',
+    maxCount: 5
+  }, // Optional
+  {
+    name: 'candidate_aadhar',
+    maxCount: 5
+  }, // Optional
+  {
+    name: 'candidate_pan',
+    maxCount: 5
+  }, // Optional
+  {
+    name: 'candidate_highest_qualification',
+    maxCount: 5
+  }, // Optional
+  {
+    name: 'candidate_resume',
+    maxCount: 5
+  } // Optional
 ]);
 
 // Error handling middleware for Multer
 router.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
-    return res.status(400).json({ success: false, message: err.message });
+    return res.status(400).json({
+      success: false,
+      message: err.message
+    });
   } else if (err) {
-    return res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
   next();
 });
@@ -72,7 +99,7 @@ router.get('/all-candidates', authenticateToken, all_candidates);
 router.get('/my-candidates', authenticateToken, my_candidates);
 router.delete('/delete-candidate/:id', authenticateToken, delete_candidate);
 router.get('/candidate-info/:id', authenticateToken, send_data_by_id);
-router.put('/update-candidate/:id', authenticateToken, upload, update_candidate);
+router.post('/update-candidate/:id', authenticateToken, update_candidate);
 router.get("/all-modules", module_data);
 router.get('/job_applicants/:id', authenticateToken, id_based_jobs_applicants);
 
