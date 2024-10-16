@@ -12,7 +12,6 @@ function UpdateJobDetails() {
     // const [allStatus, setAllStatus] = useState({
     //   error
     // })
-    const [jobExpiry, setJobExpiry] = useState("No Expiry")
     const [jobDetails, setJobDetails] = useState({
         job_title: "",
         job_type: 'Full Time',
@@ -38,6 +37,7 @@ function UpdateJobDetails() {
         job_location: "",
         job_scheduled_date: "",
     });
+    const [jobExpiry, setJobExpiry] = useState(jobDetails.jobExpiry ? "Set Expiry" : "No Expiry")
 
     // State to store the list of skills
     const [skillInput, setSkillInput] = useState('');
@@ -588,8 +588,11 @@ function UpdateJobDetails() {
             <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
                 <h1 className='text-xl font-semibold mb-4'>Job Expiry</h1>
                 <button
-                    className={`h-[40px] rounded-[8px] px-4 min-w-32 ${jobExpiry === 'No Expiry' ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
-                    onClick={() => setJobExpiry("No Expiry")}>
+                    className={`h-[40px] rounded-[8px] px-4 min-w-32 ${jobExpiry == null ? 'bg-indigo-700 text-white' : 'bg-gray-100'}`}
+                    onClick={() => {
+                        setJobExpiry(null)
+                        setDefaultData((values) => ({ ...values, job_exp_date: null }))
+                    }}>
                     No Expiry
                 </button>
                 <button

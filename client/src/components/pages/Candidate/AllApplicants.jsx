@@ -1,17 +1,28 @@
-import React, { useState } from 'react'
+import { combineSlices } from '@reduxjs/toolkit';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { FaUserLarge } from 'react-icons/fa6';
+import { Link, useLocation } from 'react-router-dom';
 
 function AllApplicants(props) {
+    const location = useLocation()
     const [jobDetails, setJobDetails] = useState(props.jobDetails);
     const [selectedTab, setSelectedTab] = useState("all")
-    const [allCandidates, setAllCandidates] = useState([
-        { id: 1, status: 'Pending', appliedDate: '2024-10-01', name: 'John Doe', experience: '2 years', phone: '123-456-7890', email: 'john@example.com' },
-        { id: 2, status: 'Shortlisted', appliedDate: '2024-10-02', name: 'Jane Smith', experience: '5 years', phone: '987-654-3210', email: 'jane@example.com' },
-        { id: 3, status: 'Rejected', appliedDate: '2024-10-03', name: 'Alex Brown', experience: '1 year', phone: '555-123-4567', email: 'alex@example.com' },
-        // Add more candidates as needed
-    ]);
+
+    const [appliedCandidates, setAppliedCandidates] = useState([]);
+    useEffect(() => {
+        axios.get(`/job_applicants/${props.jobId}`)
+            .then((response) => {
+                console.log(response.data.data);
+                setAppliedCandidates(response.data.data)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }, [location])
 
     return (
-        <div className='p-4 h-full'>
+        <div className='p-4 h-full bg-gray-100'>
             <div className='grid grid-cols-3 gap-4'>
                 <button
                     onClick={() => setSelectedTab("all")}
@@ -23,7 +34,7 @@ function AllApplicants(props) {
                 <button
                     onClick={() => setSelectedTab("selected")}
                     className={`${selectedTab === "selected" ? 'bg-indigo-700 text-white' : 'bg-gray-100'} inline-block h-28 px-5 rounded-xl border`}>
-                    <div className='text-xl'>Approved Applicants</div>
+                    <div className='text-xl'>Shortlisted Applicants</div>
                     <div className='text-3xl'>10</div>
                 </button>
 
@@ -37,33 +48,37 @@ function AllApplicants(props) {
 
 
 
-            <div className='mt-10'>
-                <div>
+            <div className='mt-4'>
+                <div className='p-4 bg-white rounded-xl'>
                     {/* Header */}
                     <div className='grid grid-cols-7 font-semibold'>
-                        <div className='border p-2.5 border-r-0'>Candidate ID</div>
-                        <div className='border p-2.5 border-r-0'>Status</div>
-                        <div className='border p-2.5 border-r-0'>Applied Date</div>
-                        <div className='border p-2.5 border-r-0'>Candidate Name</div>
-                        <div className='border p-2.5 border-r-0'>Work Experience</div>
-                        <div className='border p-2.5 border-r-0'>Phone Number</div>
-                        <div className='border p-2.5'>Email ID</div>
+                        <div className='p-2.5'>Profile</div>
+                        <div className='p-2.5'>Candidate Name</div>
+                        <div className='p-2.5'>Status</div>
+                        <div className='p-2.5'>Applied Date</div>
+                        <div className='p-2.5'>Work Experience</div>
+                        <div className='p-2.5'>Phone Number</div>
+                        <div className='p-2.5'>Email ID</div>
                     </div>
 
-                    {/* Data Rows */}
-                    <div className='grid grid-cols-7'>
-                        {allCandidates.map(candidate => (
-                            <React.Fragment key={candidate.id}>
-                                <div className='border p-2.5 border-r-0 border-t-0'>{candidate.id}</div>
-                                <div className='border p-2.5 border-r-0 border-t-0'>{candidate.status}</div>
-                                <div className='border p-2.5 border-r-0 border-t-0'>{candidate.appliedDate}</div>
-                                <div className='border p-2.5 border-r-0 border-t-0'>{candidate.name}</div>
-                                <div className='border p-2.5 border-r-0 border-t-0'>{candidate.experience}</div>
-                                <div className='border p-2.5 border-r-0 border-t-0'>{candidate.phone}</div>
-                                <div className='border p-2.5'>{candidate.email}</div>
-                            </React.Fragment>
-                        ))}
-                    </div>
+                    {appliedCandidates.map(candidate => (
+                        <Link to={''} className='grid grid-cols-7 hover:bg-gray-100 rounded-xl items-center'>
+                            <div className='p-2.5'><span className='inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-400'><FaUserLarge size={'13px'} /></span> <span className='ml-2'>#{candidate.id}</span></div>
+                            {/* <div className='p-2.5'>{candidate.id}</div> */}
+                            <div className='p-2.5'>{`${candidate.candidate.title} ${candidate.candidate.first_name} ${candidate.candidate.middle_name} ${candidate.candidate.last_name}`}</div>
+                            <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.job_status}</span></div>
+                            <div className='p-2.5'>
+                                {new Date(candidate.candidate.created_at).toLocaleDateString('en-GB', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric'
+                                }).replace(/ (\d+)/, ', $1')}
+                            </div>
+                            <div className='p-2.5'>{candidate.candidate.work_experience}</div>
+                            <div className='p-2.5'>{candidate.candidate.contact_number}</div>
+                            <div className='p-2.5'>{candidate.candidate.email_address}</div>
+                        </Link>
+                    ))}
                 </div>
 
             </div>

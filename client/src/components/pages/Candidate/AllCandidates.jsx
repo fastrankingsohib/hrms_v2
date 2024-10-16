@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { IoIosArrowUp } from "react-icons/io";
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
-import { Link, NavLink, useParams } from 'react-router-dom';
+import { Link, NavLink, useLocation, useParams } from 'react-router-dom';
 
-function AllCandidates() {
+function AllCandidates(props) {
+    const location = props.location;
     const [activeButton, setActiveButton] = useState("all");
     const [allCandidates, setAllCandidates] = useState([]);
     const [loading, setLoading] = useState(false); // Loading state
@@ -16,18 +17,35 @@ function AllCandidates() {
     };
 
     useEffect(() => {
-        setLoading(true); // Start loading
-        axios.get("/all-candidates")
-            .then((res) => {
-                setAllCandidates(res.data.candidates);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-            .finally(() => {
-                setLoading(false); // End loading
-            });
-    }, []);
+        if (props.activeButton === "my candidates") {
+            setLoading(true);
+            axios.get("/my-candidates")
+                .then((res) => {
+                    setAllCandidates(res.data.candidates);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+
+        else {
+            setLoading(true);
+            axios.get("/all-candidates")
+                .then((res) => {
+                    setAllCandidates(res.data.candidates);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+
+    }, [props.activeButton]);
 
     return (
         <div>

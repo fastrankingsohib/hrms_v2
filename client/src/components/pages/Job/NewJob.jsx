@@ -67,7 +67,7 @@ function NewJob() {
             job_shift: jobDetails.job_shift,
             created_by: userLoggedIn ? userLoggedIn.username : "not defined",
             job_status: jobDetails.job_scheduled_date === "" ? "Active" : "Scheduled",
-            job_exp_date: jobDetails.job_exp_date,
+            job_exp_date: jobDetails.job_exp_date === "" ? null : jobDetails.job_exp_date,
             job_scheduled_date: jobDetails.job_scheduled_date,
             job_scheduled_time: jobDetails.job_scheduled_time
         }).then((res) => {

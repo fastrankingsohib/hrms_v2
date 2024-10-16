@@ -3,11 +3,16 @@ import { useSelector } from "react-redux";
 import useNewCandidate from "../../../helpers/useNewCandidate";
 import { FaTimes } from "react-icons/fa";
 import { MdDone } from "react-icons/md";
-import { IoIosCheckmarkCircleOutline } from "react-icons/io";
+import { IoIosArrowDown, IoIosCheckmarkCircleOutline } from "react-icons/io";
 import axios from "axios";
 
 const NewCandidate = () => {
     const { registerCandidate, loading, success, error } = useNewCandidate()
+    const [selectedJobs, setSelectedJobs] = useState({
+        toggled: false,
+        jobs: [],
+        ids: [],
+    })
 
     // Canidate Handlings
     const [candidate, setCandidate] = useState({
@@ -35,7 +40,7 @@ const NewCandidate = () => {
         "other1": "Additional info 1",
         "other2": "Additional info 2",
         "other3": "Additional info 3",
-        "jobs": [35, 38, 43],
+        "jobs": [selectedJobs.ids],
         "created_by": "recruiter@example.com"
     })
 
@@ -50,6 +55,30 @@ const NewCandidate = () => {
                 console.log(err);
             })
     }, [])
+
+    const handleJobsSelection = (job, jobId, value) => {
+        setSelectedJobs((prevState) => {
+            // Create a new jobs array based on selection or deselection
+            const updatedJobs = value
+                ? [...prevState.jobs, job] // Add job
+                : prevState.jobs.filter((j) => j.id !== jobId); // Remove job
+
+            // Create a new jobIds array from the updated jobs list
+            const updatedJobIds = updatedJobs.map(j => j.id);
+
+            // Return the updated state
+            return {
+                ...prevState,
+                jobs: updatedJobs,    // Update the jobs array
+                ids: updatedJobIds    // Update the jobIds array
+            };
+        });
+    };
+
+
+
+
+
 
     // Experience Handlings
     const initialExperienceField = {
@@ -151,11 +180,6 @@ const NewCandidate = () => {
             console.log("Updated Qualification Fields after removal: ", values);
         }
     };
-
-
-
-
-
 
 
     // Skills Handling -------------------------
@@ -484,7 +508,7 @@ const NewCandidate = () => {
                             placeholder="Date of Birth" name="" id="" />
                     </div>
 
-                    <div>
+                    {/* <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Job Title</label>
 
                         <select className="primary-input" onChange={(e) => setCandidate((values) => ({ ...values, job_title: e.target.value }))}>
@@ -492,12 +516,61 @@ const NewCandidate = () => {
                             {
                                 allJobs ? allJobs.map((value, index) => {
                                     return (
-                                        <option value={value.id} onClick={() => setCandidate((values) => ({ ...values, jobs: [value] }))}>{value.job_title}</option>
+                                        <option value={value.id} onClick={() => {
+                                            setCandidate((values) => ({ ...values, jobs: [value] }));
+                                            setSelectedJobs(value.id)
+                                        }}>{value.job_title}</option>
                                     )
                                 }) : <option value="Telesales">No Jobs Found</option>
                             }
                         </select>
+                    </div> */}
+
+                    <div>
+                        <label className="inline-block mt-4 font-semibold">Select Jobs</label>
+                        <div className="relative">
+                            <div className={`select-none cursor-pointer p-[11.5px] border rounded-md mt-4 flex items-center justify-between ${selectedJobs.toggled ? "bg-gray-200" : "bg-white"}`}
+                                onClick={() => setSelectedJobs((values) => ({ ...values, toggled: !selectedJobs.toggled }))}
+                            >
+                                <span>Selected Jobs</span>
+                                <span className={`transition-colors ${selectedJobs.toggled ? "rotate-180" : "rotate-0"}`}><IoIosArrowDown /></span>
+                            </div>
+
+                            <div className={`select-none absolute grid gap-1 top-16 right-0 p-1 bg-white shadow-2xl border w-full ${selectedJobs.toggled ? "block" : "hidden"}`}>
+                                {
+                                    allJobs.length > 0 ? (
+                                        allJobs.map((value, key) => {
+                                            const isChecked = selectedJobs.jobs.some(job => job.id === value.id); // Check if job is already selected
+
+                                            if (value.job_status === "Active") {
+                                                return (
+                                                    <label
+                                                        key={key}
+                                                        htmlFor={`job-id-${key}`}
+                                                        className="flex items-center gap-4 p-2.5 bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                                                    >
+                                                        <input
+                                                            id={`job-id-${key}`}
+                                                            type="checkbox"
+                                                            checked={isChecked}
+                                                            onChange={(e) => {
+                                                                handleJobsSelection(value, value.id, e.target.checked);
+                                                                console.log(selectedJobs)
+                                                            }}
+                                                        />
+                                                        <span>{value.job_title}</span>
+                                                    </label>
+                                                );
+                                            }
+                                        })
+                                    ) : (
+                                        <div className="p-4">No Jobs Found!</div>
+                                    )
+                                }
+                            </div>
+                        </div>
                     </div>
+
 
                 </div>
 

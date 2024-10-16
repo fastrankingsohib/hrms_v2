@@ -20,12 +20,12 @@ function CandidateLayout() {
 
     useEffect(() => {
         axios.get("/all-candidates")
-        .then((res) => {
-            setAllCandidates(res.data.candidates);
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+            .then((res) => {
+                setAllCandidates(res.data.candidates);
+            })
+            .catch((err) => {
+                console.log(err)
+            })
     }, [])
 
     useEffect(() => {
@@ -54,11 +54,11 @@ function CandidateLayout() {
                         </div>
                     </div>
 
-                    <NavLink to={"/candidates/new-candidate"} className={({isActive}) => { return `${isActive ? "bg-indigo-400" : "bg-indigo-700"} h-12 inline-flex items-center justify-center p-2 w-full text-white text-2xl max-w-12 rounded-xl`}}>+</NavLink>
+                    <NavLink to={"/candidates/new-candidate"} className={({ isActive }) => { return `${isActive ? "bg-indigo-400" : "bg-indigo-700"} h-12 inline-flex items-center justify-center p-2 w-full text-white text-2xl max-w-12 rounded-xl` }}>+</NavLink>
                 </div>
 
 
-                <div><AllCandidates /></div>
+                <div><AllCandidates location={location} activeButton={activeButton} /></div>
 
             </div>
             <div className='w-3/4 h-full'><Outlet /></div>

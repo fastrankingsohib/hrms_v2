@@ -11,7 +11,6 @@ function AllJobPosts(props) {
     const [dataSuccess, setDataSuccess] = useState(false); // Success state
     const [dataError, setDataError] = useState(false); // Error state
     const [filteredJobs, setFilteredJobs] = useState([]);
-
     const location = useLocation();
 
     // Fetch the jobs when activeSelection or URL changes
@@ -94,7 +93,7 @@ function AllJobPosts(props) {
                     // Error screen if the data fetching fails
                     <div className="flex justify-center flex-wrap items-center h-[84.5vh]">
                         <div>
-                            <p className='text-red-500 w-full text-center'>Failed to load jobs.</p>
+                            <p className='text-red-500 w-full text-center'>No Jobs are posted yet.</p>
                             <p className='text-white w-full text-center mt-4'>
                                 <button className='inline-flex gap-2 items-center bg-indigo-700 rounded-full p-2 px-5' onClick={handleReloadData}><IoReloadOutline /> Refresh</button>
                             </p>

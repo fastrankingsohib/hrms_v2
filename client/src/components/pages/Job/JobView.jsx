@@ -146,7 +146,7 @@ function JobView() {
                         </div>
                     </div>
                 </div>
-                <div className={`h-full ${selectedTab === "applied candidates" ? "block" : "hidden"}`}><AllApplicants jobDetails={jobDetails} /></div>
+                <div className={`h-full ${selectedTab === "applied candidates" ? "block" : "hidden"}`}><AllApplicants jobDetails={jobDetails} jobId={jobId} /></div>
             </div>
         );
     }

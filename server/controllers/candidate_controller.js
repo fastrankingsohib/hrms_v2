@@ -294,41 +294,51 @@ const my_candidates = async (req, res) => {
   }
 };
 
-const delete_candidate = async(req,res) =>{
+const delete_candidate = async (req, res) => {
+  const candidate_id = Number(req.params.id);
+
   try {
-    const candidate_id = req.params.id;
+    await prisma.$transaction(async (prisma) => {
+      await prisma.qualifications.deleteMany({
+        where: {
+          candidate_id: candidate_id,
+        },
+      });
 
-    await prisma.qualifications.deleteMany({
-      where:{
-        candidate_id:Number(candidate_id)
-      }
-    })
+      
+      await prisma.work_experience.deleteMany({
+        where: {
+          candidate_id: candidate_id,
+        },
+      });
 
-    await prisma.work_experience.deleteMany({
-      where: {
-        candidate_id: Number(candidate_id)
-      }
-    })
+      await prisma.candidate_applied_jobs.deleteMany({
+        where: {
+          candidate_id: candidate_id,
+        },
+      });
 
-    await prisma.candidate_list.delete({
-      where: {
-        candidate_id:Number(candidate_id)
-      }
-    })
+      await prisma.candidate_list.delete({
+        where: {
+          candidate_id: candidate_id,
+        },
+      });
+    });
 
     res.status(200).send({
       message: 'Candidate deleted successfully',
-      success: true
-    })
-    
+      success: true,
+    });
+
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).send({
-      success:false,
-      message: 'Error deleting candidate'
-    })
+      success: false,
+      message: 'Error deleting candidate',
+    });
   }
-}
+};
+
 
 const send_data_by_id = async (req, res) => {
   try {
