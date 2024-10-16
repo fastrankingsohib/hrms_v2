@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState, useTransition } from 'react'
+import React, { useEffect, useRef, useState, useTransition } from 'react'
 import { AiFillCodepenCircle, AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FaList, FaListUl, FaUser } from 'react-icons/fa';
 import { Link, redirect, useNavigate, useParams } from 'react-router-dom'
@@ -169,10 +169,13 @@ function CandidateView() {
     }
 
 
+    const popupRef = useRef(null);
+
     const [nextRoundSelection, setNextRoundSelection] = useState({
         checked: false,
         value: ""
-    })
+    });
+
     const [newInterviewDetails, setNewInterviewDetails] = useState({
         date: "",
         time: "",
@@ -180,31 +183,49 @@ function CandidateView() {
         loading: false,
         success: false,
         error: false
-    })
+    });
+
+    // Function to schedule the interview
     const scheduleInterview = () => {
-        setNewInterviewDetails((values) => ({ ...values, loading: true, success: false, error: false }))
-        axios.post("/schedule-interview",
-            {
-                "job_id": 101,
-                "candidate_id": Number(candidate_id),
-                "interview_date": `${newInterviewDetails.date}`,
-                "interview_time": `${newInterviewDetails.time}`,
-                "interviewer": `${newInterviewDetails.interviewer}`,
-                "interview_round": "1"
-            }
-        )
+        setNewInterviewDetails((values) => ({
+            ...values, loading: true, success: false, error: false
+        }));
+        axios.post("/schedule-interview", {
+            "job_id": 101,
+            "candidate_id": Number(candidate_id),
+            "interview_date": `${newInterviewDetails.date}`,
+            "interview_time": `${newInterviewDetails.time}`,
+            "interviewer": `${newInterviewDetails.interviewer}`,
+            "interview_round": "1"
+        })
             .then((res) => {
-                setNewInterviewDetails((values) => ({ ...values, loading: false, success: true, error: false }))
+                setNewInterviewDetails((values) => ({
+                    ...values, loading: false, success: true, error: false
+                }));
                 setTimeout(() => {
-                    setNextRoundSelection((values) => ({ ...values, checked: false }))
-                }, 3000)
-                // console.log(res)
+                    setNextRoundSelection((values) => ({ ...values, checked: false }));
+                }, 3000);
             })
             .catch((err) => {
-                setNewInterviewDetails((values) => ({ ...values, loading: false, success: false, error: true }))
+                setNewInterviewDetails((values) => ({
+                    ...values, loading: false, success: false, error: true
+                }));
                 console.log(err);
-            })
-    }
+            });
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (popupRef.current && !popupRef.current.contains(event.target)) {
+                setNextRoundSelection((values) => ({ ...values, checked: false }));
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
 
     // Component Loading -------------------------------------------------------------------------------------------------------
@@ -248,47 +269,87 @@ function CandidateView() {
                             </div>
                         </div>
 
-                        <div className='flex gap-4 items-center pr-8'>
-                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter == "Overview" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Overview")}>Overview</button>
-                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter == "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
-                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter == "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
-                            <div className={` p-2.5 relative`}>
-                                <button className={`text-center block rounded-lg w-40 p-2.5 h-full border ${nextRoundSelection.checked ? "bg-indigo-700 text-white" : "bg-gray-100"}`}
+                        <div className='flex gap-4 items-center pr-8' ref={popupRef}>
+                            {/* Filter Buttons */}
+                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Overview" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Overview")}>Overview</button>
+                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
+                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
+
+                            <div className={`p-2.5 relative`}>
+                                <button className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
                                     onClick={() => {
                                         setNextRoundSelection((values) => ({ ...values, checked: !nextRoundSelection.checked }));
-                                        if (!nextRoundSelection.checked) {
-                                            setNextRoundSelection((values) => ({ ...values, value: "" }))
-                                        }
-                                    }}>Next Action</button>
+                                    }}>
+                                    Change Status
+                                </button>
+
                                 <div className={`absolute z-10 top-[65px] right-0 bg-white text-black border shadow-2xl w-60 grid gap-4 p-4 ${nextRoundSelection.checked ? "block" : "hidden"}`}>
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "FollowUp" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`} onClick={() => setNextRoundSelection((values) => ({ ...values, value: "FollowUp" }))}><FaListUl size={"12px"} /> Follow Up</button>
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Shortlist" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`} onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Shortlist" }))}><RiListCheck3 size={"16px"} /> Shortlist</button>
+                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "FollowUp" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "FollowUp" }))}>
+                                        <FaListUl size={"12px"} /> Follow Up
+                                    </button>
+
+                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Shortlist" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Shortlist" }))}>
+                                        <RiListCheck3 size={"16px"} /> Shortlist
+                                    </button>
+
                                     <button className='relative'>
-                                        <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Schedule" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`} onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Schedule" }))}><MdAccessTime size={"16px"} /> Schedule Interview</button>
+                                        <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Schedule" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                            onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Schedule" }))}>
+                                            <MdAccessTime size={"16px"} /> Schedule Interview
+                                        </button>
+
                                         <div className={`text-left absolute -top-[125px] -left-[170%] p-4 bg-white border shadow-2xl w-80 cursor-default ${nextRoundSelection.value === "Schedule" ? "block" : "hidden"}`}>
                                             <h1 className='text-xl font-semibold mb-4 text-center'>Schedule Interview</h1>
                                             <div className='grid'>
                                                 <label className='text-left block w-full mb-2' htmlFor="">Select Interview Date</label>
-                                                <input className='text-left block bg-gray-100 border p-2 mb-2 w-full' onChange={(e) => setNewInterviewDetails((values) => ({ ...values, date: e.target.value }))} type="date" />
+                                                <input className='text-left block bg-gray-100 border p-2 mb-2 w-full'
+                                                    onChange={(e) => setNewInterviewDetails((values) => ({ ...values, date: e.target.value }))}
+                                                    type="date"
+                                                />
+
                                                 <label className='text-left block mb-2 w-full' htmlFor="">Select Interview Time</label>
-                                                <input className='text-left block border bg-gray-100 p-2 mb-2 w-full' onChange={(e) => setNewInterviewDetails((values) => ({ ...values, time: e.target.value }))} type="time" />
+                                                <input className='text-left block border bg-gray-100 p-2 mb-2 w-full'
+                                                    onChange={(e) => setNewInterviewDetails((values) => ({ ...values, time: e.target.value }))}
+                                                    type="time"
+                                                />
+
                                                 <label className='text-left block mb-2 w-full' htmlFor="">Interviewer Name</label>
-                                                <input className='text-left block border bg-gray-100 p-2 w-full' onChange={(e) => setNewInterviewDetails((values) => ({ ...values, interviewer: e.target.value }))} type="text" placeholder='Eg. Mr. Akram' />
-                                                <button className={`p-2.5  border rounded-lg bg-indigo-700 text-white mt-8 ${newInterviewDetails.loading ? "bg-opacity-60 cursor-not-allowed" : ""}`} onClick={scheduleInterview}
-                                                    disabled={newInterviewDetails.loading}
-                                                >
-                                                    {
-                                                        newInterviewDetails.loading ? "Scheduling..." : newInterviewDetails.success ? "Scheduled New Interview" : "Schedule Interview"
-                                                    }
+                                                <input className='text-left block border bg-gray-100 p-2 w-full'
+                                                    onChange={(e) => setNewInterviewDetails((values) => ({ ...values, interviewer: e.target.value }))}
+                                                    type="text"
+                                                    placeholder='Eg. Mr. Akram'
+                                                />
+
+                                                <button className={`p-2.5 border rounded-lg bg-indigo-700 text-white mt-8 ${newInterviewDetails.loading ? "bg-opacity-60 cursor-not-allowed" : ""}`}
+                                                    onClick={scheduleInterview}
+                                                    disabled={newInterviewDetails.loading}>
+                                                    {newInterviewDetails.loading ? "Scheduling..." : newInterviewDetails.success ? "Scheduled New Interview" : "Schedule Interview"}
                                                 </button>
                                             </div>
                                         </div>
                                     </button>
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Offered" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`} onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Offered" }))}><MdOutlineDone size={"16px"} />Offered</button>
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "OnBoard" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`} onClick={() => setNextRoundSelection((values) => ({ ...values, value: "OnBoard" }))}><RiUserSharedFill size={"14px"} />On Board</button>
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Training" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`} onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Training" }))}><VscVmRunning size={"16px"} />Training</button>
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Live" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`} onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Live" }))}><FaCircleDot size={"12px"} />Live</button>
-                                    {/* <button className='p-2.5 border bg-gray-100 rounded-lg' onClick={() => setNextRoundSelection({checked: false, value: ""})}>Reset Actions</button> */}
+
+                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Offered" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Offered" }))}>
+                                        <MdOutlineDone size={"16px"} />Offered
+                                    </button>
+
+                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "OnBoard" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "OnBoard" }))}>
+                                        <RiUserSharedFill size={"14px"} />On Board
+                                    </button>
+
+                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Training" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Training" }))}>
+                                        <VscVmRunning size={"16px"} />Training
+                                    </button>
+
+                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Live" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Live" }))}>
+                                        <FaCircleDot size={"16px"} /> Live
+                                    </button>
                                 </div>
                             </div>
                         </div>

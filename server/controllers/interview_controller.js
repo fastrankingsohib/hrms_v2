@@ -8,9 +8,19 @@ const create_interview = async(req,res)=>{
             candidate_id,
             interview_date,
             interview_time,
-            interviewer,
-            interview_round,
+            interviewer
             }= req.body;
+
+            const data = await prisma.interview_details.count({
+                where: {
+                    job_id: job_id,
+                    candidate_id:candidate_id
+                }
+            })
+            const interview_round = `${data+1}`;
+
+
+
         await prisma.interview_details.create({
             data:{
                 job_id:job_id,
@@ -135,7 +145,7 @@ const update_interview = async(req,res)=>{
 
 const update_interview_status = async(req,res)=>{
     try {
-        const {candidate_id , job_id , job_status , attempted , remarks} = req.body;
+        const {candidate_id , job_id , job_candidate_status , attempted , remarks} = req.body;
         const interview_id = parseInt(req.params.id)
         await prisma.interview_details.update({
             where: {
@@ -152,7 +162,7 @@ const update_interview_status = async(req,res)=>{
                 job_id:job_id
             },
             data:{
-                job_status:job_status
+                job__candidate_status:job_candidate_status
             }
         })
         res.status(200).send({

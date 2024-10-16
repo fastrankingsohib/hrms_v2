@@ -9,9 +9,9 @@ const useNewCandidate = () => {
     const [error, setError] = useState(false);
     const loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : []
     const Navigate = useNavigate()
-    const registerCandidate = (candidate, experiences, educations, skills, hobbies) => {
+    const registerCandidate = (candidate, experiences, educations, skills, hobbies, selectedJobs) => {
         // register candidate logic here
-        setLoading(true)
+        // setLoading(true)
         let new_candidate =
         {
             "title": `${candidate.title}`,
@@ -32,9 +32,9 @@ const useNewCandidate = () => {
             "job_title": `${candidate.job_title}`,
             "department": `${candidate.department}`,
             "work_experience": 'Experience',
-            "hobbies": "hobbies",
+            "hobbies": hobbies,
             "interests": "interests",
-            "skills": "skills",
+            "skills": skills,
             "recruiter_comments": "tsgs",
             "communication_skills": "shhshs",
             "other1": "Additional info 1",
@@ -42,32 +42,33 @@ const useNewCandidate = () => {
             "other3": "Additional info 3",
             "status": "Active",
             "created_by": loggedInUser.username,
+            "jobs": selectedJobs,
             "experiences": experiences,
             "qualifications": educations,
         }
 
-        axios.post("/add-candidate", new_candidate)
-        .then((response) => {
-            console.log(response.data);
-            setLoading(false)
-            setSuccess(true)
-            setError(false)
+        // axios.post("/add-candidate", new_candidate)
+        // .then((response) => {
+        //     console.log(response.data);
+        //     setLoading(false)
+        //     setSuccess(true)
+        //     setError(false)
 
-            setTimeout(() => {
-                setSuccess(false)
-                Navigate("/my-candidates")
-            }, 3000)
-        })
-        .catch((err) => {
-            console.log(err);
-            setLoading(false)
-            setSuccess(false)
-            setError(true)
+        //     setTimeout(() => {
+        //         setSuccess(false)
+        //         Navigate("/my-candidates")
+        //     }, 3000)
+        // })
+        // .catch((err) => {
+        //     console.log(err);
+        //     setLoading(false)
+        //     setSuccess(false)
+        //     setError(true)
 
-            setTimeout(() => {
-                setError(false)
-            }, 3000)
-        })
+        //     setTimeout(() => {
+        //         setError(false)
+        //     }, 3000)
+        // })
         console.log(new_candidate)
     }
 
