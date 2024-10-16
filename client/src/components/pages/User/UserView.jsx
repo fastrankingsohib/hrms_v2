@@ -11,7 +11,7 @@ import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 
 // icons
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import UserModule from './../../commons/UserModule';
+import UserModule from './../../Commons/UserModule';
 
 const UpdateUser = () => {
     const { userid } = useParams();

@@ -2,69 +2,143 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FaUser } from 'react-icons/fa';
-import { useParams } from 'react-router-dom'
-import { FaCircleCheck, FaRegCircleCheck } from "react-icons/fa6";
-import { MdDelete, MdEdit } from 'react-icons/md';
+import { redirect, useNavigate, useParams } from 'react-router-dom'
+import { FaCartFlatbed, FaCircleCheck, FaRegCircleCheck } from "react-icons/fa6";
+import { MdDelete, MdEdit, MdOutlineDone } from 'react-icons/md';
+import useCandidateUpdate from '../../../helpers/useCanidateUpdate';
+import useUpdateUser from '../../../helpers/useUpadateUser';
 
 function CandidateView() {
+    const navigate = useNavigate()
     const { candidate_id } = useParams();
-    const [candidate, setCandidate] = useState()
+    const [candidate, setCandidate] = useState();
     const [candidateLoading, setCandidateLoading] = useState(false);
     const [candidateSuccess, setCandidateSuccess] = useState(false);
     const [candidateError, setCandidateError] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState("Overview");
+    const [isPersonalDetailsEditing, setIsPersonalDetailsEditing] = useState(false);
     const [alerts, setAlerts] = useState({
         delete: false,
     });
     const [editDetails, setEditDetails] = useState({
         personalDetails: false,
         professionalDetails: false,
-        legalDetails: false
+        legalDetails: false,
     });
-    useEffect(() => {
-        console.log(candidate)
-    }, [candidate])
+
+    // States for selected filter and editing modes
+    const [selectedFilter, setSelectedFilter] = useState("Overview");
+    const [isEducationEditing, setIsEducationEditing] = useState(false);
+    const [isExperienceEditing, setIsExperienceEditing] = useState(false);
+
+    // States for education and experience lists
+    const [educationList, setEducationList] = useState([]);
+    const [experienceList, setExperienceList] = useState([]);
+
+    // Fetch candidate data
     useEffect(() => {
         setCandidateLoading(true);
         axios.get(`/candidate-info/${candidate_id}`)
             .then((res) => {
                 if (res.data.success) {
+                    const candidateData = res.data.candidate;
                     setCandidateSuccess(true);
                     setCandidateLoading(false);
                     setCandidateError(false);
-                    setCandidate(res.data.candidate);
+                    setCandidate(candidateData);
+
+                    // Populate education and experience lists after data is fetched
+                    setEducationList(candidateData.qualifications || []);
+                    setExperienceList(candidateData.workExperiences.map((exp, index) => ({
+                        id_updated: index + 1,
+                        organisation_name: exp.organisation_name || '',
+                        last_designation: exp.last_designation || '',
+                        total_tenure: exp.total_tenure || '',
+                        last_drawn_salary: exp.last_drawn_salary || '',
+                    })) || []);
                 }
             })
             .catch((err) => {
-                setCandidateError(false);
+                setCandidateError(true);
                 setCandidateSuccess(false);
                 setCandidateLoading(false);
-            })
+            });
     }, [candidate_id]);
 
-    // Candidate Education -------------------------------------------------------------------------------------------------------
-    // Candidate Education -------------------------------------------------------------------------------------------------------
-    const [educationList, setEducationList] = useState([
-        { id: 1, institution: 'ABC University', degree: 'B.Sc.', year: 2020, grade: 'A' }
-    ]);
-    const [isEducationEditing, setIsEducationEditing] = useState(false);
-
+    // Handle Education Input Change
     const handleEducationInputChange = (index, field, value) => {
         const updatedEducation = [...educationList];
         updatedEducation[index][field] = value;
         setEducationList(updatedEducation);
     };
 
+    // Add New Education
     const addEducation = () => {
-        setEducationList([...educationList, { id: Date.now(), institution: '', degree: '', year: '', grade: '' }]);
+        setEducationList([...educationList, { id_updated: Date.now(), college_university: '', course: '', year_of_passing: '', percentage_cgpa: '' }]);
     };
 
-    const removeEducation = (id) => {
-        setEducationList(educationList.filter((education) => education.id !== id));
+    // Remove Education
+    const removeEducation = (id_updated) => {
+        setEducationList(educationList.filter((education) => education.id_updated !== id_updated));
     };
 
-    // Component Rendering -------------------------------------------------------------------------------------------------------
-    // Component Rendering -------------------------------------------------------------------------------------------------------
+    // Handle Experience Input Change
+    const handleExperienceInputChange = (index, field, value) => {
+        const updatedExperienceList = [...experienceList];
+        updatedExperienceList[index][field] = value;
+        setExperienceList(updatedExperienceList);
+    };
+
+    // Add New Experience
+    const addExperience = () => {
+        setExperienceList([
+            ...experienceList,
+            {
+                id_updated: Date.now(),
+                organisation_name: '',
+                last_designation: '',
+                total_tenure: '',
+                last_drawn_salary: '',
+            },
+        ]);
+    };
+
+    // Remove Experience
+    const removeExperience = (id_updated) => {
+        const updatedExperienceList = experienceList.filter((experience) => experience.id_updated !== id_updated);
+        setExperienceList(updatedExperienceList);
+    };
+
+    // Update Candidate Data (Saving Changes)
+    const { updateEvents, updateCandidate } = useCandidateUpdate();
+    const handleUpdateCandidate = () => {
+        updateCandidate(candidate_id, educationList, experienceList, candidate);
+    };
+
+    const [deleteEvents, setDeleteEvents] = useState({
+        loading: false,
+        error: false,
+        success: false
+    })
+
+    const handleDelete = () => {
+        setDeleteEvents({ loading: true, error: false, success: false })
+        axios.get(`/delete-candidate/${candidate_id}`)
+            .then((res) => {
+                setDeleteEvents({ loading: false, error: false, success: true })
+                console.log(res)
+            })
+            .catch((err) => {
+                // console.log(err)
+                setDeleteEvents({ loading: false, error: true, success: false })
+            })
+
+            setTimeout(() => {
+                setDeleteEvents({loading: false, error: false, success: false})
+            }, 3000)
+    }
+
+    // Component Loading -------------------------------------------------------------------------------------------------------
+    // Component Loading -------------------------------------------------------------------------------------------------------
     if (candidateLoading) {
         return (
             <div className='p-4 h-full w-full flex items-center justify-center bg-gray-100'>
@@ -75,16 +149,22 @@ function CandidateView() {
             </div>
         );
     }
+    // Data Error Rendering -----------------------------------------------------------------------------------------------------------
+    // Data Error Rendering -----------------------------------------------------------------------------------------------------------
     if (candidateError) {
         return (
-            <div className='p-4'>
-                Canidate Loaded Failed
+            <div className='p-4 h-full flex justify-center items-center text-red-500'>
+                <h1>Candidate, Deleted or Not Existed!</h1>
             </div>
         )
     }
+
+    // Final Rendering -----------------------------------------------------------------------------------------------------------
+    // Final Rendering -----------------------------------------------------------------------------------------------------------
     if (candidateSuccess) {
         return (
             <div className='h-full overflow-auto'>
+                <span className={`inline-block fixed z-40 top-72 tranition-basic p-3 ${updateEvents.success ? "right-12" : "-right-[100%]"} bg-green-600 text-white`}>Data Updated Successfully</span>
                 <div className='flex items-center justify-between sticky top-0 bg-white border-b'>
                     <div className='min-w-80'>
                         <div className='flex items-center p-4'>
@@ -125,29 +205,39 @@ function CandidateView() {
 
                     <div className='grid gap-4 p-4 bg-gray-50'>
                         <div className='grid gap-2 p-6 bg-white w-full border'>
-                            <h1 className='flex justify-between font-semibold text-indigo-700'>
+                            <h1 className='flex justify-between font-semibold text-indigo-700 pb-4'>
                                 <span className='text-xl'>Personal Details</span>
-                                <button className='inline-flex gap-2 items-center'><MdEdit /> Edit Personal Details</button>
+                                <button onClick={() => setIsPersonalDetailsEditing(!isPersonalDetailsEditing)}>{isPersonalDetailsEditing ? <span className='inline-flex gap-2 items-center p-2 px-5 bg-green-50 text-green-600'><MdOutlineDone /> Done</span> : <span className='inline-flex gap-2 items-center p-2 px-5'><MdEdit /> Edit Personal Details</span>}</button>
                             </h1>
                             <div className='grid grid-cols-2 gap-4'>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Title</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.title} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>First Name</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.first_name} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Middle Name</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.middle_name} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Last Name</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.last_name} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Title</span>
+                                    {/* <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.title} onChange={(e) => setCandidate((values) => ({ ...values, title: e.target.value }))} /> */}
+                                    <select className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                        onChange={(e) => setCandidate((values) => ({ ...values, title: e.target.value }))}
+                                        disabled={!isPersonalDetailsEditing}
+                                        defaultValue={candidate.title ? candidate.title : "---"}>
+                                        <option value="---" disabled={true}>--- Selecte Title ---</option>
+                                        <option value="Mr">Mr</option>
+                                        <option value="Ms">Ms</option>
+                                    </select>
+                                </div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>First Name</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.first_name} onChange={(e) => setCandidate((values) => ({ ...values, first_name: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Middle Name</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.middle_name} onChange={(e) => setCandidate((values) => ({ ...values, middle_name: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Last Name</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.last_name} onChange={(e) => setCandidate((values) => ({ ...values, last_name: e.target.value }))} /></div>
                                 <hr />
                                 <hr />
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Contact Number</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.contact_number} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Alt. Contact Number</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.alt_contact_number} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Email Address</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.email_address} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Alt. Email Address</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.alt_email_address} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Contact Number</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.contact_number} onChange={(e) => setCandidate((values) => ({ ...values, contact_number: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Alt. Contact Number</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.alt_contact_number} onChange={(e) => setCandidate((values) => ({ ...values, alt_contact_number: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Email Address</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.email_address} onChange={(e) => setCandidate((values) => ({ ...values, email_address: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Alt. Email Address</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.alt_email_address} onChange={(e) => setCandidate((values) => ({ ...values, alt_email_address: e.target.value }))} /></div>
                                 <hr />
                                 <hr />
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 1</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.address_line1} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 2</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.address_line2} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>POST Code</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.pin_code} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>City</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.city} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>State</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.state} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Country</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={candidate.country} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 1</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.address_line1} onChange={(e) => setCandidate((values) => ({ ...values, address_line1: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 2</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.address_line2} onChange={(e) => setCandidate((values) => ({ ...values, address_line2: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>POST Code</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.pin_code} onChange={(e) => setCandidate((values) => ({ ...values, pin_code: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>City</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.city} onChange={(e) => setCandidate((values) => ({ ...values, city: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>State</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.state} onChange={(e) => setCandidate((values) => ({ ...values, state: e.target.value }))} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Country</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.country} onChange={(e) => setCandidate((values) => ({ ...values, country: e.target.value }))} /></div>
                             </div>
                         </div>
 
@@ -156,18 +246,71 @@ function CandidateView() {
                                 <span className='text-xl'>Professional Details</span>
                             </h1>
 
-                            <div>
-                                {
-                                    candidate.workExperiences ? 
-                                    candidate.workExperiences.map(() => {
-                                        return("")
-                                    }) :
-                                    console.log("0 Work Experience Found!")
-                                }
+                            {/* Experience And Qualifications Records Editing */}
+                            {/* Experience And Qualifications Records Editing */}
+
+                            <div className='grid gap-4'>
+                                {/* Render each experience entry in edit/view mode */}
+                                {experienceList.length > 0 ?
+                                    experienceList.map((experience, index) => (
+                                        <div key={index} className='p-4 border mt-4 flex justify-between items-center'>
+                                            {isExperienceEditing ? (
+                                                <>
+                                                    <input
+                                                        type='text'
+                                                        value={experience.organisation_name}
+                                                        onChange={(e) => handleExperienceInputChange(index, 'organisation_name', e.target.value)}
+                                                        placeholder='Organisation Name'
+                                                        className='border p-2 px-4 mr-2'
+                                                    />
+                                                    <input
+                                                        type='text'
+                                                        value={experience.last_designation}
+                                                        onChange={(e) => handleExperienceInputChange(index, 'last_designation', e.target.value)}
+                                                        placeholder='Last Designation'
+                                                        className='border p-2 px-4 mr-2'
+                                                    />
+                                                    <input
+                                                        type='text'
+                                                        value={experience.total_tenure}
+                                                        onChange={(e) => handleExperienceInputChange(index, 'total_tenure', e.target.value)}
+                                                        placeholder='Total Tenure'
+                                                        className='border p-2 px-4 mr-2'
+                                                    />
+                                                    <input
+                                                        type='text'
+                                                        value={experience.last_drawn_salary}
+                                                        onChange={(e) => handleExperienceInputChange(index, 'last_drawn_salary', e.target.value)}
+                                                        placeholder='Last Drawn Salary'
+                                                        className='border p-2 px-4 mr-2'
+                                                    />
+                                                    <button onClick={() => removeExperience(experience.id_updated)} className='text-red-500'>
+                                                        <MdDelete />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <span>
+                                                    {experience.organisation_name} - {experience.last_designation} ({experience.total_tenure}) - Last Drawn Salary: {experience.last_drawn_salary}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )) : ""}
+
+                                <div>
+                                    {isExperienceEditing && (
+                                        <button onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
+                                            + Add More Experience
+                                        </button>
+                                    )}
+
+                                    <button
+                                        onClick={() => setIsExperienceEditing(!isExperienceEditing)}
+                                        className='mt-4 bg-indigo-700 text-white p-2 px-4'
+                                    >
+                                        {isExperienceEditing ? 'Save Experience' : 'Edit Experience'}
+                                    </button>
+                                </div>
                             </div>
-
-
-
 
 
                             {/* Educations And Qualifications Records Editing */}
@@ -178,47 +321,48 @@ function CandidateView() {
                                 </h1>
 
                                 <div className='grid gap-4'>
-                                    {educationList.map((education, index) => (
-                                        <div key={education.id} className='p-4 border mt-4 flex justify-between items-center'>
-                                            {isEducationEditing ? (
-                                                <>
-                                                    <input
-                                                        type='text'
-                                                        value={education.institution}
-                                                        onChange={(e) => handleEducationInputChange(index, 'institution', e.target.value)}
-                                                        placeholder='Institution'
-                                                        className='border p-2 px-4 mr-2'
-                                                    />
-                                                    <input
-                                                        type='text'
-                                                        value={education.degree}
-                                                        onChange={(e) => handleEducationInputChange(index, 'degree', e.target.value)}
-                                                        placeholder='Degree'
-                                                        className='border p-2 px-4 mr-2'
-                                                    />
-                                                    <input
-                                                        type='number'
-                                                        value={education.year}
-                                                        onChange={(e) => handleEducationInputChange(index, 'year', e.target.value)}
-                                                        placeholder='Year'
-                                                        className='border p-2 px-4 mr-2'
-                                                    />
-                                                    <input
-                                                        type='text'
-                                                        value={education.grade}
-                                                        onChange={(e) => handleEducationInputChange(index, 'grade', e.target.value)}
-                                                        placeholder='Grade'
-                                                        className='border p-2 px-4 mr-2'
-                                                    />
-                                                    <button onClick={() => removeEducation(education.id)} className='text-red-500'>
-                                                        <MdDelete />
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <span>{education.institution} - {education.degree} ({education.year}) - Grade: {education.grade}</span>
-                                            )}
-                                        </div>
-                                    ))}
+                                    {educationList.length > 0 ?
+                                        educationList.map((education, index) => (
+                                            <div key={index} className='p-4 border mt-4 flex justify-between items-center'>
+                                                {isEducationEditing ? (
+                                                    <>
+                                                        <input
+                                                            type='text'
+                                                            defaultValue={education.college_university}
+                                                            onChange={(e) => handleEducationInputChange(index, 'college_university', e.target.value)}
+                                                            placeholder='Institution'
+                                                            className='border p-2 px-4 mr-2'
+                                                        />
+                                                        <input
+                                                            type='text'
+                                                            defaultValue={education.course}
+                                                            onChange={(e) => handleEducationInputChange(index, 'course', e.target.value)}
+                                                            placeholder='Degree'
+                                                            className='border p-2 px-4 mr-2'
+                                                        />
+                                                        <input
+                                                            type='number'
+                                                            defaultValue={education.year_of_passing}
+                                                            onChange={(e) => handleEducationInputChange(index, 'year', e.target.value)}
+                                                            placeholder='Year'
+                                                            className='border p-2 px-4 mr-2'
+                                                        />
+                                                        <input
+                                                            type='text'
+                                                            defaultValue={education.percentage_cgpa}
+                                                            onChange={(e) => handleEducationInputChange(index, 'percentage_cgpa', e.target.value)}
+                                                            placeholder='Grade'
+                                                            className='border p-2 px-4 mr-2'
+                                                        />
+                                                        <button onClick={() => removeEducation(education.id)} className='text-red-500'>
+                                                            <MdDelete />
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <span>{education.college_university} - {education.course} ({education.year_of_passing}) - Grade: {education.percentage_cgpa}</span>
+                                                )}
+                                            </div>
+                                        )) : ""}
                                 </div>
 
                                 {isEducationEditing && (
@@ -236,18 +380,25 @@ function CandidateView() {
                             </div>
                         </div>
 
-                        <div className='grid gap-2 p-6 bg-white w-full border'>
+                        {/* <div className='grid gap-2 p-6 bg-white w-full border'>
                             <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
                                 <span className='text-xl'>Legal Details</span>
                                 <button className='inline-flex gap-2 items-center'><MdEdit /> Edit Legal Details</button>
                             </h1>
                             <div className='grid grid-cols-2 gap-4'>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Aadhaar No.</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={"N/A"} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>PAN No.</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={"N/A"} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Driving Licence</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={"N/A"} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Last Name</span> <input type="text" className='text-black border-l-2 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-indigo-50 border-indigo-700' defaultValue={"N/A"} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Aadhaar No.</span> <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={"N/A"} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>PAN No.</span> <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={"N/A"} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Driving Licence</span> <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={"N/A"} /></div>
+                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Last Name</span> <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={"N/A"} /></div>
                             </div>
-                        </div>
+                        </div> */}
+
+                        <div className='pb-32 flex justify-end'><button className={`p-2.5 rounded-lg px-4 bg-indigo-700 text-white ${updateEvents.loading ? 'bg-opacity-80 cursor-not-allowed' : ''}`}
+                            onClick={handleUpdateCandidate}
+                            disabled={updateEvents.loading}
+                        >
+                            {updateEvents.loading ? <span className='inline-flex gap-2 items-center justify-center h-4'><AiOutlineLoading3Quarters size={"10px"} className='reload-rounding' /> Updating ...</span> : "Update Candidate"}
+                        </button></div>
 
                         <div className='grid gap-2 p-6 bg-white w-full border mb-4'>
                             <h1 className='flex justify-between font-semibold mb-2'>
@@ -261,13 +412,16 @@ function CandidateView() {
                             </div>
 
                             {/* Delete Alert */}
-                            <div className={`${alerts.delete ? "flex" : "hidden"} fixed top-0 left-0 z-40 items-center justify-center h-full w-full backdrop-blur-lg bg-indigo-700 bg-opacity-10`}>
+                            <div className={`${alerts.delete ? "flex" : "hidden"} fixed top-0 left-0 z-40 items-center justify-center h-full w-full backdrop-blur-sm bg-black bg-opacity-10`}>
                                 <div className='w-96 min-h-32 p-10 text-center bg-white border rounded-xl'>
                                     <h1 className='text-xl font-semibold text-red-500'>Do You Want To Delete The User</h1>
-                                    <button className='bg-gray-100 rounded-lg p-2.5 px-5 mt-4 mr-4'
-                                        onClick={() => setAlerts((values) => ({ ...values, delete: false }))}
-                                    >No, Cancel</button>
-                                    <button className='bg-red-500 text-white rounded-lg p-2.5 px-5 mt-4'>Yes, Delete</button>
+                                    <div className='flex flex-wrap items-center justify-center gap-2 mt-4'>
+                                        <button className='bg-gray-100 rounded-lg p-2.5 px-5 mt-4 mr-4'
+                                            onClick={() => setAlerts((values) => ({ ...values, delete: false }))}
+                                        >Cancel</button>
+                                        <button className={`bg-red-500 text-white rounded-lg p-2.5 px-5 mt-4 ${deleteEvents.loading ? "bg-opacity-50 cursor-not-allowed" : ""}`} onClick={handleDelete} disabled={deleteEvents.loading}>{deleteEvents.loading ? "Deleting..." : "Delete"}</button>
+                                        <div className={`text-red-500 ${deleteEvents.error ? "opacity-100" : "hidden"}`}>Error: Cann't Delete the Candidate</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

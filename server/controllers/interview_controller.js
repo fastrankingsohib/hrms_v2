@@ -8,9 +8,19 @@ const create_interview = async(req,res)=>{
             candidate_id,
             interview_date,
             interview_time,
-            interviewer,
-            interview_round,
+            interviewer
             }= req.body;
+
+            const data = await prisma.interview_details.count({
+                where: {
+                    job_id: job_id,
+                    candidate_id:candidate_id
+                }
+            })
+            const interview_round = `${data+1}`;
+
+
+
         await prisma.interview_details.create({
             data:{
                 job_id:job_id,
