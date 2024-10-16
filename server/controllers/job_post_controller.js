@@ -21,11 +21,15 @@ const post_jobs = async (req, res) => {
             max_experience,
             created_by,
             job_status,
-            job_exp_date,
             job_scheduled_date,
             skills,
             job_scheduled_time
         } = req.body;
+        var {job_exp_date} = req.body;
+
+        if(job_exp_date==null){
+            job_exp_date="3000-12-12"
+        }
 
         const file_path = req.file ? req.file.path : null;
 

@@ -76,7 +76,7 @@ model job_post {
   required_qualification String?                  @db.VarChar(255)
   created_by             String?                  @db.VarChar(100)
   max_offered_salary     String?                  @db.VarChar(255)
-  job_exp_date           String?                  @db.VarChar(100)
+  job_exp_date           String?                  @db.VarChar(100) @default("3000-12-12")
   job_scheduled_date     String?                  @db.VarChar(100)
   job_status             String?                  @db.VarChar(100)
   skills                 String?                  @db.VarChar(255)
@@ -156,12 +156,14 @@ model qualifications {
 }
 
 model candidate_applied_jobs {
-  id           Int            @id @default(autoincrement())
-  candidate_id Int
-  job_id       Int
-  job_status   String?        @default("applied") @db.VarChar(50)
-  candidate    candidate_list @relation(fields: [candidate_id], references: [candidate_id])
-  job          job_post       @relation(fields: [job_id], references: [id])
+  id                   Int            @id @default(autoincrement())
+  candidate_id         Int
+  job_id               Int
+  job_candidate_status String?        @default("Applied") @db.VarChar(50)
+  candidate            candidate_list @relation(fields: [candidate_id], references: [candidate_id])
+  job                  job_post       @relation(fields: [job_id], references: [id])
+  created_at           DateTime       @default(now())
+  updated_at           DateTime?      @updatedAt
 }
 
 model interview_details {

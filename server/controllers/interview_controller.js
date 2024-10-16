@@ -145,7 +145,7 @@ const update_interview = async(req,res)=>{
 
 const update_interview_status = async(req,res)=>{
     try {
-        const {candidate_id , job_id , job_status , attempted , remarks} = req.body;
+        const {candidate_id , job_id , job_candidate_status , attempted , remarks} = req.body;
         const interview_id = parseInt(req.params.id)
         await prisma.interview_details.update({
             where: {
@@ -162,7 +162,7 @@ const update_interview_status = async(req,res)=>{
                 job_id:job_id
             },
             data:{
-                job_status:job_status
+                job__candidate_status:job_candidate_status
             }
         })
         res.status(200).send({
