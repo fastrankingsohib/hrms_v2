@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import JobOverview from './JobOverview';
-import AllApplicants from '../Candidate/AllApplicants';
+import AllApplicants from '../Job/AllApplicants';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { MdEdit } from 'react-icons/md';
 import { IoMdClose } from 'react-icons/io';

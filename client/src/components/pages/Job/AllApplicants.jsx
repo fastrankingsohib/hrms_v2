@@ -9,17 +9,33 @@ function AllApplicants(props) {
     const [jobDetails, setJobDetails] = useState(props.jobDetails);
     const [selectedTab, setSelectedTab] = useState("all")
 
-    const [appliedCandidates, setAppliedCandidates] = useState([]);
+    const [appliedApplicants, setAppliedApplicants] = useState([]);
+    const [shortlistedApplicants, setShortlistedApplicants] = useState([])
+    const [rejectedApplicants, setRejectedApplicants] = useState([])
     useEffect(() => {
         axios.get(`/job_applicants/${props.jobId}`)
             .then((response) => {
                 console.log(response.data.data);
-                setAppliedCandidates(response.data.data)
+                setAppliedApplicants(response.data.data);
+
+                let shortlisted = [];
+                let rejected = [];
+                appliedApplicants.map((value, key) => {
+                    if(value.status === "Shortlisted"){
+                        shortlistedApplicants.push(value);
+                    }
+
+                    else{
+                        rejectedApplicants.push(value)
+                    }
+                })
+                setShortlistedApplicants(shortlisted)
+                setRejectedApplicants(rejected)
             })
             .catch((err) => {
                 console.log(err)
             })
-    }, [location])
+    }, [location]);
 
     return (
         <div className='p-4 h-full bg-gray-100'>
@@ -28,21 +44,21 @@ function AllApplicants(props) {
                     onClick={() => setSelectedTab("all")}
                     className={`${selectedTab === "all" ? 'bg-indigo-700 text-white' : 'bg-gray-100'} text-xl inline-block h-28 px-5 rounded-xl border`}>
                     <div className='text-xl'>All Applicants</div>
-                    <div className='text-3xl'>20</div>
+                    <div className='text-3xl'>{appliedApplicants.length}</div>
                 </button>
 
                 <button
                     onClick={() => setSelectedTab("selected")}
                     className={`${selectedTab === "selected" ? 'bg-indigo-700 text-white' : 'bg-gray-100'} inline-block h-28 px-5 rounded-xl border`}>
                     <div className='text-xl'>Shortlisted Applicants</div>
-                    <div className='text-3xl'>10</div>
+                    <div className='text-3xl'>{shortlistedApplicants.length}</div>
                 </button>
 
                 <button
                     onClick={() => setSelectedTab("rejected")}
                     className={`${selectedTab === "rejected" ? 'bg-indigo-700 text-white' : 'bg-gray-100'} text-xl inline-block h-28 px-5 rounded-xl border`}>
                     <div className='text-xl'>Rejected Applicants</div>
-                    <div className='text-3xl'>10</div>
+                    <div className='text-3xl'>{rejectedApplicants.length}</div>
                 </button>
             </div>
 
@@ -61,7 +77,7 @@ function AllApplicants(props) {
                         <div className='p-2.5'>Email ID</div>
                     </div>
 
-                    {appliedCandidates.map(candidate => (
+                    {appliedApplicants.map(candidate => (
                         <Link to={''} className='grid grid-cols-7 hover:bg-gray-100 rounded-xl items-center'>
                             <div className='p-2.5'><span className='inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-400'><FaUserLarge size={'13px'} /></span> <span className='ml-2'>#{candidate.id}</span></div>
                             {/* <div className='p-2.5'>{candidate.id}</div> */}

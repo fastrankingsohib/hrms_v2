@@ -4,12 +4,11 @@ import { AiFillCodepenCircle, AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FaList, FaListUl, FaUser } from 'react-icons/fa';
 import { Link, redirect, useNavigate, useParams } from 'react-router-dom'
 import { FaCartFlatbed, FaCircleCheck, FaCircleDot, FaRegCircleCheck } from "react-icons/fa6";
-import { MdAccessTime, MdDelete, MdEdit, MdOutlineCancel, MdOutlineDone, MdOutlinePendingActions } from 'react-icons/md';
+import { MdAccessTime, MdAdd, MdDelete, MdDone, MdEdit, MdOutlineCancel, MdOutlineDone, MdOutlinePendingActions } from 'react-icons/md';
 import { RiListCheck3, RiUserSharedFill } from "react-icons/ri";
 import { VscVmRunning } from "react-icons/vsc";
 import useCandidateUpdate from '../../../helpers/useCanidateUpdate';
-import useUpdateUser from '../../../helpers/useUpadateUser';
-import { IoIosTimer } from 'react-icons/io';
+import { IoMdClose } from 'react-icons/io';
 
 function CandidateView() {
     const navigate = useNavigate()
@@ -33,10 +32,14 @@ function CandidateView() {
     const [isEducationEditing, setIsEducationEditing] = useState(false);
     const [isExperienceEditing, setIsExperienceEditing] = useState(false);
 
+
     // States for education and experience lists
     const [educationList, setEducationList] = useState([]);
     const [experienceList, setExperienceList] = useState([]);
+    const [skills, setSkills] = useState([]); // Add state to manage skills
+    const [hobbies, setHobbies] = useState([]);
 
+    // Fetch candidate data
     // Fetch candidate data
     useEffect(() => {
         setCandidateLoading(true);
@@ -58,6 +61,19 @@ function CandidateView() {
                         total_tenure: exp.total_tenure || '',
                         last_drawn_salary: exp.last_drawn_salary || '',
                     })) || []);
+
+                    // Convert skills string into an array
+                    const skillsArray = candidateData.skills
+                        ? candidateData.skills.split(',').map(skill => skill.trim())
+                        : []; // If there are no skills, use an empty array
+                    setSkills(skillsArray); // Update skills state
+
+                    // Convert hobbies string into an array
+                    const hobbiesArray = candidateData.hobbies
+                        ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
+                        : []; // If there are no hobbies, use an empty array
+                    setHobbies(hobbiesArray); // Update hobbies state
+
                 }
             })
             .catch((err) => {
@@ -66,6 +82,47 @@ function CandidateView() {
                 setCandidateLoading(false);
             });
     }, [candidate_id]);
+
+
+
+
+    // Hanlde Skills
+    // Initial skills list
+    const [skillInput, setSkillInput] = useState("");
+
+    const handleSkillsKeyDown = (e) => {
+        if (e.key === "Enter" && skillInput.trim()) {
+            setSkills([...skills, skillInput.trim()]);
+            setSkillInput(""); // Clear the input after adding skill
+            e.preventDefault(); // Prevent form submission or default behavior
+        }
+    };
+
+    const handleRemoveSkill = (index) => {
+        const updatedSkills = skills.filter((_, i) => i !== index);
+        setSkills(updatedSkills);
+    };
+
+
+    // Hanlde Hobbies
+    const [hobbyInput, setHobbyInput] = useState("");
+
+    const handleHobbiesKeyDown = (e) => {
+        if (e.key === "Enter" && hobbyInput.trim()) {
+            setHobbies([...hobbies, hobbyInput.trim()]);
+            setHobbyInput(""); // Clear the input after adding hobby
+            e.preventDefault(); // Prevent form submission or default behavior
+        }
+    };
+
+    const handleRemoveHobby = (index) => {
+        const updatedHobbies = hobbies.filter((_, i) => i !== index);
+        setHobbies(updatedHobbies);
+    };
+
+
+
+
 
     // Handle Education Input Change
     const handleEducationInputChange = (index, field, value) => {
@@ -114,7 +171,7 @@ function CandidateView() {
     // Update Candidate Data (Saving Changes)
     const { updateEvents, updateCandidate } = useCandidateUpdate();
     const handleUpdateCandidate = () => {
-        updateCandidate(candidate_id, educationList, experienceList, candidate);
+        updateCandidate(candidate_id, educationList, experienceList, candidate, skills, hobbies);
     };
 
     const [deleteEvents, setDeleteEvents] = useState({
@@ -228,6 +285,31 @@ function CandidateView() {
     }, []);
 
 
+
+    const [candidateStatus, setCandidateStatus] = useState(candidate ? candidate.status : "");
+    useEffect(() => {
+        setCandidateStatus(() => {
+            if(candidate){
+                return candidate === "Shortlisted" ? "Shortlisted" : nextRoundSelection.value
+            }
+        })
+    }, [nextRoundSelection])
+    // Update Candidate Status
+    const updateCandidateStatus = () => {
+        axios.post(`/update-candidate-status/${candidate_id}`,
+            {
+                "status": candidateStatus,
+                "current_status": nextRoundSelection.value
+            }
+        )
+            .then((res) => {
+                console.log(res.data);
+                setNextRoundSelection((values) => ({...values, checked: false}))
+            })
+            .catch((err) => console.log(err))
+    }
+
+
     // Component Loading -------------------------------------------------------------------------------------------------------
     // Component Loading -------------------------------------------------------------------------------------------------------
     if (candidateLoading) {
@@ -274,6 +356,7 @@ function CandidateView() {
                             <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Overview" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Overview")}>Overview</button>
                             <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
                             <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
+                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Comments" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Comments")}>Comments</button>
 
                             <div className={`p-2.5 relative`}>
                                 <button className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
@@ -283,15 +366,20 @@ function CandidateView() {
                                     Change Status
                                 </button>
 
-                                <div className={`absolute z-10 top-[65px] right-0 bg-white text-black border shadow-2xl w-60 grid gap-4 p-4 ${nextRoundSelection.checked ? "block" : "hidden"}`}>
+                                <div className={`absolute z-10 top-[65px] right-0 bg-white text-black border shadow-2xl w-80 grid gap-4 p-4 ${nextRoundSelection.checked ? "block" : "hidden"}`}>
                                     <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "FollowUp" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                         onClick={() => setNextRoundSelection((values) => ({ ...values, value: "FollowUp" }))}>
                                         <FaListUl size={"12px"} /> Follow Up
                                     </button>
 
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Shortlist" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Shortlist" }))}>
-                                        <RiListCheck3 size={"16px"} /> Shortlist
+                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Rejected" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Rejected" }))}>
+                                        <IoMdClose size={"14px"} /> Rejected
+                                    </button>
+
+                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Shortlisted" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Shortlisted" }))}>
+                                        <RiListCheck3 size={"16px"} /> Shortlisted
                                     </button>
 
                                     <button className='relative'>
@@ -300,7 +388,7 @@ function CandidateView() {
                                             <MdAccessTime size={"16px"} /> Schedule Interview
                                         </button>
 
-                                        <div className={`text-left absolute -top-[125px] -left-[170%] p-4 bg-white border shadow-2xl w-80 cursor-default ${nextRoundSelection.value === "Schedule" ? "block" : "hidden"}`}>
+                                        <div className={`text-left absolute -top-[125px] -left-[120%] p-4 bg-white border shadow-2xl w-80 cursor-default ${nextRoundSelection.value === "Schedule" ? "block" : "hidden"}`}>
                                             <h1 className='text-xl font-semibold mb-4 text-center'>Schedule Interview</h1>
                                             <div className='grid'>
                                                 <label className='text-left block w-full mb-2' htmlFor="">Select Interview Date</label>
@@ -350,12 +438,19 @@ function CandidateView() {
                                         onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Live" }))}>
                                         <FaCircleDot size={"16px"} /> Live
                                     </button>
+
+                                    <button className={`p-2.5 inline-flex items-center justify-center gap-2 border w-full rounded-md bg-black text-white border-black`}
+                                        onClick={() =>  {
+                                            updateCandidateStatus();
+                                            console.log(nextRoundSelection.value)
+                                        }}
+                                    >
+                                        <MdDone size={"16px"} /> Confirm Change
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
 
                     <div className={`max-h-full ${selectedFilter === "Overview" ? "block" : "hidden"}`}>
                         <div className='flex justify-between items-center text-sm sticky -z-10 top-[99px] bg-indigo-50 p-4'>
@@ -551,18 +646,67 @@ function CandidateView() {
                                 </div>
                             </div>
 
-                            {/* <div className='grid gap-2 p-6 bg-white w-full border'>
-                            <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
-                                <span className='text-xl'>Legal Details</span>
-                                <button className='inline-flex gap-2 items-center'><MdEdit /> Edit Legal Details</button>
-                            </h1>
-                            <div className='grid grid-cols-2 gap-4'>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Aadhaar No.</span> <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={"N/A"} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>PAN No.</span> <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={"N/A"} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Driving Licence</span> <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={"N/A"} /></div>
-                                <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Last Name</span> <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={"N/A"} /></div>
+
+                            <div className='grid gap-2 p-6 bg-white w-full border'>
+                                <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
+                                    <span className='text-xl'>Skills</span>
+                                </h1>
+                                <div>
+                                    <input
+                                        type="text"
+                                        className="border block mb-4 w-96 rounded-full focus:outline-none p-2.5 pl-4 focus:bg-gray-100 bg-white"
+                                        placeholder="Add a skill and press Enter"
+                                        value={skillInput}
+                                        onChange={(e) => setSkillInput(e.target.value)}
+                                        onKeyDown={handleSkillsKeyDown}
+                                    />
+                                    <div className='flex flex-wrap gap-2'>
+                                        {skills.map((skill, index) => (
+                                            <span key={index} className='bg-indigo-100 text-indigo-700 inline-flex justify-center gap-2 items-center p-2.5 px-5 rounded-full'>
+                                                {skill}
+                                                <button
+                                                    className="ml-2 text-red-500"
+                                                    onClick={() => handleRemoveSkill(index)}
+                                                >
+                                                    &times;
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
-                        </div> */}
+
+
+                            <div className='grid gap-2 p-6 bg-white w-full border'>
+                                <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
+                                    <span className='text-xl'>Hobbies</span>
+                                </h1>
+                                <div>
+                                    <input
+                                        type="text"
+                                        className="border p-2.5 mb-4 rounded-full w-96 pl-4 focus:outline-none focus:bg-gray-100 bg-white"
+                                        placeholder="Add a hobby and press Enter"
+                                        value={hobbyInput}
+                                        onChange={(e) => setHobbyInput(e.target.value)}
+                                        onKeyDown={handleHobbiesKeyDown}
+                                    />
+                                    <div className='flex flex-wrap gap-2'>
+                                        {hobbies.map((hobby, index) => (
+                                            <span key={index} className='bg-indigo-100 text-indigo-700 p-2.5 px-5 rounded-full'>
+                                                {hobby}
+                                                <button
+                                                    className="ml-2 text-red-500"
+                                                    onClick={() => handleRemoveHobby(index)}
+                                                >
+                                                    &times;
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+
 
                             <div className='pb-32 flex justify-end'><button className={`p-2.5 rounded-lg px-4 bg-indigo-700 text-white ${updateEvents.loading ? 'bg-opacity-80 cursor-not-allowed' : ''}`}
                                 onClick={handleUpdateCandidate}
@@ -579,13 +723,13 @@ function CandidateView() {
                                 <div className='flex gap-4'>
                                     <button className='text-white bg-red-500 rounded-lg p-2.5 px-5'
                                         onClick={() => setAlerts((values) => ({ ...values, delete: true }))}
-                                    >Delete This User</button>
+                                    >Delete This Candidate</button>
                                 </div>
 
                                 {/* Delete Alert */}
                                 <div className={`${alerts.delete ? "flex" : "hidden"} fixed top-0 left-0 z-40 items-center justify-center h-full w-full backdrop-blur-sm bg-black bg-opacity-10`}>
                                     <div className='w-96 min-h-32 p-10 text-center bg-white border rounded-xl'>
-                                        <h1 className='text-xl font-semibold text-red-500'>Do You Want To Delete The User</h1>
+                                        <h1 className='text-xl font-semibold text-red-500'>Do You Want To Delete The Candidate</h1>
                                         <div className='flex flex-wrap items-center justify-center gap-2 mt-4'>
                                             <button className='bg-gray-100 rounded-lg p-2.5 px-5 mt-4 mr-4'
                                                 onClick={() => setAlerts((values) => ({ ...values, delete: false }))}
@@ -603,9 +747,11 @@ function CandidateView() {
 
 
 
+
                     {/* Applied Jobs */}
                     <div className={`h-full ${selectedFilter === "Applied Jobs" ? "block" : "hidden"}`}>
-                        <div className=''></div>
+                        <div className=''>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -613,4 +759,4 @@ function CandidateView() {
     }
 }
 
-export default CandidateView
+export default CandidateView;

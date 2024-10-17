@@ -1,19 +1,25 @@
-import axios from "axios"
-import { useEffect, useState } from "react"
-import { useSelector } from "react-redux";
-import { json, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const useNewCandidate = () => {
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
-    const loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : []
-    const Navigate = useNavigate()
-    const registerCandidate = (candidate, experiences, educations, skills, hobbies, selectedJobs) => {
-        // register candidate logic here
-        // setLoading(true)
-        let new_candidate =
-        {
+    const loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : [];
+    const navigate = useNavigate();
+
+    const registerCandidate = (candidate, experiences, educations, skills, hobbies, selectedJobs, currentStatus, status) => {
+        // Register candidate logic here
+        setLoading(true);
+
+        // Convert skills array to a string by extracting the skill property
+        const skillsString = skills.map(skill => skill.skill).join(', '); // Adjust 'skill' if needed
+
+        // Convert hobbies array to a string by extracting the hobby property
+        const hobbiesString = hobbies.map(hobby => hobby.hobby).join(', '); // Adjust 'hobby' if needed
+
+        let new_candidate = {
             "title": `${candidate.title}`,
             "first_name": `${candidate.first_name}`,
             "middle_name": `${candidate.middle_name}`,
@@ -32,47 +38,51 @@ const useNewCandidate = () => {
             "job_title": `${candidate.job_title}`,
             "department": `${candidate.department}`,
             "work_experience": 'Experience',
-            "hobbies": hobbies,
+            // Use the converted hobbies string here
+            "hobbies": hobbiesString, // Now it's a string
             "interests": "interests",
-            "skills": skills,
+            // Use the converted skills string here
+            "skills": skillsString,
             "recruiter_comments": "tsgs",
             "communication_skills": "shhshs",
-            "other1": "Additional info 1",
-            "other2": "Additional info 2",
-            "other3": "Additional info 3",
-            "status": "Active",
+            "other1": "",
+            "other2": "",
+            "other3": "",
+            "current_status": currentStatus, 
+            "status": status,
             "created_by": loggedInUser.username,
             "jobs": selectedJobs,
             "experiences": experiences,
             "qualifications": educations,
-        }
+        };
 
-        // axios.post("/add-candidate", new_candidate)
-        // .then((response) => {
-        //     console.log(response.data);
-        //     setLoading(false)
-        //     setSuccess(true)
-        //     setError(false)
+        axios.post("/add-candidate", new_candidate)
+            .then((response) => {
+                console.log(response.data);
+                setLoading(false);
+                setSuccess(true);
+                setError(false);
 
-        //     setTimeout(() => {
-        //         setSuccess(false)
-        //         Navigate("/my-candidates")
-        //     }, 3000)
-        // })
-        // .catch((err) => {
-        //     console.log(err);
-        //     setLoading(false)
-        //     setSuccess(false)
-        //     setError(true)
+                setTimeout(() => {
+                    setSuccess(false);
+                    navigate("/my-candidates");
+                }, 3000);
+            })
+            .catch((err) => {
+                console.log(err);
+                setLoading(false);
+                setSuccess(false);
+                setError(true);
 
-        //     setTimeout(() => {
-        //         setError(false)
-        //     }, 3000)
-        // })
-        console.log(new_candidate)
-    }
+                setTimeout(() => {
+                    setError(false);
+                }, 3000);
+            });
 
-    return { registerCandidate, loading, success, error }
-}
+        console.log(new_candidate); // For debugging purposes
+    };
 
-export default useNewCandidate
+    return { registerCandidate, loading, success, error };
+};
+
+export default useNewCandidate;

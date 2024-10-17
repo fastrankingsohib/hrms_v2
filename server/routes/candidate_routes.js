@@ -8,7 +8,9 @@ import {
   my_candidates,
   reporting_to_users,
   send_data_by_id,
-  update_candidate
+  specific_job_status_update,
+  update_candidate,
+  update_candidate_status
 } from '../controllers/candidate_controller.js';
 import {
   authenticateToken
@@ -102,5 +104,7 @@ router.get('/candidate-info/:id', authenticateToken, send_data_by_id);
 router.post('/update-candidate/:id', authenticateToken, update_candidate);
 router.get("/all-modules", module_data);
 router.get('/job_applicants/:id', authenticateToken, id_based_jobs_applicants);
+router.post('/update-candidate-status/:id', authenticateToken, update_candidate_status);
+router.post('/specific-job-status-update/:job_id/:candidate_id', authenticateToken, specific_job_status_update);
 
 export default router;

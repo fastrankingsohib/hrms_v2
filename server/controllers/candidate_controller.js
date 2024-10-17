@@ -431,12 +431,14 @@ const update_candidate = async (req, res) => {
       experiences,
       jobs 
     } = req.body;
+    const files = req.files || {};
 
     const candidate_image = files['candidate_image']?.[0]?.path || null;
     const candidate_resume = files['candidate_resume']?.[0]?.path || null;
     const candidate_aadhar = files['candidate_aadhar']?.[0]?.path || null;
     const candidate_pan = files['candidate_pan']?.[0]?.path || null;
     const candidate_highest_qualification = files['candidate_highest_qualification']?.[0]?.path || null;
+
 await prisma.candidate_list.update({
       where: {
         candidate_id: candidateId,
@@ -594,5 +596,80 @@ const id_based_jobs_applicants = async(req,res) =>{
   }
 }
 
+const update_candidate_status = async (req, res) => {
+  const candidateId = parseInt(req.params.id);
 
-export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants}
+  try {
+    const { status, current_status } = req.body;
+    await prisma.candidate_list.update({
+      where: {
+        candidate_id: candidateId, // Specify the candidate by ID
+      },
+      data: {
+        status,
+        current_status,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Candidate status and current status updated successfully.",
+      candidate_id: candidateId,
+    });
+  } catch (error) {
+    console.error(error); // Log any errors
+
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred while updating candidate status.",
+    });
+  }
+};
+
+const specific_job_status_update = async (req, res) => {
+  const jobId = parseInt(req.params.job_id); 
+  const candidateId = parseInt(req.params.candidate_id);
+
+  try {
+    const { job_candidate_status } = req.body;
+    if (!job_candidate_status) {
+      return res.status(400).json({
+        success: false,
+        message: "Job candidate status is required.",
+      });
+    }
+
+    const updatedRecord = await prisma.candidate_applied_jobs.updateMany({
+      where: {
+        job_id: jobId,
+        candidate_id: candidateId,
+      },
+      data: {
+        job_candidate_status: job_candidate_status, 
+      },
+    });
+
+    if (updatedRecord.count === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No matching job and candidate found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Job candidate status updated successfully.",
+    });
+
+  } catch (error) {
+    console.error(error); 
+
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while updating job candidate status.",
+    });
+  }
+};
+
+
+export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update}

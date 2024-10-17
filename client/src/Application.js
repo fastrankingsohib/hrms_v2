@@ -13,6 +13,8 @@ import JobView from "./components/pages/Job/JobView";
 import UpdateJobDetails from "./components/pages/Job/UpdateJobDetails";
 import CandidateLayout from "./components/pages/Candidate/CandidateLayout";
 import CandidateView from "./components/pages/Candidate/CandidateView";
+import CandidateLanding from "./components/pages/Candidate/Landing";
+import JobLanding from "./components/pages/Job/Landing";
 // import AllJobPosts from "./components/pages/Job/AllJobPosts";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
@@ -24,12 +26,14 @@ const Application = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="" element={<Layout />}>
                         <Route path="jobs" element={<JobsLayout />}>
+                            <Route path="" element={<JobLanding />} />
                             <Route path="new-job" element={<NewJob />} />
                             <Route path="update/:jobId" element={<UpdateJobDetails />} />
                             <Route path="view/:jobId" element={<JobView />} />
                         </Route>
 
                         <Route path="candidates" element={<CandidateLayout />}>
+                            <Route path="" element={<CandidateLanding />} />
                             <Route path="new-candidate" element={<NewCandidate />} />
                             <Route path="view/:candidate_id" element={<CandidateView />} />
                         </Route>

@@ -1036,7 +1036,7 @@ const NewCandidate = () => {
                             onClick={() => {
                                 // console.log(qualifications);
                                 // registerCandidate(candidate, experiences, educations, skills, hobbies)
-                                registerCandidate(candidate, experienceFields, qualifications, skillFields, hobbyFields, selectedJobs.ids)
+                                registerCandidate(candidate, experienceFields, qualifications, skillFields, hobbyFields, selectedJobs.ids, nextRoundSelection.value, nextRoundSelection.value !== "Rejected" || nextRoundSelection.value !== "Follow-up" ? "Shortlisted" : nextRoundSelection.status)
                             }}
                         >Create Candidate</button>
                     </div>
