@@ -131,7 +131,7 @@ const add_candidate = async (req, res) => {
         other3,
         status,
         created_by,
-        candidate_image, // Nullable field
+        candidate_image, 
         candidate_resume, // Nullable field
         candidate_aadhar, // Nullable field
         candidate_pan, // Nullable field
@@ -268,9 +268,11 @@ const all_candidates = async (req, res) => {
 
 const my_candidates = async (req, res) => {
   try {
+
+    const {created_by} = req.body
     const candidates = await prisma.candidate_list.findMany({
       where: {
-        created_by : 'Sohib'
+        created_by : created_by
 
       },
       include: {
@@ -594,5 +596,126 @@ const id_based_jobs_applicants = async(req,res) =>{
   }
 }
 
+const id_based_count_all_applicants = async(req,res)=>{
+  try {
+    
+    const count = await prisma.candidate_applied_jobs.count({
+      where: {
+        job_id: Number(req.params.id),
+      }
+    })
+    res.status(200).send({
+      success:true,
+      message:"count of applicants sent",
+      count:count
+    })
+    
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Some error occurred while fetching applicant data.",
+    })
+  }
+}
 
-export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants}
+const id_based_count_shortlisted_applicants = async(req,res)=>{
+  try {
+    
+    const count = await prisma.candidate_applied_jobs.count({
+      where: {
+        job_id: Number(req.params.id),
+        job_candidate_status:"Shortlisted"
+      }
+    })
+    res.status(200).send({
+      success:true,
+      message:"count of shortlisted applicants sent",
+      count:count
+    })
+    
+  } catch (error) {
+    res.status(500).send({
+      success: false,
+      message: "Some error occurred while fetching applicant data.",
+    })
+  }
+}
+
+
+const id_based_count_rejected_candidates = async(req,res)=>{
+  try {
+  const count = await prisma.candidate_applied_jobs.count({
+    where: {
+      job_id: Number(req.params.id),
+      job_candidate_status:"Rejected"
+    }
+  })
+  res.status(200).send({
+    success:true,
+    message:"count of shortlisted applicants sent",
+    count:count
+  })
+  
+} catch (error) {
+  res.status(500).send({
+    success: false,
+    message: "Some error occurred while fetching applicant data.",
+  })
+}
+}
+
+const id_based_jobs_applicants_shortlisted = async(req,res) =>{
+  try {
+    const job_id = req.params.id;
+    const data = await prisma.candidate_applied_jobs.findMany({
+      where: {
+        job_id: Number(job_id),
+        job_candidate_status: "Shortlisted"
+      },
+      include: {
+        candidate: true, 
+      },
+    });
+  res.status(200).send({
+    success: true,
+    message: "job applicants successfully sent",
+    data:data
+  })    
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      success:false,
+      message:"cannot fetch applicants data"
+    })
+  }
+}
+
+const id_based_jobs_applicants_rejected = async(req,res) =>{
+  try {
+    const job_id = req.params.id;
+    const data = await prisma.candidate_applied_jobs.findMany({
+      where: {
+        job_id: Number(job_id),
+        job_candidate_status: "Rejected"
+      },
+      include: {
+        candidate: true, 
+      },
+    });
+  res.status(200).send({
+    success: true,
+    message: "job applicants successfully sent",
+    data:data
+  })    
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      success:false,
+      message:"cannot fetch applicants data"
+    })
+  }
+}
+
+
+
+export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants,id_based_count_all_applicants,id_based_count_shortlisted_applicants,id_based_count_rejected_candidates,id_based_jobs_applicants_shortlisted,id_based_jobs_applicants_rejected}

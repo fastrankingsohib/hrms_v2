@@ -3,7 +3,12 @@ import {
   add_candidate,
   all_candidates,
   delete_candidate,
+  id_based_count_all_applicants,
+  id_based_count_rejected_candidates,
+  id_based_count_shortlisted_applicants,
   id_based_jobs_applicants,
+  id_based_jobs_applicants_rejected,
+  id_based_jobs_applicants_shortlisted,
   module_data,
   my_candidates,
   reporting_to_users,
@@ -51,29 +56,28 @@ const storage = multer.diskStorage({
   }
 });
 
-// Configure Multer to accept multiple files for each field, files are optional
 const upload = multer({
   storage: storage
 }).fields([{
     name: 'candidate_image',
     maxCount: 5
-  }, // Optional
+  }, 
   {
     name: 'candidate_aadhar',
     maxCount: 5
-  }, // Optional
+  }, 
   {
     name: 'candidate_pan',
     maxCount: 5
-  }, // Optional
+  },
   {
     name: 'candidate_highest_qualification',
     maxCount: 5
-  }, // Optional
+  },
   {
     name: 'candidate_resume',
     maxCount: 5
-  } // Optional
+  }
 ]);
 
 // Error handling middleware for Multer
@@ -96,11 +100,18 @@ router.use((err, req, res, next) => {
 router.post('/add-candidate', upload, add_candidate);
 router.get('/reporting-user', authenticateToken, reporting_to_users);
 router.get('/all-candidates', authenticateToken, all_candidates);
-router.get('/my-candidates', authenticateToken, my_candidates);
+router.post('/my-candidates', authenticateToken, my_candidates);
 router.get('/delete-candidate/:id', authenticateToken, delete_candidate);
 router.get('/candidate-info/:id', authenticateToken, send_data_by_id);
 router.post('/update-candidate/:id', authenticateToken, update_candidate);
 router.get("/all-modules", module_data);
 router.get('/job_applicants/:id', authenticateToken, id_based_jobs_applicants);
+router.get('/applicants_number_job/:id',authenticateToken,id_based_count_all_applicants);
+router.get('/shortlisted_job_candidates/:id',authenticateToken,id_based_count_shortlisted_applicants);
+router.get('/rejected_job_candidates/:id',authenticateToken,id_based_count_rejected_candidates)
+router.get('/job_applicants_shortlisted/:id', authenticateToken, id_based_jobs_applicants_shortlisted);
+router.get('/job_applicants_rejected/:id', authenticateToken, id_based_jobs_applicants_rejected);
+
+
 
 export default router;
