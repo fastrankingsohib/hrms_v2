@@ -9,6 +9,8 @@ import { RiListCheck3, RiUserSharedFill } from "react-icons/ri";
 import { VscVmRunning } from "react-icons/vsc";
 import useCandidateUpdate from '../../../helpers/useCanidateUpdate';
 import { IoMdClose } from 'react-icons/io';
+import CandidateInterviews from './CandidateInterviews';
+import CandidateComments from './CandidateComments';
 
 function CandidateView() {
     const navigate = useNavigate()
@@ -744,14 +746,23 @@ function CandidateView() {
                     </div>
 
 
-
-
-
-
                     {/* Applied Jobs */}
                     <div className={`h-full ${selectedFilter === "Applied Jobs" ? "block" : "hidden"}`}>
                         <div className=''>
                         </div>
+                    </div>
+
+
+
+                    {/* Interviews */}
+                    <div className={`${selectedFilter === "Interviews" ? "block" : "hidden"}`}>
+                        <CandidateInterviews candidateId={candidate_id} />
+                    </div>
+                    
+                    
+                    {/* Interviews */}
+                    <div className={`${selectedFilter === "Comments" ? "block" : "hidden"}`}>
+                        <CandidateComments candidateId={candidate_id} />
                     </div>
                 </div>
             </div>

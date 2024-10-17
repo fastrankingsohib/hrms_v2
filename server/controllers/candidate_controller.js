@@ -268,32 +268,39 @@ const all_candidates = async (req, res) => {
 
 const my_candidates = async (req, res) => {
   try {
+    const { created_by } = req.body; 
+
+    if (!created_by) {
+      return res.status(400).json({
+        message: "'created_by' field is required",
+        success: false,
+      });
+    }
+
     const candidates = await prisma.candidate_list.findMany({
       where: {
-        created_by : 'Sohib'
-
+        created_by: created_by,  
       },
       include: {
-        workExperiences: true,  
-        qualifications: true,   
+        workExperiences: true,
+        qualifications: true,
       },
     });
 
-    
+    // Return success response
     res.status(200).send({
       message: 'Candidates fetched successfully',
       success: true,
-      candidates: candidates
-    })
+      candidates: candidates,
+    });
   } catch (error) {
     console.error('Error fetching candidates:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Internal server error',
-      success: false
+      success: false,
     });
   }
 };
-
 const delete_candidate = async (req, res) => {
   const candidate_id = Number(req.params.id);
 

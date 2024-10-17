@@ -21,11 +21,11 @@ function AllApplicants(props) {
                 let shortlisted = [];
                 let rejected = [];
                 appliedApplicants.map((value, key) => {
-                    if(value.status === "Shortlisted"){
+                    if (value.status === "Shortlisted") {
                         shortlistedApplicants.push(value);
                     }
 
-                    else{
+                    else {
                         rejectedApplicants.push(value)
                     }
                 })
@@ -38,7 +38,7 @@ function AllApplicants(props) {
     }, [location]);
 
     return (
-        <div className='p-4 h-full bg-gray-100'>
+        <div className='p-4 h-full bg-white'>
             <div className='grid grid-cols-3 gap-4'>
                 <button
                     onClick={() => setSelectedTab("all")}
@@ -65,7 +65,7 @@ function AllApplicants(props) {
 
 
             <div className='mt-4'>
-                <div className='p-4 bg-white rounded-xl'>
+                <div>
                     {/* Header */}
                     <div className='grid grid-cols-7 font-semibold'>
                         <div className='p-2.5'>Profile</div>
@@ -77,24 +77,66 @@ function AllApplicants(props) {
                         <div className='p-2.5'>Email ID</div>
                     </div>
 
-                    {appliedApplicants.map(candidate => (
-                        <Link to={''} className='grid grid-cols-7 hover:bg-gray-100 rounded-xl items-center'>
-                            <div className='p-2.5'><span className='inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-400'><FaUserLarge size={'13px'} /></span> <span className='ml-2'>#{candidate.id}</span></div>
-                            {/* <div className='p-2.5'>{candidate.id}</div> */}
-                            <div className='p-2.5'>{`${candidate.candidate.title} ${candidate.candidate.first_name} ${candidate.candidate.middle_name} ${candidate.candidate.last_name}`}</div>
-                            <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.job_status}</span></div>
-                            <div className='p-2.5'>
-                                {new Date(candidate.candidate.created_at).toLocaleDateString('en-GB', {
-                                    day: '2-digit',
-                                    month: 'short',
-                                    year: 'numeric'
-                                }).replace(/ (\d+)/, ', $1')}
-                            </div>
-                            <div className='p-2.5'>{candidate.candidate.work_experience}</div>
-                            <div className='p-2.5'>{candidate.candidate.contact_number}</div>
-                            <div className='p-2.5'>{candidate.candidate.email_address}</div>
-                        </Link>
-                    ))}
+                    {
+                        selectedTab === "all" ?
+                            appliedApplicants.map(candidate => (
+                                <button to={''} className='w-full text-left grid grid-cols-7 hover:bg-gray-100 rounded-xl items-center'>
+                                    <div className='p-2.5'><span className='inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-400'><FaUserLarge size={'13px'} /></span> <span className='ml-2'>#{candidate.id}</span></div>
+                                    {/* <div className='p-2.5'>{candidate.id}</div> */}
+                                    <div className='p-2.5'>{`${candidate.candidate.title} ${candidate.candidate.first_name} ${candidate.candidate.middle_name} ${candidate.candidate.last_name}`}</div>
+                                    <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.status}</span></div>
+                                    <div className='p-2.5'>
+                                        {new Date(candidate.candidate.created_at).toLocaleDateString('en-GB', {
+                                            day: '2-digit',
+                                            month: 'short',
+                                            year: 'numeric'
+                                        }).replace(/ (\d+)/, ', $1')}
+                                    </div>
+                                    <div className='p-2.5'>{candidate.candidate.work_experience}</div>
+                                    <div className='p-2.5'>{candidate.candidate.contact_number}</div>
+                                    <div className='p-2.5'>{candidate.candidate.email_address}</div>
+                                </button>
+                            ))
+                            : selectedTab === "selected" ?
+                                shortlistedApplicants.length > 0 ?
+                                    shortlistedApplicants.map(candidate => (
+                                        <button to={''} className='w-full text-left grid grid-cols-7 hover:bg-gray-100 rounded-xl items-center'>
+                                            <div className='p-2.5'><span className='inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-400'><FaUserLarge size={'13px'} /></span> <span className='ml-2'>#{candidate.id}</span></div>
+                                            {/* <div className='p-2.5'>{candidate.id}</div> */}
+                                            <div className='p-2.5'>{`${candidate.candidate.title} ${candidate.candidate.first_name} ${candidate.candidate.middle_name} ${candidate.candidate.last_name}`}</div>
+                                            <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.job_status}</span></div>
+                                            <div className='p-2.5'>
+                                                {new Date(candidate.candidate.created_at).toLocaleDateString('en-GB', {
+                                                    day: '2-digit',
+                                                    month: 'short',
+                                                    year: 'numeric'
+                                                }).replace(/ (\d+)/, ', $1')}
+                                            </div>
+                                            <div className='p-2.5'>{candidate.candidate.work_experience}</div>
+                                            <div className='p-2.5'>{candidate.candidate.contact_number}</div>
+                                            <div className='p-2.5'>{candidate.candidate.email_address}</div>
+                                        </button>
+                                    )) : <div className='p-2.5 text-gray-500 h-96 w-full flex items-center justify-center'>No Shortlisted Applicants</div>
+                                : rejectedApplicants.length > 0 ?
+                                    rejectedApplicants.map(candidate => (
+                                        <button to={''} className='w-full text-left grid grid-cols-7 hover:bg-gray-100 rounded-xl items-center'>
+                                            <div className='p-2.5'><span className='inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-400'><FaUserLarge size={'13px'} /></span> <span className='ml-2'>#{candidate.id}</span></div>
+                                            {/* <div className='p-2.5'>{candidate.id}</div> */}
+                                            <div className='p-2.5'>{`${candidate.candidate.title} ${candidate.candidate.first_name} ${candidate.candidate.middle_name} ${candidate.candidate.last_name}`}</div>
+                                            <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.job_status}</span></div>
+                                            <div className='p-2.5'>
+                                                {new Date(candidate.candidate.created_at).toLocaleDateString('en-GB', {
+                                                    day: '2-digit',
+                                                    month: 'short',
+                                                    year: 'numeric'
+                                                }).replace(/ (\d+)/, ', $1')}
+                                            </div>
+                                            <div className='p-2.5'>{candidate.candidate.work_experience}</div>
+                                            <div className='p-2.5'>{candidate.candidate.contact_number}</div>
+                                            <div className='p-2.5'>{candidate.candidate.email_address}</div>
+                                        </button>
+                                    )) : <div className='p-2.5 text-gray-500 h-96 w-full flex items-center justify-center'>No Rejected Applicants</div>
+                    }
                 </div>
 
             </div>

@@ -10,6 +10,7 @@ function AllCandidates(props) {
     const [allCandidates, setAllCandidates] = useState([]);
     const [loading, setLoading] = useState(false); // Loading state
     const [dropDown, setDropDown] = useState(false);
+    const user = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
 
     // Handle button click to toggle dropdown
     const handleButtonClick = (e) => {
@@ -19,7 +20,11 @@ function AllCandidates(props) {
     useEffect(() => {
         if (props.activeButton === "my candidates") {
             setLoading(true);
-            axios.get("/my-candidates")
+            axios.post(`/my-candidates`,
+                {
+                    "created_by": user !== null ? user.username : null
+                }
+            )
                 .then((res) => {
                     setAllCandidates(res.data.candidates);
                 })
