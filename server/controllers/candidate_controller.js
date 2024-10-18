@@ -578,15 +578,40 @@ const module_data = async(req,res)=>{
 }
 
 
+// const id_based_jobs_applicants = async(req,res) =>{
+//   try {
+//     const job_id = req.params.id;
+//     const data = await prisma.candidate_applied_jobs.findMany({
+//       where: {
+//         job_id: Number(job_id),
+//       },
+//       include: {
+//         candidate: true, // This includes the related candidate_list data
+//       },
+//     });
+//   res.status(200).send({
+//     success: true,
+//     message: "job applicants successfully sent",
+//     data:data
+//   })    
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).send({
+//       success:false,
+//       message:"cannot fetch applicants data"
+//     })
+//   }
+// }
+
 const id_based_jobs_applicants = async(req,res) =>{
   try {
-    const job_id = req.params.id;
+    const candidate_id = req.params.id;
     const data = await prisma.candidate_applied_jobs.findMany({
       where: {
-        job_id: Number(job_id),
+        candidate_id: Number(candidate_id),
       },
       include: {
-        candidate: true, // This includes the related candidate_list data
+        job: true,
       },
     });
   res.status(200).send({

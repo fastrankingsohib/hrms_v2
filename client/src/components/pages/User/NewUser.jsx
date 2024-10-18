@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useRegisterUser from "../../../helpers/useRegisterUser";
 import allModules from "./AllModules";
 import { useSelector } from "react-redux";
-import UserModule from './../../Commons/UserModule';
+import UserModule from './../../commons/UserModule';
 
 // Icons
 import { GoEyeClosed, GoEye, GoTriangleUp } from "react-icons/go";

@@ -7,11 +7,10 @@ import { useParams } from "react-router-dom";
 import { updateModules } from "../../../redux/reducers/auth_slice";
 import '../../../style/theme/theme.scss'
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
-
+import UserModule from './../../commons/UserModule';
 
 // icons
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import UserModule from './../../Commons/UserModule';
 
 const UpdateUser = () => {
     const { userid } = useParams();
