@@ -41,8 +41,8 @@ function AllInterviews() {
 
     return (
         <div className='h-full border-r overflow-auto'>
-            <div className='h-16 flex gap-4 p-2 border-b'>
-            </div>
+            {/* <div className='h-16 flex gap-4 p-2 border-b'>
+            </div> */}
             {
                 allInterviews.length > 0 ?
                     allInterviews.map((interview, index) => {

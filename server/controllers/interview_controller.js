@@ -165,7 +165,7 @@ const update_interview_status = async(req,res)=>{
                 job_id:job_id
             },
             data:{
-                job__candidate_status:job_candidate_status
+                job_candidate_status:job_candidate_status
             }
         })
         res.status(200).send({

@@ -20,6 +20,18 @@ function ViewInterview() {
         success: false,
         error: false,
     })
+    const [changeStatus, setChangeStatus] = useState({
+        toggled: false,
+        remarks: "",
+        candidate_id: interviewDetails.candidate_id,
+        job_candidate_status: "",
+        job_id: interviewDetails.job_id,
+        attempted: false,
+        remarks: interviewDetails.remarks,
+        loading: false,
+        success: false,
+        error: false
+    })
     // Updated Interview Details
     const [updatedInterviewDetails, setUpdatedInterviewDetails] = useState();
 
@@ -47,13 +59,22 @@ function ViewInterview() {
                 console.log(res.data.data[0])
 
                 setUpdatedInterviewDetails({
-                    attempted: res.data.data[0].attempted,
+                    attempted: false,
                     interview_round: res.data.data[0].interview_round,
                     interviewer: res.data.data[0].interviewer,
                     interview_time: res.data.data[0].interview_time,
                     interview_date: res.data.data[0].interview_date,
                     job_id: res.data.data[0].job_id,
                     remarks: res.data.data[0].remarks
+                })
+
+                setChangeStatus({
+                    toggled: false,
+                    job_candidate_status: res.data.data[0].job_candidate_status,
+                    remarks: res.data.data[0].remarks,
+                    candidate_id: res.data.data[0].candidate_id,
+                    job_id: res.data.data[0].job_id,
+                    attempted: res.data.data[0].attempted,
                 })
 
                 // Job Details
@@ -85,14 +106,34 @@ function ViewInterview() {
 
     const hanldeUpdateInterview = () => {
         axios.post(`/update-interview/${interviewId}`, updatedInterviewDetails)
-        .then((res) => {
-            console.log(res)
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-        
+            .then((res) => {
+                console.log(res)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+
         // console.log(updatedInterviewDetails)
+    }
+
+
+    const hanldeUpdateStatus = () => {
+        setChangeStatus((values) => ({ ...values, success: false, loading: true, error: false, attempted: true }))
+        console.log(changeStatus)
+        axios.post(`/update-candidate-interview-status/${interviewId}`, changeStatus)
+            .then((res) => {
+                setChangeStatus((values) => ({ ...values, success: true, loading: false, error: false, toggled: false }))
+                setTimeout(() => {
+                    setChangeStatus((values) => ({ ...values, success: false, loading: false, error: false }))
+                }, 2000)
+            })
+            .catch((err) => {
+                setChangeStatus((values) => ({ ...values, success: false, loading: false, error: true }))
+                setTimeout(() => {
+                    setChangeStatus((values) => ({ ...values, success: false, loading: false, error: false }))
+                }, 2000)
+                console.log(err);
+            })
     }
 
     if (interviewDetails) {
@@ -257,27 +298,27 @@ function ViewInterview() {
                                     <div>
                                         <div className='font-semibold pl-2'>Remarks</div>
                                         <div className='text-gray-500 flex items-center gap-2 p-2'>
-                                            <input type="text" disabled={!isEditable} className={`${isEditable ? "bg-gray-100 p-2" : "bg-white"}`} defaultValue={updatedInterviewDetails.remarks ? interviewDetails.remarks : "No Remarks"} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, remarks: e.target.value }))} />
+                                            <input type="text" disabled={true} className={`p-2 bg-white`} defaultValue={updatedInterviewDetails.remarks ? interviewDetails.remarks : "No Remarks"} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, remarks: e.target.value }))} />
                                         </div>
                                     </div>
 
 
                                     <div>
                                         <div className='font-semibold pl-2'>Intervew Attempt Status</div>
-                                        {/* <div className='text-gray-500 flex items-center gap-2'>
-                                            <span>
+                                        <div className='text-gray-500 flex items-center gap-2'>
+                                            <span className='p-2'>
                                                 {
                                                     interviewDetails.attempted ? interviewDetails.attempted : <span className='text-orange-500'>Pending</span>
                                                 }
                                             </span>
-                                        </div> */}
-                                        <div className='p-2'>
+                                        </div>
+                                        {/* <div className='p-2'>
                                             <select disabled={!isEditable} className={`w-[90%] ${isEditable ? "bg-gray-100 p-2" : "bg-white"}`} defaultValue={updatedInterviewDetails.attempted ? updatedInterviewDetails.attempted : "Pending"} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, attempted: e.target.value }))}>
                                                 <option value={"---"} disabled={true}>--- Change Interview Status ---</option>
                                                 <option value={"Pending"}>Pending</option>
-                                                <option value={"Done"}>Done</option>
+                                                <option value={"Selected"}>Selected</option>
                                             </select>
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                 </div>
@@ -285,7 +326,36 @@ function ViewInterview() {
 
 
                                 <div className='text-right'>
-                                    <button className='bg-indigo-700 text-white p-2.5 rounded-full px-5 mt-4 ml-2' onClick={hanldeUpdateInterview}>Update Details</button>
+                                    <div className={`${changeStatus.toggled ? "fixed" : "hidden"} top-0 left-0 h-full w-full backdrop-blur-sm z-40 flex items-center justify-center`}>
+                                        <div className='text-left min-h-60 w-96 p-10 bg-white border shadow-xl'>
+                                            <h1 className='text-xl font-semibold'>Update Interview Status</h1>
+
+                                            <label className='mt-4 inline-block'>Select Status</label>
+                                            <select className='w-full border p-2.5 rounded-md' defaultValue={changeStatus.job_candidate_status} onChange={(e) => setChangeStatus((values) => ({...values, job_candidate_status: e.target.value}))}>
+                                                <option value="---" disabled={true}>--- Selected Updated Status ---</option>
+                                                <option value="Selected">Selected</option>
+                                                <option value="Rejected">Rejected</option>
+                                            </select>
+                                            
+                                            <label className='mt-4 inline-block'>Attempt Status</label>
+                                            <select className='w-full border p-2.5 rounded-md' defaultValue={changeStatus.attempted} onChange={(e) => setChangeStatus((values) => ({...values, attempted: Boolean(e.target.value)}))}>
+                                                <option value="---" disabled={true}>--- Selected Updated Status ---</option>
+                                                <option value={true}>Selected</option>
+                                                <option value={false}>Rejected</option>
+                                            </select>
+
+                                            <label className='mt-4 inline-block'>HR Remarks</label>
+                                            <input type="text" className='block w-full p-2.5 rounded-md border' defaultValue={changeStatus.remarks} onChange={(e) => setChangeStatus((values) => ({...values, remarks: e.target.value}))} placeholder='Remarks' />
+
+
+                                            <div className='flex gap-4 mt-4'>
+                                                <button className='p-2.5 bg-gray-100 rounded-md w-full' onClick={() => setChangeStatus((values) => ({ ...values, toggled: false }))}>Cancel</button>
+                                                <button className='p-2.5 bg-indigo-700 text-white rounded-md min-w-[60%]' onClick={hanldeUpdateStatus}>{changeStatus.loading ? "Updating..." : changeStatus.success ? "Updated" : changeStatus.error ? "Error! Try Again" : "Update Interview"}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button className='bg-black text-white p-2.5 rounded-full px-5 mt-4' onClick={() => setChangeStatus((values) => ({ ...values, toggled: true }))}>Change Interview Status</button>
+                                    <button className='bg-indigo-700 text-white p-2.5 rounded-full px-5 mt-4 ml-4' onClick={hanldeUpdateInterview}>Update Details</button>
                                 </div>
                             </div>
 
