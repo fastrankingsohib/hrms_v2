@@ -8,7 +8,8 @@ const create_interview = async(req,res)=>{
             candidate_id,
             interview_date,
             interview_time,
-            interviewer
+            interviewer,
+            created_by,
             }= req.body;
 
             const data = await prisma.interview_details.count({
@@ -29,6 +30,7 @@ const create_interview = async(req,res)=>{
                 interview_time:interview_time,
                 interviewer:interviewer,
                 interview_round:interview_round,
+                created_by:created_by,
                 }
         })
         res.status(200).send({
@@ -86,10 +88,10 @@ const all_interviews = async(req,res)=>{
 
 const interview_of_candidate = async(req,res)=>{
     try {
-        const {candidate_id}= req.params.id
+        const candidate_id = req.params.id
         const data = await prisma.interview_details.findMany({
             where:{
-                candidate_id:candidate_id
+                candidate_id: Number(candidate_id)
             }
         })
         res.status(200).send({
@@ -105,6 +107,7 @@ const interview_of_candidate = async(req,res)=>{
         })
     }
 }
+
 
 const update_interview = async(req,res)=>{
     try {

@@ -383,40 +383,47 @@ const NewCandidate = () => {
     const [newInterviewDetails, setNewInterviewDetails] = useState({
         date: "",
         time: "",
+        jobTitle: "",
+        jobId: "",
         interviewer: "",
+        round: "",
         loading: false,
         success: false,
         error: false
     });
 
+    useEffect(() => {
+        console.log(newInterviewDetails.jobId)
+    }, [newInterviewDetails])
+
     // Function to schedule the interview
-    const scheduleInterview = () => {
-        setNewInterviewDetails((values) => ({
-            ...values, loading: true, success: false, error: false
-        }));
-        axios.post("/schedule-interview", {
-            "job_id": 101,
-            "candidate_id": Number(0),
-            "interview_date": `${newInterviewDetails.date}`,
-            "interview_time": `${newInterviewDetails.time}`,
-            "interviewer": `${newInterviewDetails.interviewer}`,
-            "interview_round": "1"
-        })
-            .then((res) => {
-                setNewInterviewDetails((values) => ({
-                    ...values, loading: false, success: true, error: false
-                }));
-                setTimeout(() => {
-                    setNextRoundSelection((values) => ({ ...values, checked: false }));
-                }, 3000);
-            })
-            .catch((err) => {
-                setNewInterviewDetails((values) => ({
-                    ...values, loading: false, success: false, error: true
-                }));
-                console.log(err);
-            });
-    };
+    // const scheduleInterview = () => {
+    //     setNewInterviewDetails((values) => ({
+    //         ...values, loading: true, success: false, error: false
+    //     }));
+    //     axios.post("/schedule-interview", {
+    //         "job_id": 101,
+    //         "candidate_id": Number(0),
+    //         "interview_date": `${newInterviewDetails.date}`,
+    //         "interview_time": `${newInterviewDetails.time}`,
+    //         "interviewer": `${newInterviewDetails.interviewer}`,
+    //         "interview_round": "1"
+    //     })
+    //         .then((res) => {
+    //             setNewInterviewDetails((values) => ({
+    //                 ...values, loading: false, success: true, error: false
+    //             }));
+    //             setTimeout(() => {
+    //                 setNextRoundSelection((values) => ({ ...values, checked: false }));
+    //             }, 3000);
+    //         })
+    //         .catch((err) => {
+    //             setNewInterviewDetails((values) => ({
+    //                 ...values, loading: false, success: false, error: true
+    //             }));
+    //             console.log(err);
+    //         });
+    // };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -578,24 +585,6 @@ const NewCandidate = () => {
                             placeholder="Date of Birth" name="" id="" />
                     </div>
 
-                    {/* <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Job Title</label>
-
-                        <select className="primary-input" onChange={(e) => setCandidate((values) => ({ ...values, job_title: e.target.value }))}>
-                            <option value="" selected disabled>-- Job Title --</option>
-                            {
-                                allJobs ? allJobs.map((value, index) => {
-                                    return (
-                                        <option value={value.id} onClick={() => {
-                                            setCandidate((values) => ({ ...values, jobs: [value] }));
-                                            setSelectedJobs(value.id)
-                                        }}>{value.job_title}</option>
-                                    )
-                                }) : <option value="Telesales">No Jobs Found</option>
-                            }
-                        </select>
-                    </div> */}
-
                     <div>
                         <label className="inline-block mt-4 font-semibold">Select Jobs</label>
                         <div className="relative">
@@ -642,6 +631,19 @@ const NewCandidate = () => {
                     </div>
 
 
+                    <div>
+                        <label htmlFor="select-default-status" className="font-semibold inline-block p-4 pl-0">Set Default Status</label>
+                        <select defaultValue={"---"} className="primary-input" id="select-default-status">
+                            <option value="---" disabled={true}>--- Select Default Status ---</option>
+                            <option value="Follow-up">Follow-up</option>
+                            <option value="Shortlisted">Shortlisted</option>
+                        </select>
+                        {/* <input type="date" className=""
+                            onChange={(e) => setCandidate((values) => ({ ...values, date_of_birth: e.target.value }))}
+                            placeholder="Date of Birth" name="" id="" /> */}
+                    </div>
+
+
                 </div>
 
 
@@ -656,7 +658,7 @@ const NewCandidate = () => {
                             className="primary-input"
                             onChange={handleExperienceChange}
                         >
-                            <option value="" disabled selected>-- Select Experience Level --</option>
+                            <option value="" disabled selected>--- Select Experience Level ---</option>
                             <option value="fresher">Fresher</option>
                             <option value="experienced">Experienced</option>
                         </select>
@@ -666,42 +668,6 @@ const NewCandidate = () => {
                         <>
                             {experienceFields.map((experienceField, index) => (
                                 <div key={index} className="grid grid-cols-4 gap-4 mb-5 pb-10 border-b relative">
-                                    {/* <div>
-                                        <label htmlFor={`jobTitle-${index}`} className="font-semibold inline-block p-4 pl-0">Job Title</label>
-                                        <input
-                                            type="text"
-                                            className="primary-input"
-                                            placeholder="Job Title"
-                                            name="jobTitle"
-                                            id={`jobTitle-${index}`}
-                                            value={experienceField.jobTitle}
-                                            onChange={event => handleInputChange(index, event)}
-                                        />
-                                    </div> */}
-
-                                    {/* <div>
-                                        <label htmlFor={`department-${index}`} className="font-semibold inline-block p-4 pl-0">Department</label>
-                                        <select
-                                            name="department"
-                                            id={`department-${index}`}
-                                            className="primary-input"
-                                            value={experienceField.department}
-                                            onChange={event => handleInputChange(index, event)}
-                                        >
-                                            <option value="" disabled selected>-- Select Department --</option>
-                                            <option value="Software Development">Software Development</option>
-                                            <option value="IT">IT</option>
-                                            <option value="Human Resources">Human Resources</option>
-                                            <option value="Marketing">Marketing</option>
-                                            <option value="Sales">Sales</option>
-                                            <option value="Finance">Finance</option>
-                                            <option value="Customer Support">Customer Support</option>
-                                            <option value="Operations">Operations</option>
-                                            <option value="Research and Development">Research and Development</option>
-                                            <option value="Legal">Legal</option>
-                                        </select>
-                                    </div> */}
-
                                     <div>
                                         <label htmlFor={`organisation_name-${index}`} className="font-semibold inline-block p-4 pl-0">Organisation Name</label>
                                         <input
@@ -939,6 +905,7 @@ const NewCandidate = () => {
                 <hr />
                 <br />
 
+
                 <div className="my-2">
                     <div className='flex gap-4 items-center pr-8' ref={popupRef}>
                         {/* Filter Buttons */}
@@ -946,7 +913,7 @@ const NewCandidate = () => {
                         <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
                         <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button> */}
 
-                        <div className={`p-2.5 relative`}>
+                        {/* <div className={`p-2.5 relative`}>
                             <button className={`text-center block rounded-lg w-80 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
                                 onClick={() => {
                                     setNextRoundSelection((values) => ({ ...values, checked: !nextRoundSelection.checked }));
@@ -993,10 +960,29 @@ const NewCandidate = () => {
                                                 placeholder='Eg. Mr. Akram'
                                             />
 
+                                            <label className='text-left block mb-2 mt-2 w-full' htmlFor="">Job For Interview</label>
+                                            <select defaultValue={"---"} className='text-left block border bg-gray-100 p-2 w-full'
+                                                onChange={(e) => 
+                                                    setNewInterviewDetails((values) => ({ ...values, jobId: e.target.value}))
+                                                }
+                                            >
+                                                <option disabled={true} value={"---"}>--- Select Job For Interview ---</option>
+                                                {
+                                                    selectedJobs.jobs.length > 0 ?
+                                                        selectedJobs.jobs.map((value, index) => {
+                                                            return (
+                                                                <option key={index} value={value.id}>{value.job_title}</option>
+                                                            )
+                                                        })
+                                                        : <option value={"Un-Assigned"}>Un-Assigned!</option>
+                                                }
+                                            </select>
+
+
                                             <button className={`p-2.5 border rounded-lg bg-indigo-700 text-white mt-8 ${newInterviewDetails.loading ? "bg-opacity-60 cursor-not-allowed" : ""}`}
-                                                onClick={scheduleInterview}
+                                                onClick={() => setNextRoundSelection((values) => ({ ...values, checked: false }))}
                                                 disabled={newInterviewDetails.loading}>
-                                                {newInterviewDetails.loading ? "Scheduling..." : newInterviewDetails.success ? "Scheduled New Interview" : "Schedule Interview"}
+                                                Save Interview Details
                                             </button>
                                         </div>
                                     </div>
@@ -1022,8 +1008,33 @@ const NewCandidate = () => {
                                     <FaCircleDot size={"16px"} /> Live
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
+                </div>
+
+
+                <br />
+                <hr />
+                <br />
+
+
+                <div className="p-2.5 px-4 border bg-gray-100">
+                    <strong>Current Status:</strong> {nextRoundSelection.value === "Schedule" || nextRoundSelection.value === "Scheduled" ?
+                        <span className="text-green-600">Interview Scheduled On
+                            <strong className="px-2">{newInterviewDetails.date}</strong>
+                            at
+                            <strong className="px-2">
+                                {new Date(`1970-01-01T${newInterviewDetails.time}:00`).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true
+                                })}
+                            </strong>
+                            for
+                            <strong className="px-2">{newInterviewDetails.jobTitle}</strong>
+                            by
+                            <strong className="px-2">{newInterviewDetails.interviewer}</strong>
+                        </span> : nextRoundSelection.value}
                 </div>
 
 
@@ -1036,7 +1047,7 @@ const NewCandidate = () => {
                             onClick={() => {
                                 // console.log(qualifications);
                                 // registerCandidate(candidate, experiences, educations, skills, hobbies)
-                                registerCandidate(candidate, experienceFields, qualifications, skillFields, hobbyFields, selectedJobs.ids, nextRoundSelection.value, nextRoundSelection.value !== "Rejected" || nextRoundSelection.value !== "Follow-up" ? "Shortlisted" : nextRoundSelection.status)
+                                registerCandidate(candidate, experienceFields, qualifications, skillFields, hobbyFields, selectedJobs.ids, nextRoundSelection.value, nextRoundSelection.value !== "Rejected" || nextRoundSelection.value !== "Follow-up" ? "Shortlisted" : nextRoundSelection.status, newInterviewDetails)
                             }}
                         >Create Candidate</button>
                     </div>

@@ -11,15 +11,18 @@ import useCandidateUpdate from '../../../helpers/useCanidateUpdate';
 import { IoMdClose } from 'react-icons/io';
 import CandidateInterviews from './CandidateInterviews';
 import CandidateComments from './CandidateComments';
+import NewInterview from './NewInterview';
 
 function CandidateView() {
     const navigate = useNavigate()
+    const [allUsers, setAllUsers] = useState([])
     const { candidate_id } = useParams();
     const [candidate, setCandidate] = useState();
     const [candidateLoading, setCandidateLoading] = useState(false);
     const [candidateSuccess, setCandidateSuccess] = useState(false);
     const [candidateError, setCandidateError] = useState(false);
     const [isPersonalDetailsEditing, setIsPersonalDetailsEditing] = useState(false);
+    let loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
     const [alerts, setAlerts] = useState({
         delete: false,
     });
@@ -41,6 +44,18 @@ function CandidateView() {
     const [skills, setSkills] = useState([]); // Add state to manage skills
     const [hobbies, setHobbies] = useState([]);
 
+
+    // Fecth User Data
+    useEffect(() => {
+        axios.get("/user/all-users")
+            .then((res) => {
+                setAllUsers(res.data.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }, [candidate_id]);
+
     // Fetch candidate data
     // Fetch candidate data
     useEffect(() => {
@@ -49,6 +64,7 @@ function CandidateView() {
             .then((res) => {
                 if (res.data.success) {
                     const candidateData = res.data.candidate;
+                    console.log(res.data.candidate)
                     setCandidateSuccess(true);
                     setCandidateLoading(false);
                     setCandidateError(false);
@@ -235,42 +251,64 @@ function CandidateView() {
         value: ""
     });
 
+    const [permissions, setPersmissions] = useState({
+        createInterview: false,
+    })
     const [newInterviewDetails, setNewInterviewDetails] = useState({
-        date: "",
-        time: "",
-        interviewer: "",
+        date: null,
+        time: null,
+        interviewer: "null",
+        job: "null",
         loading: false,
         success: false,
         error: false
     });
+
+    useEffect(() => {
+        if (newInterviewDetails.job !== "null" && newInterviewDetails.interviewer !== "null" && newInterviewDetails.date && newInterviewDetails.time) {
+            setPersmissions((values) => ({ ...values, createInterview: true}))
+        }
+        else(
+            setPersmissions((values) => ({ ...values, createInterview: false}))
+        )
+    }, [newInterviewDetails])
 
     // Function to schedule the interview
     const scheduleInterview = () => {
         setNewInterviewDetails((values) => ({
             ...values, loading: true, success: false, error: false
         }));
-        axios.post("/schedule-interview", {
-            "job_id": 101,
-            "candidate_id": Number(candidate_id),
-            "interview_date": `${newInterviewDetails.date}`,
-            "interview_time": `${newInterviewDetails.time}`,
-            "interviewer": `${newInterviewDetails.interviewer}`,
-            "interview_round": "1"
-        })
-            .then((res) => {
-                setNewInterviewDetails((values) => ({
-                    ...values, loading: false, success: true, error: false
-                }));
-                setTimeout(() => {
-                    setNextRoundSelection((values) => ({ ...values, checked: false }));
-                }, 3000);
+        if (newInterviewDetails.job !== "null" && newInterviewDetails.interviewer !== "null" && newInterviewDetails.date && newInterviewDetails.time) {
+            axios.post("/schedule-interview", {
+                "job_id": Number(newInterviewDetails.job),
+                "candidate_id": Number(candidate_id),
+                "interview_date": `${newInterviewDetails.date}`,
+                "interview_time": `${newInterviewDetails.time}`,
+                "interviewer": `${newInterviewDetails.interviewer}`
             })
-            .catch((err) => {
-                setNewInterviewDetails((values) => ({
-                    ...values, loading: false, success: false, error: true
-                }));
-                console.log(err);
-            });
+                .then((res) => {
+                    setNewInterviewDetails((values) => ({
+                        ...values, loading: false, success: true, error: false
+                    }));
+
+                    setTimeout(() => {
+                        setNextRoundSelection((values) => ({ ...values, checked: false, value: "" }));
+                        setNewInterviewDetails((values) => ({ ...values, success: false, date: null, time: null, job: "null", interviewer: "null" }))
+                    }, 3000);
+                })
+                .catch((err) => {
+                    setNewInterviewDetails((values) => ({
+                        ...values, loading: false, success: false, error: true
+                    }));
+                    console.log(err);
+                });
+        }
+        else {
+            console.log("Please Fill All Details")
+            setNewInterviewDetails((values) => ({
+                ...values, loading: false, success: false, error: false
+            }));
+        }
     };
 
     useEffect(() => {
@@ -291,7 +329,7 @@ function CandidateView() {
     const [candidateStatus, setCandidateStatus] = useState(candidate ? candidate.status : "");
     useEffect(() => {
         setCandidateStatus(() => {
-            if(candidate){
+            if (candidate) {
                 return candidate === "Shortlisted" ? "Shortlisted" : nextRoundSelection.value
             }
         })
@@ -306,11 +344,10 @@ function CandidateView() {
         )
             .then((res) => {
                 console.log(res.data);
-                setNextRoundSelection((values) => ({...values, checked: false}))
+                setNextRoundSelection((values) => ({ ...values, checked: false }))
             })
             .catch((err) => console.log(err))
     }
-
 
     // Component Loading -------------------------------------------------------------------------------------------------------
     // Component Loading -------------------------------------------------------------------------------------------------------
@@ -355,10 +392,75 @@ function CandidateView() {
 
                         <div className='flex gap-4 items-center pr-8' ref={popupRef}>
                             {/* Filter Buttons */}
-                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Overview" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Overview")}>Overview</button>
-                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
-                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
-                            <button className={`p-2.5 rounded-lg w-40 ${selectedFilter === "Comments" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Comments")}>Comments</button>
+                            <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Overview" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Overview")}>Overview</button>
+                            <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
+                            <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
+                            <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Comments" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Comments")}>Comments</button>
+                            <div className={`relative z-40`} >
+                                <span
+                                    onClick={() => {
+                                        if (nextRoundSelection.value !== "New Interview") {
+                                            setNextRoundSelection((values) => ({ ...values, value: "New Interview", checked: false }))
+                                        }
+                                        else {
+                                            setNextRoundSelection((values) => ({ ...values, value: "", checked: false }))
+                                        }
+                                    }}
+                                    className='cursor-pointer inline-block p-2.5 px-5 rounded-lg min-w-40 bg-black text-white'>Schedule Interview</span>
+                                <div
+                                    className={`z-40 ${nextRoundSelection.value === "New Interview" ? "block" : "hidden"} absolute top-16 right-0 min-h-96 w-80 p-4 bg-white border shadow-2xl text-black cursor-default`}>
+                                    <label className='block text-left'>Interview Date</label>
+                                    <input
+                                        required={true}
+                                        onChange={(e) => setNewInterviewDetails((values) => ({ ...values, date: e.target.value }))}
+                                        className='block text-left border w-full  mt-2 p-2.5 bg-gray-50' type="date" />
+                                    <br />
+                                    <label className='block text-left'>Interview Time</label>
+                                    <input
+                                        required={true}
+                                        onChange={(e) => setNewInterviewDetails((values) => ({ ...values, time: e.target.value }))}
+                                        className='block text-left border w-full mt-2 p-2.5 bg-gray-50' type="time" />
+                                    <br />
+                                    <label className='block text-left'>Interviewer</label>
+                                    <select defaultValue={"---"}
+                                        onChange={(e) => setNewInterviewDetails((values) => ({ ...values, interviewer: e.target.value }))}
+                                        className='block text-left border w-full mt-2 p-2.5 bg-gray-50'>
+                                        <option value={"---"} disabled={true}>--- Select Interviewer ---</option>
+                                        {
+                                            allUsers.length > 0 ?
+                                                allUsers.map((value, key) => {
+                                                    return (
+                                                        <option value={value.id} key={key}>{`${value.title} ${value.first_name} ${value.middle_name} ${value.last_name}`}</option>
+                                                    )
+                                                }) : <option value={"null"}>No User Found!</option>
+                                        }
+                                    </select>
+                                    <br />
+                                    <label className='block text-left'>Select Job For Interview</label>
+                                    <select defaultValue={"---"}
+                                        onChange={(e) => setNewInterviewDetails((values) => ({ ...values, job: e.target.value }))}
+                                        className='block text-left border w-full mt-2 p-2.5 bg-gray-50'>
+                                        <option value="---" disabled={true}>--- Select Interviewer ---</option>
+                                        {
+                                            candidate.candidate_applied_jobs.length > 0 ?
+                                                candidate.candidate_applied_jobs.map((value, key) => {
+                                                    return (
+                                                        <option value={value.job_id} key={key}>{value.job.job_title}</option>
+                                                    )
+                                                }) : <option value={"null"}>No Applied Jobs Found!</option>
+                                        }
+                                    </select>
+                                    <br />
+                                    <button onClick={scheduleInterview} className={`p-2.5 bg-indigo-700 text-white w-full rounded-md`}
+                                        disabled={newInterviewDetails.loading ? true : newInterviewDetails.success ? true : !permissions.createInterview ? true : false}
+                                        style={{
+                                            opacity: newInterviewDetails.loading ? 0.9 : newInterviewDetails.success ? 0.9 : !permissions.createInterview ? 0.5 : 1,
+                                            cursor: newInterviewDetails.loading ? "not-allowed" : newInterviewDetails.success ? "not-allowed" : !permissions.createInterview ? "not-allowed" : "",
+                                            backgroundColor: newInterviewDetails.loading ? "" : newInterviewDetails.success ? "green" : newInterviewDetails.error ? "red" : "",
+                                        }}
+                                    >{newInterviewDetails.loading ? "Scheduling" : newInterviewDetails.success ? "Interview Scheduled" : newInterviewDetails.error ? "Error! Try Again" : "Schedule Interview"}</button>
+                                </div>
+                            </div>
 
                             <div className={`p-2.5 relative`}>
                                 <button className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
@@ -442,7 +544,7 @@ function CandidateView() {
                                     </button>
 
                                     <button className={`p-2.5 inline-flex items-center justify-center gap-2 border w-full rounded-md bg-black text-white border-black`}
-                                        onClick={() =>  {
+                                        onClick={() => {
                                             updateCandidateStatus();
                                             console.log(nextRoundSelection.value)
                                         }}
@@ -758,12 +860,13 @@ function CandidateView() {
                     <div className={`${selectedFilter === "Interviews" ? "block" : "hidden"}`}>
                         <CandidateInterviews candidateId={candidate_id} />
                     </div>
-                    
-                    
-                    {/* Interviews */}
+
+
+                    {/* Comments */}
                     <div className={`${selectedFilter === "Comments" ? "block" : "hidden"}`}>
                         <CandidateComments candidateId={candidate_id} />
                     </div>
+
                 </div>
             </div>
         )

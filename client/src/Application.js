@@ -15,6 +15,8 @@ import CandidateLayout from "./components/pages/Candidate/CandidateLayout";
 import CandidateView from "./components/pages/Candidate/CandidateView";
 import CandidateLanding from "./components/pages/Candidate/Landing";
 import JobLanding from "./components/pages/Job/Landing";
+import InterviewLayout from "./components/pages/Interview/InterviewLayout";
+import InterviewLanding from "./components/pages/Interview/Landing";
 // import AllJobPosts from "./components/pages/Job/AllJobPosts";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
@@ -38,14 +40,15 @@ const Application = () => {
                             <Route path="view/:candidate_id" element={<CandidateView />} />
                         </Route>
                         
+                        <Route path="interviews" element={<InterviewLayout />}>
+                            <Route path="" element={<InterviewLanding />} />
+                        </Route>
+                        
                         <Route path="candidates" element={<CandidateLayout />}></Route>
 
-                        {/* <Route path="/all-job-posts" element={<AllJobPosts />} /> */}
                         <Route path="/add-new-user" element={<NewUser />} />
                         <Route path="/all-users/" element={<AllUsers />} />
                         <Route path="/user/:userid" element={<UserView />} />
-                        {/* <Route path="/add-new-candidate" element={<NewCandidate />} /> */}
-                        {/* <Route path="/my-candidates" element={<MyCandidates />} /> */}
                         <Route path="*" element={<PageNotFound />} />
                     </Route>
                 </Route>

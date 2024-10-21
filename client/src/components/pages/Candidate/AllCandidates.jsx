@@ -3,6 +3,7 @@ import axios from 'axios';
 import { IoIosArrowUp } from "react-icons/io";
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { Link, NavLink, useLocation, useParams } from 'react-router-dom';
+import { MdWorkOutline, MdCall, MdEdit, MdDeleteOutline } from "react-icons/md";
 
 function AllCandidates(props) {
     const location = props.location;
@@ -50,11 +51,11 @@ function AllCandidates(props) {
                 });
         }
 
-    }, [props.activeButton]);
+    }, [props.activeButton, props.location]);
 
     return (
-        <div>
-            <div className='grid h-full overflow-auto'>
+        <div className='h-full overflow-auto'>
+            <div className='grid'>
                 {/* Check if loading is true, display loading spinner */}
                 {loading ? (
                     <div className='flex justify-center items-center h-20'>
@@ -65,18 +66,30 @@ function AllCandidates(props) {
                     // If not loading, show candidate list or a message if empty
                     allCandidates.length > 0 ? (
                         allCandidates.map((value, index) => (
-                            <NavLink to={`/candidates/view/${value.candidate_id}`} key={index} className={({ isActive }) => `${isActive ? "bg-indigo-50 border-indigo-700" : "bg-white border-l-transparent border-b"} p-4 h-20 border-l-4 block w-full`}>
+                            <div className={`relative flex p-2 h-20 border-b transition-small ${location.pathname == `/candidates/view/${value.candidate_id}` ? "bg-indigo-100" : "hover:shadow-xl hover:bg-gray-50"}`}>
+                                <div className='min-w-12 flex justify-center items-center -mt-6 -ml-2'>
+                                    <input type="checkbox" />
+                                </div>
                                 <div className='w-full'>
-                                    <div className='w-full flex items-center justify-between'>
-                                        <span className='text-xl inline-block -mt-1 font-bold'>{`${value.title} ${value.first_name} ${value.last_name}`}</span>
-                                        <span><div className={`${value.status === "Active" ? "text-green-500" : value.status === "Inactive" ? "bg-orange-500" : "text-red-500"}`}>{`${value.status}`}</div></span>
-                                    </div>
-                                    <div className='w-full flex items-center justify-between'>
-                                        <span>{`${value.contact_number}`}</span>
-                                        <span><span className='text-gray-400'>Experience:</span> <strong className='inline-block w-20 text-right'>{value.work_experience}</strong></span>
+                                    <NavLink to={`/candidates/view/${value.candidate_id}`} className={'block mt-[6px] hover:text-indigo-700 hover:underline'}>
+                                        {`${value.title} ${value.first_name} ${value.last_name}`}
+                                    </NavLink>
+                                    <div className='mt-1'>
+                                        <span className='inline-flex items-center gap-2 w-40'><MdCall /> {value.contact_number}</span>
+                                        <span className='inline-flex items-center gap-2'><MdWorkOutline /> 10 Yrs. Experience</span>
                                     </div>
                                 </div>
-                            </NavLink>
+
+                                {/* Action Area - Initially hidden, visible on hover */}
+                                <span className='absolute inline-flex gap-2 items-center p-2 top-0 right-0 transition-opacity duration-200 opacity-0 hover-parent-hover:opacity-100'>
+                                    <span className='w-8 h-8 inline-flex items-center justify-center rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-200'>
+                                        <MdEdit />
+                                    </span>
+                                    <span className='w-8 h-8 inline-flex items-center justify-center rounded-lg cursor-pointer bg-red-100 hover:bg-red-500 hover:text-white'>
+                                        <MdDeleteOutline />
+                                    </span>
+                                </span>
+                            </div>
                         ))
                     ) : (
                         <div className='p-4'>No Candidates Found!</div>

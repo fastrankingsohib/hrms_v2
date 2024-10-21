@@ -32,7 +32,7 @@ function CandidateLayout() {
         // setActiveButton("all")
     }, [location])
     return (
-        <div className='h-full flex'>
+        <div className='h-full flex overflow-hidden'>
             <div className='w-1/4 h-full border-r border-b select-none'>
                 <div className='border-b flex items-start justify-between bg-white gap-2 p-2 sticky top-0 z-30'>
                     <div
@@ -58,10 +58,10 @@ function CandidateLayout() {
                 </div>
 
 
-                <div><AllCandidates location={location} activeButton={activeButton} /></div>
+                <div className='h-full overflow-auto pb-20'><AllCandidates location={location} activeButton={activeButton} /></div>
 
             </div>
-            <div className='w-3/4 h-full'><Outlet /></div>
+            <div className='w-3/4'><Outlet /></div>
         </div>
     )
 }

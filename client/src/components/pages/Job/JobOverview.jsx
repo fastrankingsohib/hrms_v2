@@ -107,10 +107,66 @@ function JobOverview(props) {
                     {jobDetails.job_status}
                 </span>
             </div>
+            
+            <div className="flex">
+                <span className='text-gray-400 min-w-60 inline-block' style={{display: jobDetails.job_status === "Scheduled" ? "block" : "none"}}>Scheduled On</span>
+                <span>
+                    {jobDetails.job_scheduled_date}
+                </span>
+            </div>
+            
+            <div className="flex">
+                <span className='text-gray-400 min-w-60 inline-block'>Job Created On</span>
+                <span>
+                    {
+                        (() => {
+                            const date = new Date(jobDetails.created_at);
+                            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+                            const formattedDate = date.toLocaleDateString('en-US', options);
+                            const formattedTime = date.toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                            });
+
+                            // Replace ":" with "." in the time string
+                            const timeWithDot = formattedTime.replace(':', '.');
+
+                            return `${formattedDate} - ${timeWithDot}`;
+                        })()
+                    }
+                </span>
+            </div>
+
+
+            <div className="flex">
+                <span className='text-gray-400 min-w-60 inline-block'>Job Created By</span>
+                <span>@{jobDetails.created_by}</span>
+            </div>
+
+            <div className="flex">
+                <span className='text-gray-400 min-w-60 inline-block'>Job Expiry Date</span>
+                <span>
+                    {
+                        jobDetails.job_exp_date ? 
+                        (() => {
+                            const date = new Date(jobDetails.job_exp_date);
+                            return date.toLocaleDateString('en-US', {
+                                day: 'numeric',
+                                month: 'short', // e.g., "Oct"
+                                year: 'numeric'
+                            });
+                        })() : "No Expiry Limit"
+                    }
+                </span>
+            </div>
+
+
             <div className="flex">
                 <span className='text-gray-400 min-w-60 inline-block'>Job Description</span>
                 <span>{jobDetails.job_desc}</span>
             </div>
+
             <div className="flex">
                 <span className='text-gray-400 min-w-60 inline-block'>Job Details (PDF)</span>
                 <span className='min-w-80 bg-gray-50 border border-indigo-200 rounded-2xl inline-flex justify-between items-center p-5'>

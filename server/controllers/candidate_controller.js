@@ -72,10 +72,8 @@ const add_candidate = async (req, res) => {
       work_tenure,
     } = req.body;
 
-    // Ensure req.files is handled even when it's undefined
     const files = req.files || {};
 
-    // Handle the uploaded files safely, making them nullable
     const candidate_image = files['candidate_image']?.[0]?.path || null;
     const candidate_resume = files['candidate_resume']?.[0]?.path || null;
     const candidate_aadhar = files['candidate_aadhar']?.[0]?.path || null;
@@ -87,7 +85,6 @@ const add_candidate = async (req, res) => {
     console.log('PAN path:', candidate_pan);
     console.log('Qualification path:', candidate_highest_qualification);
 
-    // Validate email and phone number
     if (!validator.isEmail(email_address)) {
       return res.status(400).send({ message: 'Invalid email format.' });
     }
@@ -96,11 +93,9 @@ const add_candidate = async (req, res) => {
       return res.status(400).send({ message: 'Invalid mobile number.' });
     }
 
-    // Check for existing email or contact
     const emailOrContactCheck = await check_email_contact(req, res);
     if (emailOrContactCheck) return;
 
-    // Create candidate entry
     const candidate = await prisma.candidate_list.create({
       data: {
         title,
@@ -131,18 +126,21 @@ const add_candidate = async (req, res) => {
         other3,
         status,
         created_by,
-        candidate_image, // Nullable field
-        candidate_resume, // Nullable field
-        candidate_aadhar, // Nullable field
-        candidate_pan, // Nullable field
-        candidate_highest_qualification, // Nullable field
+        candidate_image,
+        candidate_resume,
+        candidate_aadhar,
+        candidate_pan,
+        candidate_highest_qualification,
         work_tenure,
       },
     });
 
-    const candidate_id = candidate.candidate_id;
+    const candidate_id = candidate.candidate_id; // Get the created candidate_id
 
-    // Handle experiences if provided
+    // Log the candidate_id for debugging purposes (optional)
+    console.log('Candidate ID:', candidate_id);
+
+    // Handle experiences
     if (Array.isArray(experiences) && experiences.length > 0) {
       const experienceData = experiences.map((exp) => ({
         candidate_id: candidate_id,
@@ -157,7 +155,7 @@ const add_candidate = async (req, res) => {
       });
     }
 
-    // Handle qualifications if provided
+    // Handle qualifications
     if (Array.isArray(qualifications) && qualifications.length > 0) {
       const qualificationData = qualifications.map((qual) => ({
         candidate_id: candidate_id,
@@ -172,7 +170,7 @@ const add_candidate = async (req, res) => {
       });
     }
 
-    // Handle job applications if provided
+    // Handle job applications
     if (Array.isArray(jobs) && jobs.length > 0) {
       const jobData = jobs.map((jobId) => ({
         candidate_id: candidate_id,
@@ -184,16 +182,15 @@ const add_candidate = async (req, res) => {
       });
     }
 
+    // Respond with candidate_id included
     return res.status(200).json({
       success: true,
       message: 'Candidate and related data successfully added.',
+      candidate_id: candidate_id,  // Include the candidate_id in the response
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: 'An error occurred while adding candidate, experiences, qualifications, and jobs.',
-    });
+    return res.status(500).json({ success: false, message: 'Error adding candidate.' });
   }
 };
 
@@ -603,6 +600,31 @@ const id_based_jobs_applicants = async(req,res) =>{
   }
 }
 
+const candidate_applied_based_jobs = async(req,res) =>{
+  try {
+    const candidate_id = req.params.id;
+    const data = await prisma.candidate_applied_jobs.findMany({
+      where: {
+        candidate_id: Number(candidate_id),
+      },
+      include: {
+        job: true,
+      },
+    });
+  res.status(200).send({
+    success: true,
+    message: "job applicants successfully sent",
+    data:data
+  })    
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      success:false,
+      message:"cannot fetch applicants data"
+    })
+  }
+}
+
 const update_candidate_status = async (req, res) => {
   const candidateId = parseInt(req.params.id);
 
@@ -679,4 +701,4 @@ const specific_job_status_update = async (req, res) => {
 };
 
 
-export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update}
+export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update, candidate_applied_based_jobs}

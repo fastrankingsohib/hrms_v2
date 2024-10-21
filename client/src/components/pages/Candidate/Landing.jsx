@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 function CandidateLanding() {
   return (
-    <div className='h-full flex items-center justify-center select-none'>
+    <div className='h-[90vh] overflow-auto flex items-center justify-center'>
         <div>
             <img className='-mt-40' src={CandidateSvg} alt="" width={"300px"} />
             <div className='text-center'>Select Any Candidate For Action</div>
