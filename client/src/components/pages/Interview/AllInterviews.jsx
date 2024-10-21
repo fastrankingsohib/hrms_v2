@@ -13,7 +13,7 @@ function AllInterviews() {
         // All Users Api
         axios.get("/user/all-users")
             .then((res) => {
-                // setAllInterviews(res.data.data);
+                setAllUsers(res.data.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -22,7 +22,6 @@ function AllInterviews() {
         // All Interviews Api
         axios.get("/all-interviews")
             .then((res) => {
-                console.log(res.data.data)
                 setAllInterviews(res.data.data);
             })
             .catch((err) => {
@@ -33,7 +32,6 @@ function AllInterviews() {
         axios.get("/display_jobs")
             .then((res) => {
                 setAllJobs(res.data.jobs);
-                // console.log(res.data.jobs)
             })
             .catch((err) => {
                 console.log(err)
@@ -41,12 +39,14 @@ function AllInterviews() {
     }, [])
 
     return (
-        <div className='h-full overflow-auto'>
+        <div className='h-full border-r overflow-auto'>
+            <div className='h-16 flex gap-4 p-2 border-b'>
+            </div>
             {
                 allInterviews.length > 0 ?
                     allInterviews.map((interview, index) => {
                         return (
-                            <div key={index} className='h-20 p-3 border-b border-r transition-small hover:shadow-xl'>
+                            <div key={index} className='h-20 p-3 border-b transition-small hover:shadow-xl'>
                                 <h1 className='px-3 flex items-center'>
                                     <span><input type="checkbox" className='h-4 w-4' /></span>
                                     <Link to={`view/${interview.id}`} className='block -mt-1 ml-4 font-semibold hover:underline hover:text-indigo-700'>
@@ -56,7 +56,7 @@ function AllInterviews() {
                                                     allJobs.map((job, jobIndex) => {
                                                         if (job.id === interview.job_id) {
                                                             return (
-                                                                <span>{job.job_title == "" ? "Job Title" : job.job_title}</span>
+                                                                <span key={jobIndex}>{job.job_title == "" ? "Job Title" : job.job_title}</span>
                                                             )
                                                         }
                                                     }) : "---"
@@ -67,8 +67,8 @@ function AllInterviews() {
                                 </h1>
 
 
-                                <div className='ml-[38px] font-light'>
-                                    <span className='inline-flex items-center gap-2'>
+                                <div className='ml-[38px] font-light flex items-center'>
+                                    <span className='w-full inline-flex items-center gap-2'>
                                         <HiOutlineCalendarDays size={"14px"} />
                                         {
                                             new Date(interview.interview_date).toLocaleDateString('en-US', {
@@ -79,7 +79,7 @@ function AllInterviews() {
                                         }
                                     </span>
 
-                                    <span className='inline-flex items-center gap-2 ml-4'>
+                                    <span className='w-full inline-flex items-center gap-2 ml-4'>
                                         <IoTimeOutline />
                                         {
                                             (() => {
@@ -96,9 +96,18 @@ function AllInterviews() {
                                         }
                                     </span>
 
-                                    <span className='inline-flex items-center gap-2 ml-4'>
+                                    <span className='w-full inline-flex items-center gap-2 ml-4'>
                                         <FaUserTie />
-                                        {interview.interviewer}
+                                        {
+                                            allUsers.length > 0 ? 
+                                            allUsers.map((value, index) => {
+                                                if(value.id == interview.interviewer){
+                                                    return(
+                                                        <div key={index}>{`${value.title} ${value.first_name} ${value.middle_name}`}</div>
+                                                    )
+                                                }
+                                            }) : "o"
+                                        }
                                     </span>
                                 </div>
 
@@ -110,4 +119,4 @@ function AllInterviews() {
     )
 }
 
-export default AllInterviews
+export default AllInterviews;

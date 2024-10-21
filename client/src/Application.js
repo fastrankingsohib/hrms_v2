@@ -17,6 +17,7 @@ import CandidateLanding from "./components/pages/Candidate/Landing";
 import JobLanding from "./components/pages/Job/Landing";
 import InterviewLayout from "./components/pages/Interview/InterviewLayout";
 import InterviewLanding from "./components/pages/Interview/Landing";
+import ViewInterview from "./components/pages/Interview/ViewInterview";
 // import AllJobPosts from "./components/pages/Job/AllJobPosts";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
@@ -42,6 +43,7 @@ const Application = () => {
                         
                         <Route path="interviews" element={<InterviewLayout />}>
                             <Route path="" element={<InterviewLanding />} />
+                            <Route path="view/:interviewId" element={<ViewInterview />} />
                         </Route>
                         
                         <Route path="candidates" element={<CandidateLayout />}></Route>
