@@ -18,6 +18,7 @@ import JobLanding from "./components/pages/Job/Landing";
 import InterviewLayout from "./components/pages/Interview/InterviewLayout";
 import InterviewLanding from "./components/pages/Interview/Landing";
 import ViewInterview from "./components/pages/Interview/ViewInterview";
+import Home from "./components/pages/Home/Home";
 // import AllJobPosts from "./components/pages/Job/AllJobPosts";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
@@ -28,6 +29,7 @@ const Application = () => {
                 <Route path="/" >
                     <Route path="/login" element={<Login />} />
                     <Route path="" element={<Layout />}>
+                        <Route path="" element={<Home />} />
                         <Route path="jobs" element={<JobsLayout />}>
                             <Route path="" element={<JobLanding />} />
                             <Route path="new-job" element={<NewJob />} />
@@ -40,12 +42,12 @@ const Application = () => {
                             <Route path="new-candidate" element={<NewCandidate />} />
                             <Route path="view/:candidate_id" element={<CandidateView />} />
                         </Route>
-                        
+
                         <Route path="interviews" element={<InterviewLayout />}>
                             <Route path="" element={<InterviewLanding />} />
                             <Route path="view/:interviewId" element={<ViewInterview />} />
                         </Route>
-                        
+
                         <Route path="candidates" element={<CandidateLayout />}></Route>
 
                         <Route path="/add-new-user" element={<NewUser />} />

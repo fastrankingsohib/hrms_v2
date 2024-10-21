@@ -12,6 +12,7 @@ import { IoMdClose } from 'react-icons/io';
 import CandidateInterviews from './CandidateInterviews';
 import CandidateComments from './CandidateComments';
 import NewInterview from './NewInterview';
+import AppliedJobs from './AppliedJobs';
 
 function CandidateView() {
     const navigate = useNavigate()
@@ -850,8 +851,7 @@ function CandidateView() {
 
                     {/* Applied Jobs */}
                     <div className={`h-full ${selectedFilter === "Applied Jobs" ? "block" : "hidden"}`}>
-                        <div className=''>
-                        </div>
+                        <AppliedJobs candidateId={candidate_id} />
                     </div>
 
 

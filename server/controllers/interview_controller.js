@@ -146,49 +146,53 @@ const update_interview = async(req,res)=>{
     }
 }
 
-const update_interview_status = async(req,res)=>{
+const update_interview_status = async (req, res) => {
     try {
-        const {candidate_id , job_id , job_candidate_status , attempted , remarks} = req.body;
-        const interview_id = parseInt(req.params.id)
-        await prisma.interview_details.update({
-            where: {
-                id:interview_id
-            },
-            data:{
-                attempted:attempted,
-                remarks:remarks
-            }
-        })
-        await prisma.candidate_applied_jobs.updateMany({
-            where:{
-                candidate_id:candidate_id,
-                job_id:job_id
-            },
-            data:{
-                job_candidate_status:job_candidate_status
-            }
-        })
-        res.status(200).send({
-            success:true,
-            message:"Interview status updated successfully"
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            success : false,
-            message : "could not update interview status"
+        const { candidate_id, job_id, job_candidate_status, attempted, remarks } = req.body;
+        const interview_id = parseInt(req.params.id);
 
-        })
-        
+       
+        // Use a transaction to ensure both updates succeed or fail together
+        await prisma.$transaction(async (prisma) => {
+            await prisma.interview_details.update({
+                where: { id: interview_id },
+                data: {
+                    attempted: attempted,
+                    remarks: remarks
+                }
+            });
+
+            await prisma.candidate_applied_jobs.updateMany({
+                where: {
+                    candidate_id: candidate_id,
+                    job_id: job_id
+                },
+                data: {
+                    job_candidate_status: job_candidate_status
+                }
+            });
+        });
+
+        res.status(200).send({
+            success: true,
+            message: "Interview status updated successfully"
+        });
+    } catch (error) {
+        console.error("Error updating interview status:", error); // More specific error logging
+        res.status(500).send({
+            success: false,
+            message: "Could not update interview status"
+        });
     }
-}
+};
+
 
 const delete_interview = async(req,res)=>{
     try {
         const interview_id = req.params.id
         await prisma.interview_details.delete({
             where:{
-                id:interview_id
+                id:parseInt(interview_id)
             }
         })
         res.status(200).send({

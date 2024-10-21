@@ -27,7 +27,7 @@ const useLogin = () => {
                     setLoginError(false);
                     setLoginLoading(false);
 
-                    Navigate('/jobs');
+                    Navigate('/');
                     
                     dispatch(
                         userLoggedIn(

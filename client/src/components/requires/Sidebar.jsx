@@ -57,7 +57,7 @@ const Sidebar = () => {
     return (
         <section className="relative h-full">
             <div className="pt-8 flex items-center justify-center">
-                <img src={logo} width={'100px'} alt="Logo" />
+                <Link to={'/'}><img src={logo} width={'100px'} alt="Logo" /></Link>
             </div>
             <h1 className="p-4 mb-8 text-xl text-center">HR Management System</h1>
 

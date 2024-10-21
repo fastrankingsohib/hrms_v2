@@ -160,7 +160,7 @@ model candidate_applied_jobs {
   id                   Int            @id @default(autoincrement())
   candidate_id         Int
   job_id               Int
-  job_candidate_status String?        @default("applied") @db.VarChar(50)
+  job_candidate_status String?        @default("Applied") @db.VarChar(50)
   created_at           DateTime       @default(now())
   updated_at           DateTime?
   candidate            candidate_list @relation(fields: [candidate_id], references: [candidate_id])
