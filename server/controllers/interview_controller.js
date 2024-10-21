@@ -202,5 +202,27 @@ const delete_interview = async(req,res)=>{
     }
 }
 
+const interview_by_id = async(req,res)=>{
+    try {
+        const id = parseInt(req.params.id);
+        const data = await prisma.interview_details.findMany({
+            where:{
+                id:id
+            }
+        })
+        res.status(200).send({
+            success:true,
+            data:data,
+            message:"data successfully sent."
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({
+            success : false,
+            message : "could not get interview details"
+        })
+    }
+}
 
-export {create_interview , all_interviews , interview_of_candidate , update_interview ,update_interview_status,delete_interview}
+
+export {create_interview , all_interviews , interview_of_candidate , update_interview ,update_interview_status,delete_interview,interview_by_id}
