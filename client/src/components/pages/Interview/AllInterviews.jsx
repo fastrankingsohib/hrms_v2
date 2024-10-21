@@ -1,12 +1,13 @@
 import axios, { all } from 'axios';
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { HiOutlineCalendarDays } from "react-icons/hi2";
 import { IoTimeOutline } from "react-icons/io5";
 import { FaUserTie } from "react-icons/fa";
 
 function AllInterviews() {
     const [allUsers, setAllUsers] = useState([])
+    let location = useLocation();
     const [allInterviews, setAllInterviews] = useState([]);
     const [allJobs, setAllJobs] = useState([]);
     useEffect(() => {
@@ -46,7 +47,7 @@ function AllInterviews() {
                 allInterviews.length > 0 ?
                     allInterviews.map((interview, index) => {
                         return (
-                            <div key={index} className='h-20 p-3 border-b transition-small hover:shadow-xl'>
+                            <div key={index} className={`h-20 p-3 border-b transition-small hover:shadow-xl ${location.pathname == `/interviews/view/${interview.id}` ? "bg-indigo-100" : "s"}`}>
                                 <h1 className='px-3 flex items-center'>
                                     <span><input type="checkbox" className='h-4 w-4' /></span>
                                     <Link to={`view/${interview.id}`} className='block -mt-1 ml-4 font-semibold hover:underline hover:text-indigo-700'>
@@ -103,7 +104,7 @@ function AllInterviews() {
                                             allUsers.map((value, index) => {
                                                 if(value.id == interview.interviewer){
                                                     return(
-                                                        <div key={index}>{`${value.title} ${value.first_name} ${value.middle_name}`}</div>
+                                                        <div key={index}>{`${value.first_name}`}</div>
                                                     )
                                                 }
                                             }) : "o"
