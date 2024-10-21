@@ -2,15 +2,17 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { resetModules } from "../redux/reducers/auth_slice";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const useRegisterUser = () => {
+    const [registerEvents, setRegisterEvents] = useState({ loading: false, success: false, error: false })
     const allModules = useSelector((state) => state.userModules);
     const loggedInUser = useSelector((state) => state.user_auth);
     const Navigate = useNavigate()
     const dispatch = useDispatch()
     const selectedModules = [];
     allModules.map((module, moduleKey) => {
-        if(module.moduleSelected){
+        if (module.moduleSelected) {
             selectedModules.push({
                 module_name: module.module_name,
                 c: module.c,
@@ -22,6 +24,7 @@ const useRegisterUser = () => {
     })
 
     const registerUser = (user) => {
+        setRegisterEvents({ loading: true, success: false, error: false })
         console.log(user);
         console.log(selectedModules);
         axios.post("/register", {
@@ -45,19 +48,24 @@ const useRegisterUser = () => {
             "reporting_to": user.reportingTo,
             "created_by": loggedInUser.username,
             "modules": selectedModules
-          }
+        }
         )
-        .then((response) => {
-            console.log(response.data);
-            dispatch(resetModules());
-            Navigate('/');
-        })
-        .catch((err) => 
-            console.log(err)
-        );
+            .then((response) => {
+                setRegisterEvents({ loading: false, success: true, error: false })
+                setTimeout(() => {
+                    setRegisterEvents({ loading: false, success: false, error: false })
+                }, 4000)
+                console.log(response.data);
+                dispatch(resetModules());
+                Navigate('/all-users');
+            })
+            .catch((err) => {
+                setRegisterEvents({ loading: false, success: false, error: true })
+                console.log(err)
+            });
     }
 
-    return { registerUser }
+    return { registerEvents, registerUser }
 }
 
 export default useRegisterUser;

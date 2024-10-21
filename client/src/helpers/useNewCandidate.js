@@ -80,7 +80,7 @@ const useNewCandidate = () => {
 
                 setTimeout(() => {
                     setSuccess(false);
-                    navigate("/my-candidates");
+                    navigate("/candidates");
                 }, 3000);
             })
             .catch((err) => {

@@ -66,7 +66,7 @@ const NewUser = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const { registerUser } = useRegisterUser();
+    const { registerEvents, registerUser } = useRegisterUser();
 
     const register = (e) => {
         e.preventDefault();
@@ -144,7 +144,7 @@ const NewUser = () => {
 
 
     return (
-        <section className="p-4 component-rendering-tranistion">
+        <section className="p-10 component-rendering-tranistion">
             <h1 className="text-2xl font-semibold">Create New User</h1>
 
             <form onSubmit={register} className="w-full mt-10">
@@ -527,10 +527,10 @@ const NewUser = () => {
                     <div className="w-1/4 pl-4 relative">
                         <button
                             className="primary-button justify-center"
-                            disabled={mobileError || submitError || warnDefault > 0} // Simplified condition
+                            disabled={mobileError || submitError || warnDefault > 0 || registerEvents.loading} // Simplified condition
                             style={{
-                                opacity: mobileError || submitError || warnDefault > 0 ? 0.8 : 1,
-                                cursor: mobileError || submitError || warnDefault > 0 ? 'not-allowed' : 'pointer'
+                                opacity: mobileError || submitError || registerEvents.loading || warnDefault > 0 ? 0.8 : 1,
+                                cursor: mobileError || submitError || registerEvents.loading || warnDefault > 0 ? 'not-allowed' : 'pointer'
                             }}
                         >
                             Create User
@@ -540,7 +540,6 @@ const NewUser = () => {
                         </span> */}
                     </div>
                 </div>
-
             </form>
         </section>
     )

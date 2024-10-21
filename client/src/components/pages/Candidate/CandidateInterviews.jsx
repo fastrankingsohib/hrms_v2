@@ -50,7 +50,7 @@ function CandidateInterviews(props) {
                     allInterview.map((value, index) => {
                         return (
                             <div className='grid grid-cols-7 hover:bg-gray-50'>
-                                <div className='p-4'>#{value.id}</div>
+                                <Link to={`/interviews/view/${value.id}`} className='p-4 hover:underline hover:text-indigo-700'>#{value.id}</Link>
                                 <div className='p-4'>
                                     { 
                                         allJobs.length > 0 ?

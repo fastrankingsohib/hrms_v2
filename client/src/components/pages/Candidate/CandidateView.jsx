@@ -588,8 +588,8 @@ function CandidateView() {
                                             disabled={!isPersonalDetailsEditing}
                                             defaultValue={candidate.title ? candidate.title : "---"}>
                                             <option value="---" disabled={true}>--- Selecte Title ---</option>
-                                            <option value="Mr">Mr</option>
-                                            <option value="Ms">Ms</option>
+                                            <option value="Mr.">Mr</option>
+                                            <option value="Ms.">Ms</option>
                                         </select>
                                     </div>
                                     <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>First Name</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.first_name} onChange={(e) => setCandidate((values) => ({ ...values, first_name: e.target.value }))} /></div>
