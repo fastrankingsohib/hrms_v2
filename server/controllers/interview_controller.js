@@ -188,7 +188,7 @@ const delete_interview = async(req,res)=>{
         const interview_id = req.params.id
         await prisma.interview_details.delete({
             where:{
-                id:interview_id
+                id:parseInt(interview_id)
             }
         })
         res.status(200).send({
