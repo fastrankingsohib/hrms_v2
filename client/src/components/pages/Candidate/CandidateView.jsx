@@ -13,6 +13,11 @@ import CandidateInterviews from './CandidateInterviews';
 import CandidateComments from './CandidateComments';
 import NewInterview from './NewInterview';
 import AppliedJobs from './AppliedJobs';
+import { MdWork } from "react-icons/md";
+import { GrStatusGoodSmall } from "react-icons/gr";
+import { VscDebugStepOut } from "react-icons/vsc";
+
+
 
 function CandidateView() {
     const navigate = useNavigate()
@@ -23,6 +28,7 @@ function CandidateView() {
     const [candidateSuccess, setCandidateSuccess] = useState(false);
     const [candidateError, setCandidateError] = useState(false);
     const [isPersonalDetailsEditing, setIsPersonalDetailsEditing] = useState(false);
+    const [experienceInYears, setExpeirenceInYears] = useState("")
     let loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
     const [alerts, setAlerts] = useState({
         delete: false,
@@ -59,17 +65,17 @@ function CandidateView() {
 
     // Fetch candidate data
     // Fetch candidate data
-    useEffect(() => {
+    const fetchCandidate = () => {
         setCandidateLoading(true);
         axios.get(`/candidate-info/${candidate_id}`)
             .then((res) => {
                 if (res.data.success) {
                     const candidateData = res.data.candidate;
-                    console.log(res.data.candidate)
                     setCandidateSuccess(true);
                     setCandidateLoading(false);
                     setCandidateError(false);
                     setCandidate(candidateData);
+                    setExpeirenceInYears(res.data.experience_in_years)
 
                     // Populate education and experience lists after data is fetched
                     setEducationList(candidateData.qualifications || []);
@@ -100,6 +106,49 @@ function CandidateView() {
                 setCandidateSuccess(false);
                 setCandidateLoading(false);
             });
+    }
+    useEffect(() => {
+        // setCandidateLoading(true);
+        // axios.get(`/candidate-info/${candidate_id}`)
+        //     .then((res) => {
+        //         if (res.data.success) {
+        //             const candidateData = res.data.candidate;
+        //             setCandidateSuccess(true);
+        //             setCandidateLoading(false);
+        //             setCandidateError(false);
+        //             setCandidate(candidateData);
+        //             setExpeirenceInYears(res.data.experience_in_years)
+
+        //             // Populate education and experience lists after data is fetched
+        //             setEducationList(candidateData.qualifications || []);
+        //             setExperienceList(candidateData.workExperiences.map((exp, index) => ({
+        //                 id_updated: index + 1,
+        //                 organisation_name: exp.organisation_name || '',
+        //                 last_designation: exp.last_designation || '',
+        //                 total_tenure: exp.total_tenure || '',
+        //                 last_drawn_salary: exp.last_drawn_salary || '',
+        //             })) || []);
+
+        //             // Convert skills string into an array
+        //             const skillsArray = candidateData.skills
+        //                 ? candidateData.skills.split(',').map(skill => skill.trim())
+        //                 : []; // If there are no skills, use an empty array
+        //             setSkills(skillsArray); // Update skills state
+
+        //             // Convert hobbies string into an array
+        //             const hobbiesArray = candidateData.hobbies
+        //                 ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
+        //                 : []; // If there are no hobbies, use an empty array
+        //             setHobbies(hobbiesArray); // Update hobbies state
+
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         setCandidateError(true);
+        //         setCandidateSuccess(false);
+        //         setCandidateLoading(false);
+        //     });
+        fetchCandidate()
     }, [candidate_id]);
 
 
@@ -205,7 +254,7 @@ function CandidateView() {
             .then((res) => {
                 setDeleteEvents({ loading: false, error: false, success: true })
                 setAlerts({ delete: false });
-                console.log(res);
+                navigate("/candidates")
 
                 setCandidateLoading(true);
                 axios.get(`/candidate-info/${candidate_id}`)
@@ -337,6 +386,7 @@ function CandidateView() {
     }, [nextRoundSelection])
     // Update Candidate Status
     const updateCandidateStatus = () => {
+        fetchCandidate()
         axios.post(`/update-candidate-status/${candidate_id}`,
             {
                 "status": candidateStatus,
@@ -385,8 +435,9 @@ function CandidateView() {
                                 <div className='inline-flex items-center justify-center h-20 w-20 bg-gray-100 rounded-full mr-4'><FaUser size={"20px"} className='text-gray-400' /></div>
                                 <div>
                                     <div className='text-xl font-bold'>{`${candidate.title} ${candidate.first_name} ${candidate.last_name}`}</div>
-                                    <div>Experience: {candidate.work_experience}</div>
-                                    <div className={`${candidate.status === "Active" ? "text-green-500" : candidate.status === "Inactive" ? "bg-orange-500" : "text-red-500"}`}>{`${candidate.status}`}</div>
+                                    <div className='flex items-center gap-2'><MdWork /> {experienceInYears}</div>
+                                    {/* <div className={`${candidate.status === "Active" ? "text-green-500" : candidate.status === "Inactive" ? "bg-orange-500" : "text-red-500"}`}>{`${candidate.status}`}</div> */}
+                                    <div className='flex items-center gap-2'><VscDebugStepOut size={"14px"} className='rotate-90' /> {`${candidate.status}`}</div>
                                 </div>
                             </div>
                         </div>
@@ -434,7 +485,7 @@ function CandidateView() {
                                         <RiListCheck3 size={"16px"} /> Shortlisted
                                     </button>
 
-                                    <button className='relative'>
+                                    {/* <button className='relative'>
                                         <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Schedule" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                             onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Schedule" }))}>
                                             <MdAccessTime size={"16px"} /> Schedule Interview
@@ -469,7 +520,7 @@ function CandidateView() {
                                                 </button>
                                             </div>
                                         </div>
-                                    </button>
+                                    </button> */}
 
                                     <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Offered" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                         onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Offered" }))}>
@@ -569,11 +620,11 @@ function CandidateView() {
 
                                 <div className='grid gap-4'>
                                     {/* Render each experience entry in edit/view mode */}
-                                    {experienceList.length > 0 ?
+                                    {experienceList.length > 0 ? (
                                         experienceList.map((experience, index) => (
                                             <div key={index} className='p-4 border mt-4 flex justify-between items-center'>
                                                 {isExperienceEditing ? (
-                                                    <>
+                                                    <div className='grid grid-cols-6'>
                                                         <input
                                                             type='text'
                                                             value={experience.organisation_name}
@@ -589,10 +640,17 @@ function CandidateView() {
                                                             className='border p-2 px-4 mr-2'
                                                         />
                                                         <input
-                                                            type='text'
-                                                            value={experience.total_tenure}
-                                                            onChange={(e) => handleExperienceInputChange(index, 'total_tenure', e.target.value)}
-                                                            placeholder='Total Tenure'
+                                                            type='number' // Change to number for easier input handling
+                                                            value={experience.total_tenure_months || ''} // Adjusted to take months
+                                                            onChange={(e) => handleExperienceInputChange(index, 'total_tenure_months', e.target.value)}
+                                                            placeholder='Total Tenure Years'
+                                                            className='border p-2 px-4 mr-2'
+                                                        />
+                                                        <input
+                                                            type='number' // Change to number for easier input handling
+                                                            value={experience.total_tenure_months || ''} // Adjusted to take months
+                                                            onChange={(e) => handleExperienceInputChange(index, 'total_tenure_months', e.target.value)}
+                                                            placeholder='Total Tenure Months'
                                                             className='border p-2 px-4 mr-2'
                                                         />
                                                         <input
@@ -602,17 +660,20 @@ function CandidateView() {
                                                             placeholder='Last Drawn Salary'
                                                             className='border p-2 px-4 mr-2'
                                                         />
-                                                        <button onClick={() => removeExperience(experience.id_updated)} className='text-red-500'>
-                                                            <MdDelete />
+                                                        <button onClick={() => removeExperience(experience.id_updated)} className='text-red-500 bg-red-100 flex items-center gap-2 justify-center'>
+                                                            <MdDelete /> Remove Experience
                                                         </button>
-                                                    </>
+                                                    </div>
                                                 ) : (
                                                     <span>
-                                                        {experience.organisation_name} - {experience.last_designation} ({experience.total_tenure}) - Last Drawn Salary: {experience.last_drawn_salary}
+                                                        {experience.organisation_name} - {experience.last_designation} ({experience.total_tenure_months} months) - Last Drawn Salary: {experience.last_drawn_salary}
                                                     </span>
                                                 )}
                                             </div>
-                                        )) : ""}
+                                        ))
+                                    ) : (
+                                        <div>No Experience Added</div>
+                                    )}
 
                                     <div>
                                         {isExperienceEditing && (
@@ -629,6 +690,7 @@ function CandidateView() {
                                         </button>
                                     </div>
                                 </div>
+
 
 
                                 {/* Educations And Qualifications Records Editing */}
@@ -680,7 +742,7 @@ function CandidateView() {
                                                         <span>{education.college_university} - {education.course} ({education.year_of_passing}) - Grade: {education.percentage_cgpa}</span>
                                                     )}
                                                 </div>
-                                            )) : ""}
+                                            )) : "No Education"}
                                     </div>
 
                                     {isEducationEditing && (

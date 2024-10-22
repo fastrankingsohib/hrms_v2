@@ -12,6 +12,7 @@ function AllCandidates(props) {
     const [loading, setLoading] = useState(false); // Loading state
     const [dropDown, setDropDown] = useState(false);
     const user = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
+    const [candidateExperience, setCandidateExperience] = useState(0)
 
     // Handle button click to toggle dropdown
     const handleButtonClick = (e) => {
@@ -28,6 +29,7 @@ function AllCandidates(props) {
             )
                 .then((res) => {
                     setAllCandidates(res.data.candidates);
+
                 })
                 .catch((err) => {
                     console.log(err);
@@ -42,6 +44,36 @@ function AllCandidates(props) {
             axios.get("/all-candidates")
                 .then((res) => {
                     setAllCandidates(res.data.candidates);
+                    const experience = res.data.candidates.workExperience
+                    let experienceYears = 0
+                    experience.length > 0 ?
+                    experience.map((candidateExp, index) => {
+                        return experienceYears += candidateExp.total_tenure;
+                    }) : experienceYears = 0
+                    setCandidateExperience(experienceYears)
+
+                    let candidate_experience = []
+                    if (res.data.candidates.length > 0) {
+                        console.log(res.data.candidates)
+                        // res.data.candidates.map((value, index) => {
+                        //     console.log("Candidate ----")
+                        //     console.log(value)
+                        //     let candidate_id = value.candidate_id
+                        //     let total_experience = 0;
+
+                        //     if (value.workExperiences.length > 0) {
+                        //         return (
+                        //             value.workExperiences.map((experience, index) => {
+                        //                 // console.log(Number(experience.total_tenure))
+                        //                 return total_experience += Number(experience.total_tenure)
+                        //             })
+                        //         )
+                        //     }
+
+                        //     candidate_experience.push({candidateId: candidate_id, experience: total_experience})
+                        // })
+                        // setCandidateExperience(candidate_experience)
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -76,7 +108,7 @@ function AllCandidates(props) {
                                     </NavLink>
                                     <div className='mt-1'>
                                         <span className='inline-flex items-center gap-2 w-40'><MdCall /> {value.contact_number}</span>
-                                        <span className='inline-flex items-center gap-2'><MdWorkOutline /> 10 Yrs. Experience</span>
+                                        <span className='inline-flex items-center gap-2'><MdWorkOutline /> {value.experience_in_years}</span>
                                     </div>
                                 </div>
 

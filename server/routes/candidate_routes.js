@@ -4,12 +4,7 @@ import {
   all_candidates,
   candidate_applied_based_jobs,
   delete_candidate,
-  id_based_count_all_applicants,
-  id_based_count_rejected_candidates,
-  id_based_count_shortlisted_applicants,
   id_based_jobs_applicants,
-  id_based_jobs_applicants_rejected,
-  id_based_jobs_applicants_shortlisted,
   module_data,
   my_candidates,
   reporting_to_users,
@@ -59,28 +54,29 @@ const storage = multer.diskStorage({
   }
 });
 
+// Configure Multer to accept multiple files for each field, files are optional
 const upload = multer({
   storage: storage
 }).fields([{
     name: 'candidate_image',
     maxCount: 5
-  }, 
+  }, // Optional
   {
     name: 'candidate_aadhar',
     maxCount: 5
-  }, 
+  }, // Optional
   {
     name: 'candidate_pan',
     maxCount: 5
-  },
+  }, // Optional
   {
     name: 'candidate_highest_qualification',
     maxCount: 5
-  },
+  }, // Optional
   {
     name: 'candidate_resume',
     maxCount: 5
-  }
+  } // Optional
 ]);
 
 // Error handling middleware for Multer
@@ -109,12 +105,8 @@ router.get('/candidate-info/:id', authenticateToken, send_data_by_id);
 router.post('/update-candidate/:id', authenticateToken, update_candidate);
 router.get("/all-modules", module_data);
 router.get('/job_applicants/:id', authenticateToken, id_based_jobs_applicants);
-router.get('/applicants_number_job/:id',authenticateToken,id_based_count_all_applicants);
-router.get('/shortlisted_job_candidates/:id',authenticateToken,id_based_count_shortlisted_applicants);
-router.get('/rejected_job_candidates/:id',authenticateToken,id_based_count_rejected_candidates)
-router.get('/job_applicants_shortlisted/:id', authenticateToken, id_based_jobs_applicants_shortlisted);
-router.get('/job_applicants_rejected/:id', authenticateToken, id_based_jobs_applicants_rejected);
-
-
+router.get('/applicants-applied-jobs/:id', authenticateToken, candidate_applied_based_jobs);
+router.post('/update-candidate-status/:id', authenticateToken, update_candidate_status);
+router.post('/specific-job-status-update/:job_id/:candidate_id', authenticateToken, specific_job_status_update);
 
 export default router;
