@@ -267,10 +267,10 @@ function CandidateView() {
 
     useEffect(() => {
         if (newInterviewDetails.job !== "null" && newInterviewDetails.interviewer !== "null" && newInterviewDetails.date && newInterviewDetails.time) {
-            setPersmissions((values) => ({ ...values, createInterview: true}))
+            setPersmissions((values) => ({ ...values, createInterview: true }))
         }
-        else(
-            setPersmissions((values) => ({ ...values, createInterview: false}))
+        else (
+            setPersmissions((values) => ({ ...values, createInterview: false }))
         )
     }, [newInterviewDetails])
 
@@ -397,7 +397,7 @@ function CandidateView() {
                             <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
                             <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
                             <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Comments" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Comments")}>Comments</button>
-                            <div className={`relative z-40`} >
+                            <div className={`relative`} >
                                 <span
                                     onClick={() => {
                                         if (nextRoundSelection.value !== "New Interview") {
@@ -408,59 +408,6 @@ function CandidateView() {
                                         }
                                     }}
                                     className='cursor-pointer inline-block p-2.5 px-5 rounded-lg min-w-40 bg-black text-white'>Schedule Interview</span>
-                                <div
-                                    className={`z-40 ${nextRoundSelection.value === "New Interview" ? "block" : "hidden"} absolute top-16 right-0 min-h-96 w-80 p-4 bg-white border shadow-2xl text-black cursor-default`}>
-                                    <label className='block text-left'>Interview Date</label>
-                                    <input
-                                        required={true}
-                                        onChange={(e) => setNewInterviewDetails((values) => ({ ...values, date: e.target.value }))}
-                                        className='block text-left border w-full  mt-2 p-2.5 bg-gray-50' type="date" />
-                                    <br />
-                                    <label className='block text-left'>Interview Time</label>
-                                    <input
-                                        required={true}
-                                        onChange={(e) => setNewInterviewDetails((values) => ({ ...values, time: e.target.value }))}
-                                        className='block text-left border w-full mt-2 p-2.5 bg-gray-50' type="time" />
-                                    <br />
-                                    <label className='block text-left'>Interviewer</label>
-                                    <select defaultValue={"---"}
-                                        onChange={(e) => setNewInterviewDetails((values) => ({ ...values, interviewer: e.target.value }))}
-                                        className='block text-left border w-full mt-2 p-2.5 bg-gray-50'>
-                                        <option value={"---"} disabled={true}>--- Select Interviewer ---</option>
-                                        {
-                                            allUsers.length > 0 ?
-                                                allUsers.map((value, key) => {
-                                                    return (
-                                                        <option value={value.id} key={key}>{`${value.title} ${value.first_name} ${value.middle_name} ${value.last_name}`}</option>
-                                                    )
-                                                }) : <option value={"null"}>No User Found!</option>
-                                        }
-                                    </select>
-                                    <br />
-                                    <label className='block text-left'>Select Job For Interview</label>
-                                    <select defaultValue={"---"}
-                                        onChange={(e) => setNewInterviewDetails((values) => ({ ...values, job: e.target.value }))}
-                                        className='block text-left border w-full mt-2 p-2.5 bg-gray-50'>
-                                        <option value="---" disabled={true}>--- Select Interviewer ---</option>
-                                        {
-                                            candidate.candidate_applied_jobs.length > 0 ?
-                                                candidate.candidate_applied_jobs.map((value, key) => {
-                                                    return (
-                                                        <option value={value.job_id} key={key}>{value.job.job_title}</option>
-                                                    )
-                                                }) : <option value={"null"}>No Applied Jobs Found!</option>
-                                        }
-                                    </select>
-                                    <br />
-                                    <button onClick={scheduleInterview} className={`p-2.5 bg-indigo-700 text-white w-full rounded-md`}
-                                        disabled={newInterviewDetails.loading ? true : newInterviewDetails.success ? true : !permissions.createInterview ? true : false}
-                                        style={{
-                                            opacity: newInterviewDetails.loading ? 0.9 : newInterviewDetails.success ? 0.9 : !permissions.createInterview ? 0.5 : 1,
-                                            cursor: newInterviewDetails.loading ? "not-allowed" : newInterviewDetails.success ? "not-allowed" : !permissions.createInterview ? "not-allowed" : "",
-                                            backgroundColor: newInterviewDetails.loading ? "" : newInterviewDetails.success ? "green" : newInterviewDetails.error ? "red" : "",
-                                        }}
-                                    >{newInterviewDetails.loading ? "Scheduling" : newInterviewDetails.success ? "Interview Scheduled" : newInterviewDetails.error ? "Error! Try Again" : "Schedule Interview"}</button>
-                                </div>
                             </div>
 
                             <div className={`p-2.5 relative`}>
@@ -588,8 +535,8 @@ function CandidateView() {
                                             disabled={!isPersonalDetailsEditing}
                                             defaultValue={candidate.title ? candidate.title : "---"}>
                                             <option value="---" disabled={true}>--- Selecte Title ---</option>
-                                            <option value="Mr.">Mr</option>
-                                            <option value="Ms.">Ms</option>
+                                            <option value="Mr.">Mr.</option>
+                                            <option value="Ms.">Ms.</option>
                                         </select>
                                     </div>
                                     <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>First Name</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.first_name} onChange={(e) => setCandidate((values) => ({ ...values, first_name: e.target.value }))} /></div>
@@ -865,6 +812,71 @@ function CandidateView() {
                     {/* Comments */}
                     <div className={`${selectedFilter === "Comments" ? "block" : "hidden"}`}>
                         <CandidateComments candidateId={candidate_id} />
+                    </div>
+
+
+
+
+
+                    {/* Set Interview */}
+                    <div className={`fixed flex justify-center items-center h-full w-full z-[101] backdrop-blur-sm left-0 top-0 ${nextRoundSelection.value === "New Interview" ? "block" : "hidden"}`}>
+                        <div
+                            className={`min-h-96 w-80 p-4 bg-white border shadow-2xl text-black cursor-default`}>
+                            <label className='block text-left'>Interview Date</label>
+                            <input
+                                required={true}
+                                onChange={(e) => setNewInterviewDetails((values) => ({ ...values, date: e.target.value }))}
+                                className='block text-left border w-full  mt-2 p-2.5 bg-gray-50' type="date" />
+                            <br />
+                            <label className='block text-left'>Interview Time</label>
+                            <input
+                                required={true}
+                                onChange={(e) => setNewInterviewDetails((values) => ({ ...values, time: e.target.value }))}
+                                className='block text-left border w-full mt-2 p-2.5 bg-gray-50' type="time" />
+                            <br />
+                            <label className='block text-left'>Interviewer</label>
+                            <select defaultValue={"---"}
+                                onChange={(e) => setNewInterviewDetails((values) => ({ ...values, interviewer: e.target.value }))}
+                                className='block text-left border w-full mt-2 p-2.5 bg-gray-50'>
+                                <option value={"---"} disabled={true}>--- Select Interviewer ---</option>
+                                {
+                                    allUsers.length > 0 ?
+                                        allUsers.map((value, key) => {
+                                            return (
+                                                <option value={value.id} key={key}>{`${value.title} ${value.first_name} ${value.middle_name} ${value.last_name}`}</option>
+                                            )
+                                        }) : <option value={"null"}>No User Found!</option>
+                                }
+                            </select>
+                            <br />
+                            <label className='block text-left'>Select Job For Interview</label>
+                            <select defaultValue={"---"}
+                                onChange={(e) => setNewInterviewDetails((values) => ({ ...values, job: e.target.value }))}
+                                className='block text-left border w-full mt-2 p-2.5 bg-gray-50'>
+                                <option value="---" disabled={true}>--- Select Interviewer ---</option>
+                                {
+                                    candidate.candidate_applied_jobs.length > 0 ?
+                                        candidate.candidate_applied_jobs.map((value, key) => {
+                                            return (
+                                                <option value={value.job_id} key={key}>{value.job.job_title}</option>
+                                            )
+                                        }) : <option value={"null"}>No Applied Jobs Found!</option>
+                                }
+                            </select>
+                            <br />
+
+                            <div className='flex gap-4'>
+                                <button className='min-w-[30%] px-5 rounded-md bg-gray-100' onClick={() => setNextRoundSelection((values) => ({ ...values, value: "", checked: false }))}>Cancel</button>
+                                <button onClick={scheduleInterview} className={`min-w-[60%] p-2.5 bg-indigo-700 text-white w-full rounded-md`}
+                                    disabled={newInterviewDetails.loading ? true : newInterviewDetails.success ? true : !permissions.createInterview ? true : false}
+                                    style={{
+                                        opacity: newInterviewDetails.loading ? 0.9 : newInterviewDetails.success ? 0.9 : !permissions.createInterview ? 0.5 : 1,
+                                        cursor: newInterviewDetails.loading ? "not-allowed" : newInterviewDetails.success ? "not-allowed" : !permissions.createInterview ? "not-allowed" : "",
+                                        backgroundColor: newInterviewDetails.loading ? "" : newInterviewDetails.success ? "green" : newInterviewDetails.error ? "red" : "",
+                                    }}
+                                >{newInterviewDetails.loading ? "Scheduling" : newInterviewDetails.success ? "Interview Scheduled" : newInterviewDetails.error ? "Error! Try Again" : "Schedule Interview"}</button>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
