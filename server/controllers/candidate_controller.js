@@ -126,11 +126,11 @@ const add_candidate = async (req, res) => {
         other3,
         status,
         created_by,
-        candidate_image,
-        candidate_resume,
-        candidate_aadhar,
-        candidate_pan,
-        candidate_highest_qualification,
+        candidate_image, // Nullable field
+        candidate_resume, // Nullable field
+        candidate_aadhar, // Nullable field
+        candidate_pan, // Nullable field
+        candidate_highest_qualification, // Nullable field
         work_tenure,
       },
     });
@@ -265,18 +265,10 @@ const all_candidates = async (req, res) => {
 
 const my_candidates = async (req, res) => {
   try {
-    const { created_by } = req.body; 
-
-    if (!created_by) {
-      return res.status(400).json({
-        message: "'created_by' field is required",
-        success: false,
-      });
-    }
-
     const candidates = await prisma.candidate_list.findMany({
       where: {
-        created_by: created_by,  
+        created_by : 'Sohib'
+
       },
       include: {
         workExperiences: true,
@@ -600,105 +592,5 @@ const id_based_jobs_applicants = async(req,res) =>{
   }
 }
 
-const candidate_applied_based_jobs = async(req,res) =>{
-  try {
-    const candidate_id = req.params.id;
-    const data = await prisma.candidate_applied_jobs.findMany({
-      where: {
-        candidate_id: Number(candidate_id),
-      },
-      include: {
-        job: true,
-      },
-    });
-  res.status(200).send({
-    success: true,
-    message: "job applicants successfully sent",
-    data:data
-  })    
-  } catch (error) {
-    console.log(error)
-    res.status(500).send({
-      success:false,
-      message:"cannot fetch applicants data"
-    })
-  }
-}
 
-const update_candidate_status = async (req, res) => {
-  const candidateId = parseInt(req.params.id);
-
-  try {
-    const { status, current_status } = req.body;
-    await prisma.candidate_list.update({
-      where: {
-        candidate_id: candidateId, // Specify the candidate by ID
-      },
-      data: {
-        status,
-        current_status,
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Candidate status and current status updated successfully.",
-      candidate_id: candidateId,
-    });
-  } catch (error) {
-    console.error(error); // Log any errors
-
-    return res.status(500).json({
-      success: false,
-      message: "Error occurred while updating candidate status.",
-    });
-  }
-};
-
-const specific_job_status_update = async (req, res) => {
-  const jobId = parseInt(req.params.job_id); 
-  const candidateId = parseInt(req.params.candidate_id);
-
-  try {
-    const { job_candidate_status } = req.body;
-    if (!job_candidate_status) {
-      return res.status(400).json({
-        success: false,
-        message: "Job candidate status is required.",
-      });
-    }
-
-    const updatedRecord = await prisma.candidate_applied_jobs.updateMany({
-      where: {
-        job_id: jobId,
-        candidate_id: candidateId,
-      },
-      data: {
-        job_candidate_status: job_candidate_status, 
-      },
-    });
-
-    if (updatedRecord.count === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No matching job and candidate found.",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Job candidate status updated successfully.",
-    });
-
-  } catch (error) {
-    console.error(error); 
-
-    return res.status(500).json({
-      success: false,
-      message: "An error occurred while updating job candidate status.",
-    });
-  }
-};
-
-
-export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update, candidate_applied_based_jobs}
+export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants}
