@@ -44,36 +44,50 @@ function AllCandidates(props) {
             axios.get("/all-candidates")
                 .then((res) => {
                     setAllCandidates(res.data.candidates);
+                    if (res.data.candidates.length > 0) {
+                        let candidate_experience = []
+                        console.log("Value is Greater then 0");
+                        res.data.candidates.map((value, index) => {
+                            let months = 0;
+                            return (
+                                value.workExperiences.length > 0 ?
+                                
+                                value.workExperiences.map((workExperience, index) => {
+                                    console.log(workExperience);
+                                    months += Number(workExperience.total_tenure_months);
+                                    console.log(months)
+                                }) : "No Experience"
+                            )
+                        })
+                    }
                     const experience = res.data.candidates.workExperience
                     let experienceYears = 0
                     experience.length > 0 ?
-                    experience.map((candidateExp, index) => {
-                        return experienceYears += candidateExp.total_tenure;
-                    }) : experienceYears = 0
+                        experience.map((candidateExp, index) => {
+                            return experienceYears += candidateExp.total_tenure;
+                        }) : experienceYears = 0
                     setCandidateExperience(experienceYears)
 
-                    let candidate_experience = []
-                    if (res.data.candidates.length > 0) {
-                        console.log(res.data.candidates)
-                        // res.data.candidates.map((value, index) => {
-                        //     console.log("Candidate ----")
-                        //     console.log(value)
-                        //     let candidate_id = value.candidate_id
-                        //     let total_experience = 0;
+                    // if (res.data.candidates > 0) {
+                    //     // res.data.candidates.map((value, index) => {
+                    //     //     console.log("Candidate ----")
+                    //     //     console.log(value)
+                    //     //     let candidate_id = value.candidate_id
+                    //     //     let total_experience = 0;
 
-                        //     if (value.workExperiences.length > 0) {
-                        //         return (
-                        //             value.workExperiences.map((experience, index) => {
-                        //                 // console.log(Number(experience.total_tenure))
-                        //                 return total_experience += Number(experience.total_tenure)
-                        //             })
-                        //         )
-                        //     }
+                    //     //     if (value.workExperiences.length > 0) {
+                    //     //         return (
+                    //     //             value.workExperiences.map((experience, index) => {
+                    //     //                 // console.log(Number(experience.total_tenure))
+                    //     //                 return total_experience += Number(experience.total_tenure)
+                    //     //             })
+                    //     //         )
+                    //     //     }
 
-                        //     candidate_experience.push({candidateId: candidate_id, experience: total_experience})
-                        // })
-                        // setCandidateExperience(candidate_experience)
-                    }
+                    //     //     candidate_experience.push({candidateId: candidate_id, experience: total_experience})
+                    //     // })
+                    //     // setCandidateExperience(candidate_experience)
+                    // }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -98,7 +112,7 @@ function AllCandidates(props) {
                     // If not loading, show candidate list or a message if empty
                     allCandidates.length > 0 ? (
                         allCandidates.map((value, index) => (
-                            <div className={`relative flex p-2 h-20 border-b transition-small ${location.pathname == `/candidates/view/${value.candidate_id}` ? "bg-indigo-100" : "hover:shadow-xl hover:bg-gray-50"}`}>
+                            <div key={index} className={`relative flex p-2 h-20 border-b transition-small ${location.pathname == `/candidates/view/${value.candidate_id}` ? "bg-indigo-100" : "hover:shadow-xl hover:bg-gray-50"}`}>
                                 <div className='min-w-12 flex justify-center items-center -mt-6 -ml-2'>
                                     <input type="checkbox" />
                                 </div>

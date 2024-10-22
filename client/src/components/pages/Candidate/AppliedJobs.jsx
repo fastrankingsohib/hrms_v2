@@ -27,7 +27,7 @@ function AppliedJobs(props) {
                 appliedJobs.length > 0 ?
                     appliedJobs.map((value, index) => {
                         return (
-                            <div className='grid grid-cols-4 hover:bg-gray-50'>
+                            <div key={index} className='grid grid-cols-4 hover:bg-gray-50'>
                                 <div className='p-4'>#{value.job.id}</div>
                                 <div className='p-4'>{value.job.job_title}</div>
                                 <div className='p-4'>

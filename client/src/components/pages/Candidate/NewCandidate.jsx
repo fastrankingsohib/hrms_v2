@@ -111,69 +111,73 @@ const NewCandidate = () => {
 
 
 
+    // Initial experience field structure
     const initialExperienceField = {
         organisation_name: "",
-        total_tenure: "", // This will store the total tenure in months
+        total_tenure_years: "",
+        total_tenure_months: "",
         last_designation: "",
-        last_drawn_salary: ""
+        last_drawn_salary: "",
+        // total_tenure: "", // This will hold the total tenure in months
     };
-
 
     const [experienceFields, setExperienceFields] = useState([initialExperienceField]);
     const [isExperienced, setIsExperienced] = useState(false);
-    useEffect(() => {
-        let totalExperience = 0;
-        if (experienceFields.length > 0) {
-            experienceFields.map((value, index) => {
-                // console.log(value.total_tenure)
-                totalExperience = + value.total_tenure;
-            })
-            setCandidate((values) => ({ ...values, work_tenure: totalExperience }));
-        }
-        console.log(totalExperience)
-    }, [experienceFields])
 
-    const addExperienceField = () => {
-        setExperienceFields([...experienceFields, initialExperienceField]);
-    };
-
+    // Function to handle experience fields input change
     const handleInputChange = (index, event) => {
-        const values = [...experienceFields]; // Create a shallow copy of the experience fields
+        const values = [...experienceFields]; // Shallow copy of the experience fields
         values[index] = {
             ...values[index], // Copy the existing experience object
-            [event.target.name]: event.target.value // Update only the specific field
+            [event.target.name]: event.target.value, // Update the specific field
         };
 
         // Calculate total tenure in months
         const years = parseInt(values[index].total_tenure_years) || 0; // Default to 0 if NaN
         const months = parseInt(values[index].total_tenure_months) || 0; // Default to 0 if NaN
-        values[index].total_tenure = String((years * 12) + months); // Calculate total tenure in months
+        values[index].total_tenure = String((years * 12) + months); // Store total tenure in months
+        values[index].total_tenure_years = String(years); // Store total tenure in Years
+        values[index].total_tenure_months = String(months); // Store total tenure Months
 
-        setExperienceFields(values);
+        setExperienceFields(values); // Update state
     };
 
+    // Function to add more experience fields
+    const addExperienceField = () => {
+        setExperienceFields([...experienceFields, initialExperienceField]); // Add new field
+    };
+
+    // Function to remove an experience field
     const removeExperienceField = (index) => {
         if (experienceFields.length > 1) {
             const values = [...experienceFields];
-            values.splice(index, 1);
+            values.splice(index, 1); // Remove the field at the given index
             setExperienceFields(values);
         }
     };
 
+    // Function to handle experience level (experienced or fresher)
     const handleExperienceChange = (event) => {
         const selectedValue = event.target.value;
         setIsExperienced(selectedValue === "experienced");
 
-        // Log the current experience fields before any potential changes
-        console.log("Current Experience Fields: ", experienceFields);
-
-        // Reset experience fields when "Fresher" is selected
         if (selectedValue === "fresher") {
-            setExperienceFields([initialExperienceField]); // Reset to initial field
+            setExperienceFields([initialExperienceField]); // Reset to one field for fresher
         } else if (selectedValue === "experienced" && experienceFields.length === 0) {
-            setExperienceFields([initialExperienceField]); // Initialize with one empty field
+            setExperienceFields([initialExperienceField]); // Initialize for experienced if no fields
         }
     };
+
+    // Effect to calculate total tenure and update candidate state
+    useEffect(() => {
+        let totalExperience = 0;
+        experienceFields.forEach((value) => {
+            totalExperience += parseInt(value.total_tenure) || 0;
+        });
+        console.log("Total Experience in months:", totalExperience);
+        // Update candidate's work tenure if needed
+        // setCandidate((values) => ({ ...values, work_tenure: totalExperience }));
+    }, [experienceFields]);
 
 
 
@@ -711,95 +715,137 @@ const NewCandidate = () => {
                         </select>
                     </div>
 
-                    {isExperienced && (
-                        <>
-                            {experienceFields.map((experienceField, index) => (
-                                <div key={index} className="grid grid-cols-5 gap-4 mb-5 pb-10 border-b relative">
-                                    <div>
-                                        <label htmlFor={`organisation_name-${index}`} className="font-semibold inline-block p-4 pl-0">Organisation Name</label>
-                                        <input
-                                            type="text"
-                                            className="primary-input"
-                                            placeholder="Organisation Name"
-                                            name="organisation_name"
-                                            id={`organisation_name-${index}`}
-                                            value={experienceField.organisation_name}
-                                            onChange={event => handleInputChange(index, event)}
-                                        />
-                                    </div>
+                    <div>
+                        {/* Experience Selection (Experienced/Fresher) */}
+                        <div>
+                            <label className="font-semibold inline-block mb-2">Experience</label>
+                            <select
+                                name="experience"
+                                className="primary-select"
+                                onChange={handleExperienceChange}
+                            >
+                                <option value="fresher">Fresher</option>
+                                <option value="experienced">Experienced</option>
+                            </select>
+                        </div>
 
-                                    <div>
-                                        <label htmlFor={`total_tenure_years-${index}`} className="font-semibold inline-block p-4 pl-0">Total Tenure - in Years</label>
-                                        <input
-                                            type="number"
-                                            className="primary-input"
-                                            placeholder="Total Tenure - Years"
-                                            name="total_tenure_years"
-                                            id={`total_tenure_years-${index}`}
-                                            onChange={event => handleInputChange(index, event)} // Call handleInputChange to update total tenure
-                                        />
-                                    </div>
+                        {isExperienced && (
+                            <>
+                                {experienceFields.map((experienceField, index) => (
+                                    <div key={index} className="grid grid-cols-5 gap-4 mb-5 pb-10 border-b relative">
+                                        <div>
+                                            <label
+                                                htmlFor={`organisation_name-${index}`}
+                                                className="font-semibold inline-block p-4 pl-0"
+                                            >
+                                                Organisation Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="primary-input"
+                                                placeholder="Organisation Name"
+                                                name="organisation_name"
+                                                id={`organisation_name-${index}`}
+                                                value={experienceField.organisation_name}
+                                                onChange={(event) => handleInputChange(index, event)}
+                                            />
+                                        </div>
 
-                                    <div>
-                                        <label htmlFor={`total_tenure_months-${index}`} className="font-semibold inline-block p-4 pl-0">Total Tenure - in Months</label>
-                                        <input
-                                            type="number"
-                                            className="primary-input"
-                                            placeholder="Total Tenure - Months"
-                                            name="total_tenure_months"
-                                            id={`total_tenure_months-${index}`}
-                                            onChange={event => handleInputChange(index, event)} // Call handleInputChange to update total tenure
-                                        />
-                                    </div>
+                                        <div>
+                                            <label
+                                                htmlFor={`total_tenure_years-${index}`}
+                                                className="font-semibold inline-block p-4 pl-0"
+                                            >
+                                                Total Tenure - Years
+                                            </label>
+                                            <input
+                                                type="number"
+                                                className="primary-input"
+                                                placeholder="Total Tenure - Years"
+                                                name="total_tenure_years"
+                                                id={`total_tenure_years-${index}`}
+                                                value={experienceField.total_tenure_years}
+                                                onChange={(event) => handleInputChange(index, event)}
+                                            />
+                                        </div>
 
-                                    <div>
-                                        <label htmlFor={`last_designation-${index}`} className="font-semibold inline-block p-4 pl-0">Last Designation</label>
-                                        <input
-                                            type="text"
-                                            className="primary-input"
-                                            placeholder="Last Designation"
-                                            name="last_designation"
-                                            id={`last_designation-${index}`}
-                                            value={experienceField.last_designation}
-                                            onChange={event => handleInputChange(index, event)}
-                                        />
-                                    </div>
+                                        <div>
+                                            <label
+                                                htmlFor={`total_tenure_months-${index}`}
+                                                className="font-semibold inline-block p-4 pl-0"
+                                            >
+                                                Total Tenure - Months
+                                            </label>
+                                            <input
+                                                type="number"
+                                                className="primary-input"
+                                                placeholder="Total Tenure - Months"
+                                                name="total_tenure_months"
+                                                id={`total_tenure_months-${index}`}
+                                                value={experienceField.total_tenure_months}
+                                                onChange={(event) => handleInputChange(index, event)}
+                                            />
+                                        </div>
 
-                                    <div>
-                                        <label htmlFor={`last_drawn_salary-${index}`} className="font-semibold inline-block p-4 pl-0">Last Drawn Salary</label>
-                                        <input
-                                            type="text"
-                                            className="primary-input"
-                                            placeholder="Last Drawn Salary"
-                                            name="last_drawn_salary"
-                                            id={`last_drawn_salary-${index}`}
-                                            value={experienceField.last_drawn_salary}
-                                            onChange={event => handleInputChange(index, event)}
-                                        />
-                                    </div>
+                                        <div>
+                                            <label
+                                                htmlFor={`last_designation-${index}`}
+                                                className="font-semibold inline-block p-4 pl-0"
+                                            >
+                                                Last Designation
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="primary-input"
+                                                placeholder="Last Designation"
+                                                name="last_designation"
+                                                id={`last_designation-${index}`}
+                                                value={experienceField.last_designation}
+                                                onChange={(event) => handleInputChange(index, event)}
+                                            />
+                                        </div>
 
+                                        <div>
+                                            <label
+                                                htmlFor={`last_drawn_salary-${index}`}
+                                                className="font-semibold inline-block p-4 pl-0"
+                                            >
+                                                Last Drawn Salary
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="primary-input"
+                                                placeholder="Last Drawn Salary"
+                                                name="last_drawn_salary"
+                                                id={`last_drawn_salary-${index}`}
+                                                value={experienceField.last_drawn_salary}
+                                                onChange={(event) => handleInputChange(index, event)}
+                                            />
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            className={`absolute top-0 right-0 mt-4 mr-4 text-red-600 ${experienceFields.length === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                                            onClick={() => removeExperienceField(index)}
+                                            disabled={experienceFields.length === 1}
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                ))}
+
+                                <div className="w-1/4 flex justify-start pr-3">
                                     <button
                                         type="button"
-                                        className={`absolute top-0 right-0 mt-4 mr-4 text-red-600 ${experienceFields.length === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
-                                        onClick={() => removeExperienceField(index)}
-                                        disabled={experienceFields.length === 1}
+                                        className="primary-button justify-center"
+                                        onClick={addExperienceField}
                                     >
-                                        Remove
+                                        Add More
                                     </button>
                                 </div>
-                            ))}
-
-                            <div className="w-1/4 flex justify-start pr-3">
-                                <button
-                                    type="button"
-                                    className="primary-button justify-center"
-                                    onClick={addExperienceField}
-                                >
-                                    Add More
-                                </button>
-                            </div>
-                        </>
-                    )}
+                            </>
+                        )}
+                    </div>
                 </div>
 
 

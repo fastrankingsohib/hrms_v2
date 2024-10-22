@@ -133,15 +133,16 @@ model candidate_list {
 }
 
 model work_experience {
-  exp_id            Int            @id @default(autoincrement())
-  candidate_id      Int
-  organisation_name String         @db.VarChar(255)
-  total_tenure      String?        @db.VarChar(50)
-  last_designation  String?        @db.VarChar(100)
-  last_drawn_salary String?        @db.VarChar(50)
-  created_at        DateTime       @default(now())
-  updated_at        DateTime       @updatedAt
-  candidate         candidate_list @relation("CandidateWorkExperience", fields: [candidate_id], references: [candidate_id])
+  exp_id              Int            @id @default(autoincrement())
+  candidate_id        Int
+  organisation_name   String         @db.VarChar(255)
+  total_tenure_years  String?        @db.VarChar(50)
+  total_tenure_months String?        @db.VarChar(50)
+  last_designation    String?        @db.VarChar(100)
+  last_drawn_salary   String?        @db.VarChar(50)
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+  candidate           candidate_list @relation("CandidateWorkExperience", fields: [candidate_id], references: [candidate_id])
 }
 
 model qualifications {

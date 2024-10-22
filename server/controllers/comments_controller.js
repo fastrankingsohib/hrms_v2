@@ -64,7 +64,7 @@ try {
  catch (error) {
     console.log(error)
     res.status(200).send({
-        success:true,
+        success:false,
         message:"cannot delete comment"
     })
     

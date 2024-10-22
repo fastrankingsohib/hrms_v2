@@ -145,7 +145,8 @@ const add_candidate = async (req, res) => {
       const experienceData = experiences.map((exp) => ({
         candidate_id: candidate_id,
         organisation_name: exp.organisation_name,
-        total_tenure: exp.total_tenure || null,
+        total_tenure_years: exp.total_tenure_years || null,
+        total_tenure_months: exp.total_tenure_months || null,
         last_designation: exp.last_designation || null,
         last_drawn_salary: exp.last_drawn_salary || null,
       }));
@@ -494,7 +495,8 @@ await prisma.candidate_list.update({
       const experienceData = experiences.map((exp) => ({
         candidate_id: candidateId,
         organisation_name: exp.organisation_name,
-        total_tenure: exp.total_tenure || null,
+        total_tenure_years: exp.total_tenure_years || null,
+        total_tenure_months: exp.total_tenure_months || null,
         last_designation: exp.last_designation || null,
         last_drawn_salary: exp.last_drawn_salary || null,
       }));

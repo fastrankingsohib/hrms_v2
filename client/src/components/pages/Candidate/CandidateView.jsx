@@ -648,7 +648,7 @@ function CandidateView() {
                                                         />
                                                         <input
                                                             type='number' // Change to number for easier input handling
-                                                            value={experience.total_tenure_months || ''} // Adjusted to take months
+                                                            value={experience.total_tenure_years || ''} // Adjusted to take months
                                                             onChange={(e) => handleExperienceInputChange(index, 'total_tenure_months', e.target.value)}
                                                             placeholder='Total Tenure Months'
                                                             className='border p-2 px-4 mr-2'
