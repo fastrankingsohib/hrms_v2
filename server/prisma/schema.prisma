@@ -126,10 +126,10 @@ model candidate_list {
   candidate_pan                   String?
   work_tenure                     String?                  @db.VarChar(100)
   candidate_applied_jobs          candidate_applied_jobs[]
+  comments                        comments[]
   interview_details               interview_details[]
   qualifications                  qualifications[]         @relation("CandidateQualifications")
   workExperiences                 work_experience[]        @relation("CandidateWorkExperience")
-  comments                        comments[]
 }
 
 model work_experience {
@@ -157,14 +157,14 @@ model qualifications {
 }
 
 model candidate_applied_jobs {
-  id           Int            @id @default(autoincrement())
-  candidate_id Int
-  job_id       Int
-  job_status   String?        @default("applied") @db.VarChar(50)
-  created_at   DateTime       @default(now())
-  updated_at   DateTime?
-  candidate    candidate_list @relation(fields: [candidate_id], references: [candidate_id])
-  job          job_post       @relation(fields: [job_id], references: [id])
+  id                   Int            @id @default(autoincrement())
+  candidate_id         Int
+  job_id               Int
+  job_candidate_status String?        @default("Applied") @db.VarChar(50)
+  created_at           DateTime       @default(now())
+  updated_at           DateTime?
+  candidate            candidate_list @relation(fields: [candidate_id], references: [candidate_id])
+  job                  job_post       @relation(fields: [job_id], references: [id])
 }
 
 model interview_details {
@@ -191,6 +191,6 @@ model comments {
   updated_by     String?         @db.VarChar(100)
   created_at     DateTime        @default(now())
   updated_at     DateTime?       @updatedAt
-  candidate_list candidate_list? @relation(fields: [candidate_id], references: [candidate_id])
   candidate_id   Int?
+  candidate_list candidate_list? @relation(fields: [candidate_id], references: [candidate_id])
 }
