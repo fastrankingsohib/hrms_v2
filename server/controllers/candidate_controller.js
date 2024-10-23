@@ -414,7 +414,7 @@ const send_data_by_id = async (req, res) => {
 
 
 const update_candidate = async (req, res) => {
-  const candidateId = parseInt(req.params.id); 
+  const candidateId = parseInt(req.params.id);
 
   try {
     const {
@@ -448,7 +448,7 @@ const update_candidate = async (req, res) => {
       current_status,
       qualifications,
       experiences,
-      jobs 
+      jobs
     } = req.body;
     const files = req.files || {};
 
@@ -458,7 +458,8 @@ const update_candidate = async (req, res) => {
     const candidate_pan = files['candidate_pan']?.[0]?.path || null;
     const candidate_highest_qualification = files['candidate_highest_qualification']?.[0]?.path || null;
 
-await prisma.candidate_list.update({
+    // Update candidate details
+    await prisma.candidate_list.update({
       where: {
         candidate_id: candidateId,
       },
@@ -499,13 +500,14 @@ await prisma.candidate_list.update({
       },
     });
 
-    await prisma.work_experience.deleteMany({
-      where: {
-        candidate_id: candidateId,
-      },
-    });
-
+    // Update experiences only if provided
     if (Array.isArray(experiences) && experiences.length > 0) {
+      await prisma.work_experience.deleteMany({
+        where: {
+          candidate_id: candidateId,
+        },
+      });
+
       const experienceData = experiences.map((exp) => ({
         candidate_id: candidateId,
         organisation_name: exp.organisation_name,
@@ -520,13 +522,14 @@ await prisma.candidate_list.update({
       });
     }
 
-    await prisma.qualifications.deleteMany({
-      where: {
-        candidate_id: candidateId,
-      },
-    });
-
+    // Update qualifications only if provided
     if (Array.isArray(qualifications) && qualifications.length > 0) {
+      await prisma.qualifications.deleteMany({
+        where: {
+          candidate_id: candidateId,
+        },
+      });
+
       const qualificationData = qualifications.map((qual) => ({
         candidate_id: candidateId,
         course: qual.course,
@@ -540,16 +543,17 @@ await prisma.candidate_list.update({
       });
     }
 
-    await prisma.candidate_applied_jobs.deleteMany({
-      where: {
-        candidate_id: candidateId,
-      },
-    });
-
+    // Update jobs only if provided
     if (Array.isArray(jobs) && jobs.length > 0) {
+      await prisma.candidate_applied_jobs.deleteMany({
+        where: {
+          candidate_id: candidateId,
+        },
+      });
+
       const jobData = jobs.map((jobId) => ({
         candidate_id: candidateId,
-        job_id: jobId, 
+        job_id: jobId,
       }));
 
       await prisma.candidate_applied_jobs.createMany({
@@ -571,7 +575,6 @@ await prisma.candidate_list.update({
     });
   }
 };
-
 
 const module_data = async(req,res)=>{
   try {
