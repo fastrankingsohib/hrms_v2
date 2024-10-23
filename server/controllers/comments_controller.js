@@ -52,7 +52,7 @@ try {
         const id = req.params.id
         await prisma.comments.delete({
             where:{
-                comment_id:id
+                comment_id:parseInt(id)
             }
         })
         res.status(200).send({
@@ -64,7 +64,7 @@ try {
  catch (error) {
     console.log(error)
     res.status(200).send({
-        success:true,
+        success:false,
         message:"cannot delete comment"
     })
     
