@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 function AllUsers() {
     const [allUser, setAllUsers] = useState([]);
@@ -35,6 +36,14 @@ function AllUsers() {
         }
     };
 
+    if (loading) {
+        return (
+            <div className='h-full w-full flex items-center justify-center bg-gray-100'>
+                <AiOutlineLoading3Quarters className='animate-spin mr-4' size={"20px"} />Loading...
+            </div>
+        )
+    }
+
     return (
         <div className='overflow-auto'>
             <div className='flex w-full'>
@@ -54,60 +63,32 @@ function AllUsers() {
                 <div className='w-full min-w-60 font-bold p-3 border'>Role</div>
                 <div className='w-full min-w-60 font-bold p-3 border'>Reporting To</div>
             </div>
+
             {
-                loading == false ?
-                    allUser.map((user) => (
-                        <div className='flex w-full' key={user.id}> {/* Add key prop for unique identification */}
-                            <div className='w-full min-w-60 p-3 border flex justify-between'>
-                                <Link to={`/user/${user.id}`} className='p-1 rounded-full px-4 bg-green-500 text-white'>View</Link>
-                                <button type='button' className='p-1 rounded-full px-4 bg-red-500 text-white'
-                                    onClick={() => handleDelete(user.id)} // Call handleDelete with user id
-                                >Delete</button>
-                            </div>
-                            <div className='w-full min-w-60 p-3 border'>{user.employee_id}</div>
-                            <div className='w-full min-w-60 p-3 border'>{`${user.title} ${user.first_name} ${user.middle_name}`}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.username}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.gender}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.dob}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.email}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.mobile}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.date_of_joining}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.designation}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.status}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.department}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.user_type}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.role}</div>
-                            <div className='w-full min-w-60 p-3 border'>{user.reporting_to}</div>
+                allUser.map((user) => (
+                    <div className='flex w-full' key={user.id}> {/* Add key prop for unique identification */}
+                        <div className='w-full min-w-60 p-3 border flex justify-between'>
+                            <Link to={`/user/${user.id}`} className='p-1 rounded-full px-4 bg-green-500 text-white'>View</Link>
+                            <button type='button' className='p-1 rounded-full px-4 bg-red-500 text-white'
+                                onClick={() => handleDelete(user.id)} // Call handleDelete with user id
+                            >Delete</button>
                         </div>
-                    )) :
-                    <div>
-                        {
-                            scaleton.map((value, key) => {
-                                return (
-                                    <div className='flex w-full' key={key}> {/* Add key prop for unique identification */}
-                                        <div className='w-full min-w-60 p-3 border flex justify-between'>
-                                            <span className='p-1 rounded-full px-4 bg-gray-200 text-gray-200'>View</span>
-                                            <span className='p-1 rounded-full px-4 bg-gray-200 text-gray-200'>Delete</span>
-                                        </div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                        <div className='w-full min-w-60 p-3 border'><span className='h-full w-full inline-block bg-gray-200 rounded-full'></span></div>
-                                    </div>
-                                )
-                            })
-                        }
+                        <div className='w-full min-w-60 p-3 border'>{user.employee_id}</div>
+                        <div className='w-full min-w-60 p-3 border'>{`${user.title} ${user.first_name} ${user.middle_name}`}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.username}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.gender}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.dob}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.email}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.mobile}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.date_of_joining}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.designation}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.status}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.department}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.user_type}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.role}</div>
+                        <div className='w-full min-w-60 p-3 border'>{user.reporting_to}</div>
                     </div>
+                ))
             }
         </div>
     );

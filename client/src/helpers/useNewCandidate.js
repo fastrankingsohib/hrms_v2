@@ -48,27 +48,28 @@ const useNewCandidate = () => {
             "other1": "",
             "other2": "",
             "other3": "",
-            "current_status": currentStatus,
-            "status": status,
+            "current_status": candidate.current_status,
+            "status": candidate.status,
             "created_by": loggedInUser.username,
             "jobs": selectedJobs,
             "experiences": experiences,
+            "work_tenure": `${candidate.work_tenure}`,
             "qualifications": educations,
         };
 
         let scheduleInterview = (candidate_id) => {
-            axios.post(`/schedule-interview`,
-                {
-                    "job_id": newInterviewDetails.jobId,
-                    "candidate_id": candidate_id,
-                    "interview_date": newInterviewDetails.date,
-                    "interview_time": newInterviewDetails.time,
-                    "interviewer": newInterviewDetails.interviewer,
-                    "interview_round": newInterviewDetails.round
-                }
-            )
-                .then((res) => console.log(res.data))
-                .catch((err) => console.log(err))
+            // axios.post(`/schedule-interview`,
+            //     {
+            //         "job_id": newInterviewDetails.jobId,
+            //         "candidate_id": candidate_id,
+            //         "interview_date": newInterviewDetails.date,
+            //         "interview_time": newInterviewDetails.time,
+            //         "interviewer": newInterviewDetails.interviewer,
+            //         "interview_round": newInterviewDetails.round
+            //     }
+            // )
+            //     .then((res) => console.log(res.data))
+            //     .catch((err) => console.log(err))
         }
 
         axios.post("/add-candidate", new_candidate)
@@ -80,7 +81,7 @@ const useNewCandidate = () => {
 
                 setTimeout(() => {
                     setSuccess(false);
-                    navigate("/my-candidates");
+                    navigate("/candidates");
                 }, 3000);
             })
             .catch((err) => {

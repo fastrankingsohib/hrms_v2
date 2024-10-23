@@ -1,5 +1,5 @@
 import React, { useDebugValue, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { IoMdArrowBack } from "react-icons/io";
 import axios from 'axios';
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -15,6 +15,7 @@ function ViewInterview() {
     const [candidateDetails, setCandidateDetails] = useState()
     const [interviewDetails, setInterviewDetails] = useState({})
     const [isEditable, setIsEditable] = useState(false)
+    const navigate = useNavigate()
     const [interviewEvents, setInterviewEvents] = useState({
         loading: false,
         success: false,
@@ -139,7 +140,7 @@ function ViewInterview() {
     if (interviewDetails) {
         return (
             <div className='p-4 h-full w-full'>
-                <button className='flex gap-3 items-center bg-gray-100 rounded-full p-2 px-4'><IoMdArrowBack /> Back</button>
+                <button className='flex gap-3 items-center bg-gray-100 rounded-full p-2 px-4' onClick={() => navigate(-1)}><IoMdArrowBack /> Back</button>
 
                 {
                     interviewEvents.loading ?

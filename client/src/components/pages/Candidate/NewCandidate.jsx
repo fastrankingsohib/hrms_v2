@@ -10,91 +10,128 @@ import { RiListCheck3, RiUserSharedFill } from "react-icons/ri";
 import { VscVmRunning } from "react-icons/vsc";
 
 const NewCandidate = () => {
-    const { registerCandidate, loading, success, error } = useNewCandidate()
+    const { registerCandidate, loading, success, error } = useNewCandidate();
     const [selectedJobs, setSelectedJobs] = useState({
         toggled: false,
         jobs: [],
         ids: [],
-    })
+    });
 
-    // Canidate Handlings
+    // Candidate Handlings
     const [candidate, setCandidate] = useState({
-        "title": "",
-        "first_name": "",
-        "middle_name": "",
-        "last_name": "",
-        "address_line1": "",
-        "address_line2": "",
-        "city": "",
-        "state": "",
-        "pin_code": "",
-        "country": "",
-        "contact_number": "",
-        "alt_contact_number": "",
-        "email_address": "",
-        "alt_email_address": "",
-        "date_of_birth": "",
-        "job_title": "",
-        "department": "",
-        "work_experience": "",
-        "recruiter_comments": "",
-        "communication_skills": "Excellent",
-        "status": "",
-        "other1": "Additional info 1",
-        "other2": "Additional info 2",
-        "other3": "Additional info 3",
-        "jobs": [selectedJobs.ids],
-        "created_by": "recruiter@example.com"
-    })
+        title: "",
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        address_line1: "",
+        address_line2: "",
+        city: "",
+        state: "",
+        pin_code: "",
+        country: "",
+        contact_number: "",
+        alt_contact_number: "",
+        email_address: "",
+        alt_email_address: "",
+        date_of_birth: "",
+        job_title: "",
+        department: "",
+        work_experience: "",
+        recruiter_comments: "",
+        communication_skills: "Excellent",
+        status: "",
+        current_status: "",
+        other1: "Additional info 1",
+        other2: "Additional info 2",
+        other3: "Additional info 3",
+        jobs: selectedJobs.ids, // Updated to use ids directly
+        work_tenure: "",
+        created_by: "recruiter@example.com",
+    });
 
     const [allJobs, setAllJobs] = useState([]);
+    const dropdownRef = useRef(null); // Ref for the dropdown
+
     useEffect(() => {
+        // Fetching jobs from the server
         axios.get("/display_jobs")
             .then((res) => {
                 console.log(res.data);
                 setAllJobs(res.data.jobs);
             })
             .catch((err) => {
-                console.log(err);
-            })
-    }, [])
+                console.error(err);
+            });
+    }, []);
 
+    // Handle job selection
     const handleJobsSelection = (job, jobId, value) => {
         setSelectedJobs((prevState) => {
-            // Create a new jobs array based on selection or deselection
             const updatedJobs = value
                 ? [...prevState.jobs, job] // Add job
                 : prevState.jobs.filter((j) => j.id !== jobId); // Remove job
 
-            // Create a new jobIds array from the updated jobs list
             const updatedJobIds = updatedJobs.map(j => j.id);
 
-            // Return the updated state
+            // Update the candidate's job field
+            setCandidate((prevCandidate) => ({
+                ...prevCandidate,
+                jobs: updatedJobIds, // Update jobs in candidate state
+            }));
+
             return {
                 ...prevState,
-                jobs: updatedJobs,    // Update the jobs array
-                ids: updatedJobIds    // Update the jobIds array
+                jobs: updatedJobs, // Update the jobs array
+                ids: updatedJobIds, // Update the jobIds array
             };
         });
     };
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setSelectedJobs((prevState) => ({ ...prevState, toggled: false }));
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside);
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
+
+    const handleToggleDropdown = () => {
+        setSelectedJobs((prevState) => ({ ...prevState, toggled: !prevState.toggled }));
+    };
 
 
 
 
 
-    // Experience Handlings
+
+
     const initialExperienceField = {
-        // jobTitle: "",
-        // department: "",
         organisation_name: "",
-        total_tenure: "",
+        total_tenure: "", // This will store the total tenure in months
         last_designation: "",
         last_drawn_salary: ""
     };
 
+
     const [experienceFields, setExperienceFields] = useState([initialExperienceField]);
     const [isExperienced, setIsExperienced] = useState(false);
+    useEffect(() => {
+        let totalExperience = 0;
+        if (experienceFields.length > 0) {
+            experienceFields.map((value, index) => {
+                // console.log(value.total_tenure)
+                totalExperience = + value.total_tenure;
+            })
+            setCandidate((values) => ({ ...values, work_tenure: totalExperience }));
+        }
+        console.log(totalExperience)
+    }, [experienceFields])
 
     const addExperienceField = () => {
         setExperienceFields([...experienceFields, initialExperienceField]);
@@ -106,6 +143,12 @@ const NewCandidate = () => {
             ...values[index], // Copy the existing experience object
             [event.target.name]: event.target.value // Update only the specific field
         };
+
+        // Calculate total tenure in months
+        const years = parseInt(values[index].total_tenure_years) || 0; // Default to 0 if NaN
+        const months = parseInt(values[index].total_tenure_months) || 0; // Default to 0 if NaN
+        values[index].total_tenure = String((years * 12) + months); // Calculate total tenure in months
+
         setExperienceFields(values);
     };
 
@@ -440,6 +483,8 @@ const NewCandidate = () => {
 
 
 
+
+
     return (
         <section className="p-4 component-rendering-tranistion h-full overflow-auto">
             <h1 className="text-2xl font-semibold">Create New Candidate</h1>
@@ -587,45 +632,47 @@ const NewCandidate = () => {
 
                     <div>
                         <label className="inline-block mt-4 font-semibold">Select Jobs</label>
-                        <div className="relative">
-                            <div className={`select-none cursor-pointer p-[11.5px] border rounded-md mt-4 flex items-center justify-between ${selectedJobs.toggled ? "bg-gray-200" : "bg-white"}`}
-                                onClick={() => setSelectedJobs((values) => ({ ...values, toggled: !selectedJobs.toggled }))}
+                        <div className="relative" ref={dropdownRef}>
+                            <div
+                                className={`select-none cursor-pointer p-[11.5px] border rounded-md mt-4 flex items-center justify-between ${selectedJobs.toggled ? "bg-gray-200" : "bg-white"}`}
+                                onClick={handleToggleDropdown}
                             >
                                 <span>Selected Jobs</span>
-                                <span className={`transition-colors ${selectedJobs.toggled ? "rotate-180" : "rotate-0"}`}><IoIosArrowDown /></span>
+                                <span className={`transition-colors ${selectedJobs.toggled ? "rotate-180" : "rotate-0"}`}>
+                                    <IoIosArrowDown />
+                                </span>
                             </div>
 
                             <div className={`select-none absolute grid gap-1 top-16 right-0 p-1 bg-white shadow-2xl border w-full ${selectedJobs.toggled ? "block" : "hidden"}`}>
-                                {
-                                    allJobs.length > 0 ? (
-                                        allJobs.map((value, key) => {
-                                            const isChecked = selectedJobs.jobs.some(job => job.id === value.id); // Check if job is already selected
+                                {allJobs.length > 0 ? (
+                                    allJobs.map((value, key) => {
+                                        const isChecked = selectedJobs.jobs.some(job => job.id === value.id); // Check if job is already selected
 
-                                            if (value.job_status === "Active") {
-                                                return (
-                                                    <label
-                                                        key={key}
-                                                        htmlFor={`job-id-${key}`}
-                                                        className="flex items-center gap-4 p-2.5 bg-gray-50 hover:bg-gray-100 cursor-pointer"
-                                                    >
-                                                        <input
-                                                            id={`job-id-${key}`}
-                                                            type="checkbox"
-                                                            checked={isChecked}
-                                                            onChange={(e) => {
-                                                                handleJobsSelection(value, value.id, e.target.checked);
-                                                                console.log(selectedJobs)
-                                                            }}
-                                                        />
-                                                        <span>{value.job_title}</span>
-                                                    </label>
-                                                );
-                                            }
-                                        })
-                                    ) : (
-                                        <div className="p-4">No Jobs Found!</div>
-                                    )
-                                }
+                                        if (value.job_status === "Active") {
+                                            return (
+                                                <label
+                                                    key={key}
+                                                    htmlFor={`job-id-${key}`}
+                                                    className="flex items-center gap-4 p-2.5 bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                                                >
+                                                    <input
+                                                        id={`job-id-${key}`}
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={(e) => {
+                                                            handleJobsSelection(value, value.id, e.target.checked);
+                                                            console.log(selectedJobs);
+                                                        }}
+                                                    />
+                                                    <span>{value.job_title}</span>
+                                                </label>
+                                            );
+                                        }
+                                        return null; // If not active, return null
+                                    })
+                                ) : (
+                                    <div className="p-4">No Jobs Found!</div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -633,7 +680,7 @@ const NewCandidate = () => {
 
                     <div>
                         <label htmlFor="select-default-status" className="font-semibold inline-block p-4 pl-0">Set Default Status</label>
-                        <select defaultValue={"---"} className="primary-input" id="select-default-status">
+                        <select defaultValue={"---"} className="primary-input" id="select-default-status" onChange={(e) => setCandidate((values) => ({ ...values, current_status: e.target.value, status: e.target.value }))}>
                             <option value="---" disabled={true}>--- Select Default Status ---</option>
                             <option value="Follow-up">Follow-up</option>
                             <option value="Shortlisted">Shortlisted</option>
@@ -667,7 +714,7 @@ const NewCandidate = () => {
                     {isExperienced && (
                         <>
                             {experienceFields.map((experienceField, index) => (
-                                <div key={index} className="grid grid-cols-4 gap-4 mb-5 pb-10 border-b relative">
+                                <div key={index} className="grid grid-cols-5 gap-4 mb-5 pb-10 border-b relative">
                                     <div>
                                         <label htmlFor={`organisation_name-${index}`} className="font-semibold inline-block p-4 pl-0">Organisation Name</label>
                                         <input
@@ -682,15 +729,26 @@ const NewCandidate = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor={`total_tenure-${index}`} className="font-semibold inline-block p-4 pl-0">Total Tenure</label>
+                                        <label htmlFor={`total_tenure_years-${index}`} className="font-semibold inline-block p-4 pl-0">Total Tenure - in Years</label>
                                         <input
-                                            type="text"
+                                            type="number"
                                             className="primary-input"
-                                            placeholder="Total Tenure"
-                                            name="total_tenure"
-                                            id={`total_tenure-${index}`}
-                                            value={experienceField.total_tenure}
-                                            onChange={event => handleInputChange(index, event)}
+                                            placeholder="Total Tenure - Years"
+                                            name="total_tenure_years"
+                                            id={`total_tenure_years-${index}`}
+                                            onChange={event => handleInputChange(index, event)} // Call handleInputChange to update total tenure
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor={`total_tenure_months-${index}`} className="font-semibold inline-block p-4 pl-0">Total Tenure - in Months</label>
+                                        <input
+                                            type="number"
+                                            className="primary-input"
+                                            placeholder="Total Tenure - Months"
+                                            name="total_tenure_months"
+                                            id={`total_tenure_months-${index}`}
+                                            onChange={event => handleInputChange(index, event)} // Call handleInputChange to update total tenure
                                         />
                                     </div>
 
@@ -801,7 +859,11 @@ const NewCandidate = () => {
                             <div>
                                 <label htmlFor={`percentage_cgpa-${index}`} className="font-semibold inline-block p-4 pl-0">Percentage/CGPA</label>
                                 <input
-                                    type="text"
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    minLength={0}
+                                    maxLength={100}
                                     className="primary-input"
                                     placeholder="Percentage/CGPA"
                                     name="percentage_cgpa"
@@ -1013,30 +1075,6 @@ const NewCandidate = () => {
                 </div>
 
 
-                <br />
-                <hr />
-                <br />
-
-
-                <div className="p-2.5 px-4 border bg-gray-100">
-                    <strong>Current Status:</strong> {nextRoundSelection.value === "Schedule" || nextRoundSelection.value === "Scheduled" ?
-                        <span className="text-green-600">Interview Scheduled On
-                            <strong className="px-2">{newInterviewDetails.date}</strong>
-                            at
-                            <strong className="px-2">
-                                {new Date(`1970-01-01T${newInterviewDetails.time}:00`).toLocaleTimeString([], {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: true
-                                })}
-                            </strong>
-                            for
-                            <strong className="px-2">{newInterviewDetails.jobTitle}</strong>
-                            by
-                            <strong className="px-2">{newInterviewDetails.interviewer}</strong>
-                        </span> : nextRoundSelection.value}
-                </div>
-
 
 
 
@@ -1052,6 +1090,7 @@ const NewCandidate = () => {
                         >Create Candidate</button>
                     </div>
                 </div>
+                <br /><br />
             </div>
         </section>
     )
