@@ -10,8 +10,9 @@ const useCandidateUpdate = () => {
         success: false,
     });
 
-    const updateCandidate = (candidateId, candidateEducation, candidateExperience, personalDetails, candidateSkills, candidateHobbies, candidateComment) => {
+    const updateCandidate = (candidateId, candidateEducation, candidateExperience, personalDetails, candidateSkills, candidateHobbies, candidateJobs) => {
         setUpdateEvents({ loading: true, error: false, success: false });
+        console.log(candidateExperience)
 
         // Convert arrays to strings
         const skillsString = candidateSkills.join(', '); // Convert candidateSkills array to a comma-separated string
@@ -49,7 +50,7 @@ const useCandidateUpdate = () => {
                 "status": personalDetails.status,
                 "qualifications": candidateEducation,
                 "experiences": candidateExperience,
-                "jobs": personalDetails.jobs,
+                // "jobs": candidateJobs,
                 "created_by": personalDetails.created_by,
             }
         )

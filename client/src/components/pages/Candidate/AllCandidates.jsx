@@ -44,29 +44,28 @@ function AllCandidates(props) {
             axios.get("/all-candidates")
                 .then((res) => {
                     setAllCandidates(res.data.candidates);
-                    if (res.data.candidates.length > 0) {
-                        let candidate_experience = []
-                        console.log("Value is Greater then 0");
-                        res.data.candidates.map((value, index) => {
-                            let months = 0;
-                            return (
-                                value.workExperiences.length > 0 ?
+                    // if (res.data.candidates.length > 0) {
+                    //     let candidate_experience = []
+                    //     console.log("Value is Greater then 0");
+                    //     res.data.candidates.map((value, index) => {
+                    //         let months = 0;
+                    //         return (
+                    //             value.workExperiences.length > 0 ?
                                 
-                                value.workExperiences.map((workExperience, index) => {
-                                    console.log(workExperience);
-                                    months += Number(workExperience.total_tenure_months);
-                                    console.log(months)
-                                }) : "No Experience"
-                            )
-                        })
-                    }
-                    const experience = res.data.candidates.workExperience
-                    let experienceYears = 0
-                    experience.length > 0 ?
-                        experience.map((candidateExp, index) => {
-                            return experienceYears += candidateExp.total_tenure;
-                        }) : experienceYears = 0
-                    setCandidateExperience(experienceYears)
+                    //             value.workExperiences.map((workExperience, index) => {
+                    //                 months += Number(workExperience.total_tenure_months);
+                    //                 console.log(months)
+                    //             }) : "No Experience"
+                    //         )
+                    //     })
+                    // }
+                    // const experience = res.data.candidates.workExperience
+                    // let experienceYears = 0
+                    // experience.length > 0 ?
+                    //     experience.map((candidateExp, index) => {
+                    //         return experienceYears += candidateExp.total_tenure;
+                    //     }) : experienceYears = 0
+                    // setCandidateExperience(experienceYears)
 
                     // if (res.data.candidates > 0) {
                     //     // res.data.candidates.map((value, index) => {
@@ -122,7 +121,7 @@ function AllCandidates(props) {
                                     </NavLink>
                                     <div className='mt-1'>
                                         <span className='inline-flex items-center gap-2 w-40'><MdCall /> {value.contact_number}</span>
-                                        <span className='inline-flex items-center gap-2'><MdWorkOutline /> {value.experience_in_years}</span>
+                                        <span className='inline-flex items-center gap-2'><MdWorkOutline /> {`${value.experience_years > 0 ? `${value.experience_years} Year` : `${value.experience_years} Years`}`} {value.experience_months > 0 ? `& ${value.experience_months} Months` : ""}</span>
                                     </div>
                                 </div>
 

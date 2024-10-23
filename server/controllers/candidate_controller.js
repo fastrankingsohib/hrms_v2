@@ -240,12 +240,19 @@ const all_candidates = async (req, res) => {
     });
 
     const candidatesWithExperience = candidates.map(candidate => {
-      const years = Math.floor(candidate.work_tenure / 12);  
-      const months = candidate.work_tenure % 12;
+      let totalTenureMonths = candidate.workExperiences.reduce((acc, experience) => {
+        const tenureYears = parseInt(experience.total_tenure_years || 0, 10);
+        const tenureMonths = parseInt(experience.total_tenure_months || 0, 10);
+        return acc + (tenureYears * 12) + tenureMonths;
+      }, 0);
+
+      const experience_years = Math.floor(totalTenureMonths / 12);
+      const experience_months = totalTenureMonths % 12;
 
       return {
         ...candidate,
-        experience_in_years: `${years}y ${months}m`, 
+        experience_years,   
+        experience_months,  
       };
     });
 
@@ -262,6 +269,7 @@ const all_candidates = async (req, res) => {
     });
   }
 };
+
 
 
 const my_candidates = async (req, res) => {
@@ -347,9 +355,8 @@ const delete_candidate = async (req, res) => {
 
 const send_data_by_id = async (req, res) => {
   try {
-    const candidate_id = Number(req.params.id); 
+    const candidate_id = Number(req.params.id);
 
-   
     const candidate = await prisma.candidate_list.findUnique({
       where: {
         candidate_id: candidate_id,
@@ -361,7 +368,7 @@ const send_data_by_id = async (req, res) => {
           include: {
             job: { 
               select: {
-                job_title: true, 
+                job_title: true,
               },
             },
           },
@@ -375,18 +382,24 @@ const send_data_by_id = async (req, res) => {
         message: "Candidate not found",
       });
     }
-    const years = Math.floor(candidate.work_tenure / 12);
-    const months = candidate.work_tenure % 12;
 
-   
-     const  experience_in_years= `${years} years and ${months} months`;
-   
+    // Calculate total tenure in months from all work experiences
+    let totalTenureMonths = candidate.workExperiences.reduce((acc, experience) => {
+      const tenureYears = parseInt(experience.total_tenure_years || 0, 10);
+      const tenureMonths = parseInt(experience.total_tenure_months || 0, 10);
+      return acc + (tenureYears * 12) + tenureMonths;
+    }, 0);
+
+    // Convert total months into years and months
+    const experience_years = Math.floor(totalTenureMonths / 12);
+    const experience_months = totalTenureMonths % 12;
 
     res.status(200).send({
       success: true,
       message: "Data successfully retrieved",
       candidate: candidate,
-      experience_in_years: experience_in_years
+      experience_years: experience_years,   // Total experience in years
+      experience_months: experience_months  // Remaining months
     });
   } catch (error) {
     console.error(error);
@@ -396,6 +409,7 @@ const send_data_by_id = async (req, res) => {
     });
   }
 };
+
 
 
 

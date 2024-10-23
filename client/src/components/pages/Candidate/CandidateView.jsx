@@ -28,7 +28,8 @@ function CandidateView() {
     const [candidateSuccess, setCandidateSuccess] = useState(false);
     const [candidateError, setCandidateError] = useState(false);
     const [isPersonalDetailsEditing, setIsPersonalDetailsEditing] = useState(false);
-    const [experienceInYears, setExpeirenceInYears] = useState("")
+    const [experienceInYears, setExpeirenceInYears] = useState()
+    const [experienceInMonths, setExpeirenceInMonths] = useState()
     let loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
     const [alerts, setAlerts] = useState({
         delete: false,
@@ -69,6 +70,51 @@ function CandidateView() {
         setCandidateLoading(true);
         axios.get(`/candidate-info/${candidate_id}`)
             .then((res) => {
+                console.log(res.data)
+                if (res.data.success) {
+                    const candidateData = res.data.candidate;
+                    setCandidateSuccess(true);
+                    setCandidateLoading(false);
+                    setCandidateError(false);
+                    setCandidate(candidateData);
+                    setExpeirenceInYears(res.data.experience_years)
+                    setExpeirenceInMonths(res.data.experience_months)
+
+                    // Populate education and experience lists after data is fetched
+                    setEducationList(candidateData.qualifications || []);
+                    setExperienceList(candidateData.workExperiences.map((exp, index) => ({
+                        id_updated: index + 1,
+                        organisation_name: exp.organisation_name || '',
+                        last_designation: exp.last_designation || '',
+                        total_tenure_years: exp.total_tenure_years || '',
+                        total_tenure_months: exp.total_tenure_months || '',
+                        last_drawn_salary: exp.last_drawn_salary || '',
+                    })) || []);
+
+                    // Convert skills string into an array
+                    const skillsArray = candidateData.skills
+                        ? candidateData.skills.split(',').map(skill => skill.trim())
+                        : []; // If there are no skills, use an empty array
+                    setSkills(skillsArray); // Update skills state
+
+                    // Convert hobbies string into an array
+                    const hobbiesArray = candidateData.hobbies
+                        ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
+                        : []; // If there are no hobbies, use an empty array
+                    setHobbies(hobbiesArray); // Update hobbies state
+
+                }
+            })
+            .catch((err) => {
+                setCandidateError(true);
+                setCandidateSuccess(false);
+                setCandidateLoading(false);
+            });
+    }
+    useEffect(() => {
+        setCandidateLoading(true);
+        axios.get(`/candidate-info/${candidate_id}`)
+            .then((res) => {
                 if (res.data.success) {
                     const candidateData = res.data.candidate;
                     setCandidateSuccess(true);
@@ -106,49 +152,7 @@ function CandidateView() {
                 setCandidateSuccess(false);
                 setCandidateLoading(false);
             });
-    }
-    useEffect(() => {
-        // setCandidateLoading(true);
-        // axios.get(`/candidate-info/${candidate_id}`)
-        //     .then((res) => {
-        //         if (res.data.success) {
-        //             const candidateData = res.data.candidate;
-        //             setCandidateSuccess(true);
-        //             setCandidateLoading(false);
-        //             setCandidateError(false);
-        //             setCandidate(candidateData);
-        //             setExpeirenceInYears(res.data.experience_in_years)
-
-        //             // Populate education and experience lists after data is fetched
-        //             setEducationList(candidateData.qualifications || []);
-        //             setExperienceList(candidateData.workExperiences.map((exp, index) => ({
-        //                 id_updated: index + 1,
-        //                 organisation_name: exp.organisation_name || '',
-        //                 last_designation: exp.last_designation || '',
-        //                 total_tenure: exp.total_tenure || '',
-        //                 last_drawn_salary: exp.last_drawn_salary || '',
-        //             })) || []);
-
-        //             // Convert skills string into an array
-        //             const skillsArray = candidateData.skills
-        //                 ? candidateData.skills.split(',').map(skill => skill.trim())
-        //                 : []; // If there are no skills, use an empty array
-        //             setSkills(skillsArray); // Update skills state
-
-        //             // Convert hobbies string into an array
-        //             const hobbiesArray = candidateData.hobbies
-        //                 ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
-        //                 : []; // If there are no hobbies, use an empty array
-        //             setHobbies(hobbiesArray); // Update hobbies state
-
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         setCandidateError(true);
-        //         setCandidateSuccess(false);
-        //         setCandidateLoading(false);
-        //     });
-        fetchCandidate()
+        // fetchCandidate()
     }, [candidate_id]);
 
 
@@ -174,7 +178,6 @@ function CandidateView() {
 
     // Hanlde Hobbies
     const [hobbyInput, setHobbyInput] = useState("");
-
     const handleHobbiesKeyDown = (e) => {
         if (e.key === "Enter" && hobbyInput.trim()) {
             setHobbies([...hobbies, hobbyInput.trim()]);
@@ -187,10 +190,6 @@ function CandidateView() {
         const updatedHobbies = hobbies.filter((_, i) => i !== index);
         setHobbies(updatedHobbies);
     };
-
-
-
-
 
     // Handle Education Input Change
     const handleEducationInputChange = (index, field, value) => {
@@ -224,7 +223,8 @@ function CandidateView() {
                 id_updated: Date.now(),
                 organisation_name: '',
                 last_designation: '',
-                total_tenure: '',
+                total_tenure_months: '',
+                total_tenure_years: '',
                 last_drawn_salary: '',
             },
         ]);
@@ -239,7 +239,7 @@ function CandidateView() {
     // Update Candidate Data (Saving Changes)
     const { updateEvents, updateCandidate } = useCandidateUpdate();
     const handleUpdateCandidate = () => {
-        updateCandidate(candidate_id, educationList, experienceList, candidate, skills, hobbies);
+        updateCandidate(candidate_id, educationList, experienceList, candidate, skills, hobbies, candidate ? candidate.candidate_applied_jobs : []);
     };
 
     const [deleteEvents, setDeleteEvents] = useState({
@@ -272,7 +272,8 @@ function CandidateView() {
                                 id_updated: index + 1,
                                 organisation_name: exp.organisation_name || '',
                                 last_designation: exp.last_designation || '',
-                                total_tenure: exp.total_tenure || '',
+                                total_tenure_years: exp.total_tenure_months || '',
+                                total_tenure_months: exp.total_tenure_months || '',
                                 last_drawn_salary: exp.last_drawn_salary || '',
                             })) || []);
                         }
@@ -298,8 +299,12 @@ function CandidateView() {
 
     const [nextRoundSelection, setNextRoundSelection] = useState({
         checked: false,
-        value: ""
+        value: candidate ? candidate.current_status : ""
     });
+
+    useEffect(() => {
+        setNextRoundSelection((values) => ({ ...values, value: candidate ? candidate.current_status : "" }))
+    }, [candidate])
 
     const [permissions, setPersmissions] = useState({
         createInterview: false,
@@ -361,18 +366,18 @@ function CandidateView() {
         }
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
-                setNextRoundSelection((values) => ({ ...values, checked: false }));
-            }
-        };
+    // useEffect(() => {
+    //     const handleClickOutside = (event) => {
+    //         if (popupRef.current && !popupRef.current.contains(event.target)) {
+    //             setNextRoundSelection((values) => ({ ...values, checked: false }));
+    //         }
+    //     };
 
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+    //     document.addEventListener("mousedown", handleClickOutside);
+    //     return () => {
+    //         document.removeEventListener("mousedown", handleClickOutside);
+    //     };
+    // }, []);
 
 
 
@@ -386,7 +391,6 @@ function CandidateView() {
     }, [nextRoundSelection])
     // Update Candidate Status
     const updateCandidateStatus = () => {
-        fetchCandidate()
         axios.post(`/update-candidate-status/${candidate_id}`,
             {
                 "status": candidateStatus,
@@ -396,6 +400,46 @@ function CandidateView() {
             .then((res) => {
                 console.log(res.data);
                 setNextRoundSelection((values) => ({ ...values, checked: false }))
+                setCandidateLoading(true);
+                axios.get(`/candidate-info/${candidate_id}`)
+                    .then((res) => {
+                        if (res.data.success) {
+                            const candidateData = res.data.candidate;
+                            setCandidateSuccess(true);
+                            setCandidateLoading(false);
+                            setCandidateError(false);
+                            setCandidate(candidateData);
+                            setExpeirenceInYears(res.data.experience_in_years)
+
+                            // Populate education and experience lists after data is fetched
+                            setEducationList(candidateData.qualifications || []);
+                            setExperienceList(candidateData.workExperiences.map((exp, index) => ({
+                                id_updated: index + 1,
+                                organisation_name: exp.organisation_name || '',
+                                last_designation: exp.last_designation || '',
+                                total_tenure: exp.total_tenure || '',
+                                last_drawn_salary: exp.last_drawn_salary || '',
+                            })) || []);
+
+                            // Convert skills string into an array
+                            const skillsArray = candidateData.skills
+                                ? candidateData.skills.split(',').map(skill => skill.trim())
+                                : []; // If there are no skills, use an empty array
+                            setSkills(skillsArray); // Update skills state
+
+                            // Convert hobbies string into an array
+                            const hobbiesArray = candidateData.hobbies
+                                ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
+                                : []; // If there are no hobbies, use an empty array
+                            setHobbies(hobbiesArray); // Update hobbies state
+
+                        }
+                    })
+                    .catch((err) => {
+                        setCandidateError(true);
+                        setCandidateSuccess(false);
+                        setCandidateLoading(false);
+                    });
             })
             .catch((err) => console.log(err))
     }
@@ -435,7 +479,7 @@ function CandidateView() {
                                 <div className='inline-flex items-center justify-center h-20 w-20 bg-gray-100 rounded-full mr-4'><FaUser size={"20px"} className='text-gray-400' /></div>
                                 <div>
                                     <div className='text-xl font-bold'>{`${candidate.title} ${candidate.first_name} ${candidate.last_name}`}</div>
-                                    <div className='flex items-center gap-2'><MdWork /> {experienceInYears}</div>
+                                    <div className='flex items-center gap-2'><MdWork /> {`${experienceInYears > 0 ? `${experienceInYears} Year` : `${experienceInYears} Years`}`} {experienceInMonths > 0 ? `& ${experienceInMonths} Months` : ""}</div>
                                     {/* <div className={`${candidate.status === "Active" ? "text-green-500" : candidate.status === "Inactive" ? "bg-orange-500" : "text-red-500"}`}>{`${candidate.status}`}</div> */}
                                     <div className='flex items-center gap-2'><VscDebugStepOut size={"14px"} className='rotate-90' /> {`${candidate.status}`}</div>
                                 </div>
@@ -461,96 +505,13 @@ function CandidateView() {
                                     className='cursor-pointer inline-block p-2.5 px-5 rounded-lg min-w-40 bg-black text-white'>Schedule Interview</span>
                             </div>
 
-                            <div className={`p-2.5 relative`}>
+                            <div className={`p-2.5`}>
                                 <button className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
                                     onClick={() => {
-                                        setNextRoundSelection((values) => ({ ...values, checked: !nextRoundSelection.checked }));
+                                        setNextRoundSelection((values) => ({ ...values, checked: true }));
                                     }}>
                                     Change Status
                                 </button>
-
-                                <div className={`absolute z-10 top-[65px] right-0 bg-white text-black border shadow-2xl w-80 grid gap-4 p-4 ${nextRoundSelection.checked ? "block" : "hidden"}`}>
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "FollowUp" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "FollowUp" }))}>
-                                        <FaListUl size={"12px"} /> Follow Up
-                                    </button>
-
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Rejected" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Rejected" }))}>
-                                        <IoMdClose size={"14px"} /> Rejected
-                                    </button>
-
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Shortlisted" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Shortlisted" }))}>
-                                        <RiListCheck3 size={"16px"} /> Shortlisted
-                                    </button>
-
-                                    {/* <button className='relative'>
-                                        <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Schedule" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                            onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Schedule" }))}>
-                                            <MdAccessTime size={"16px"} /> Schedule Interview
-                                        </button>
-
-                                        <div className={`text-left absolute -top-[125px] -left-[120%] p-4 bg-white border shadow-2xl w-80 cursor-default ${nextRoundSelection.value === "Schedule" ? "block" : "hidden"}`}>
-                                            <h1 className='text-xl font-semibold mb-4 text-center'>Schedule Interview</h1>
-                                            <div className='grid'>
-                                                <label className='text-left block w-full mb-2' htmlFor="">Select Interview Date</label>
-                                                <input className='text-left block bg-gray-100 border p-2 mb-2 w-full'
-                                                    onChange={(e) => setNewInterviewDetails((values) => ({ ...values, date: e.target.value }))}
-                                                    type="date"
-                                                />
-
-                                                <label className='text-left block mb-2 w-full' htmlFor="">Select Interview Time</label>
-                                                <input className='text-left block border bg-gray-100 p-2 mb-2 w-full'
-                                                    onChange={(e) => setNewInterviewDetails((values) => ({ ...values, time: e.target.value }))}
-                                                    type="time"
-                                                />
-
-                                                <label className='text-left block mb-2 w-full' htmlFor="">Interviewer Name</label>
-                                                <input className='text-left block border bg-gray-100 p-2 w-full'
-                                                    onChange={(e) => setNewInterviewDetails((values) => ({ ...values, interviewer: e.target.value }))}
-                                                    type="text"
-                                                    placeholder='Eg. Mr. Akram'
-                                                />
-
-                                                <button className={`p-2.5 border rounded-lg bg-indigo-700 text-white mt-8 ${newInterviewDetails.loading ? "bg-opacity-60 cursor-not-allowed" : ""}`}
-                                                    onClick={scheduleInterview}
-                                                    disabled={newInterviewDetails.loading}>
-                                                    {newInterviewDetails.loading ? "Scheduling..." : newInterviewDetails.success ? "Scheduled New Interview" : "Schedule Interview"}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </button> */}
-
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Offered" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Offered" }))}>
-                                        <MdOutlineDone size={"16px"} />Offered
-                                    </button>
-
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "OnBoard" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "OnBoard" }))}>
-                                        <RiUserSharedFill size={"14px"} />On Board
-                                    </button>
-
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Training" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Training" }))}>
-                                        <VscVmRunning size={"16px"} />Training
-                                    </button>
-
-                                    <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Live" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
-                                        onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Live" }))}>
-                                        <FaCircleDot size={"16px"} /> Live
-                                    </button>
-
-                                    <button className={`p-2.5 inline-flex items-center justify-center gap-2 border w-full rounded-md bg-black text-white border-black`}
-                                        onClick={() => {
-                                            updateCandidateStatus();
-                                            console.log(nextRoundSelection.value)
-                                        }}
-                                    >
-                                        <MdDone size={"16px"} /> Confirm Change
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -585,18 +546,103 @@ function CandidateView() {
                                             onChange={(e) => setCandidate((values) => ({ ...values, title: e.target.value }))}
                                             disabled={!isPersonalDetailsEditing}
                                             defaultValue={candidate.title ? candidate.title : "---"}>
-                                            <option value="---" disabled={true}>--- Selecte Title ---</option>
+                                            <option value="" disabled={true}>--- Selecte Title ---</option>
                                             <option value="Mr.">Mr.</option>
                                             <option value="Ms.">Ms.</option>
                                         </select>
                                     </div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>First Name</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.first_name} onChange={(e) => setCandidate((values) => ({ ...values, first_name: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Middle Name</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.middle_name} onChange={(e) => setCandidate((values) => ({ ...values, middle_name: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Last Name</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.last_name} onChange={(e) => setCandidate((values) => ({ ...values, last_name: e.target.value }))} /></div>
+                                    <div className='flex gap-4'>
+                                        <span className='font-semibold min-w-40 py-2'>First Name</span>
+                                        <input
+                                            type="text"
+                                            disabled={!isPersonalDetailsEditing}
+                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            value={candidate.first_name}
+                                            onChange={(e) => {
+                                                const inputValue = e.target.value;
+                                                const regex = /^[A-Za-z\s]*$/; // Only allow alphabetic characters and spaces
+                                                if (regex.test(inputValue)) {
+                                                    setCandidate((values) => ({ ...values, first_name: inputValue }));
+                                                }
+                                            }}
+                                            placeholder="First Name"
+                                        />
+                                    </div>
+
+                                    <div className='flex gap-4'>
+                                        <span className='font-semibold min-w-40 py-2'>Middle Name</span>
+                                        <input
+                                            type="text"
+                                            disabled={!isPersonalDetailsEditing}
+                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            value={candidate.middle_name}
+                                            onChange={(e) => {
+                                                const inputValue = e.target.value;
+                                                const regex = /^[A-Za-z\s]*$/; // Only allow alphabetic characters and spaces
+                                                if (regex.test(inputValue)) {
+                                                    setCandidate((values) => ({ ...values, middle_name: inputValue }));
+                                                }
+                                            }}
+                                            placeholder="Middle Name"
+                                        />
+                                    </div>
+
+                                    <div className='flex gap-4'>
+                                        <span className='font-semibold min-w-40 py-2'>Last Name</span>
+                                        <input
+                                            type="text"
+                                            disabled={!isPersonalDetailsEditing}
+                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            value={candidate.last_name}
+                                            onChange={(e) => {
+                                                const inputValue = e.target.value;
+                                                const regex = /^[A-Za-z\s]*$/; // Only allow alphabetic characters and spaces
+                                                if (regex.test(inputValue)) {
+                                                    setCandidate((values) => ({ ...values, last_name: inputValue }));
+                                                }
+                                            }}
+                                            placeholder="Last Name"
+                                        />
+                                    </div>
+
                                     <hr />
                                     <hr />
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Contact Number</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.contact_number} onChange={(e) => setCandidate((values) => ({ ...values, contact_number: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Alt. Contact Number</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.alt_contact_number} onChange={(e) => setCandidate((values) => ({ ...values, alt_contact_number: e.target.value }))} /></div>
+                                    <div className='flex gap-4'>
+                                        <span className='font-semibold min-w-40 py-2'>Contact Number</span>
+                                        <input
+                                            type="text"
+                                            disabled={!isPersonalDetailsEditing}
+                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            value={candidate.contact_number}
+                                            onChange={(e) => {
+                                                const inputValue = e.target.value;
+                                                const regex = /^[0-9+\- ]*$/; // Allow only numbers, +, -, and spaces
+                                                if (regex.test(inputValue)) {
+                                                    setCandidate((values) => ({ ...values, contact_number: inputValue }));
+                                                }
+                                            }}
+                                            placeholder="Contact Number"
+                                        />
+                                    </div>
+
+                                    <div className='flex gap-4'>
+                                        <span className='font-semibold min-w-40 py-2'>Alt. Contact Number</span>
+                                        <input
+                                            type="text"
+                                            disabled={!isPersonalDetailsEditing}
+                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            value={candidate.alt_contact_number}
+                                            onChange={(e) => {
+                                                const inputValue = e.target.value;
+                                                const regex = /^[0-9+\- ]*$/; // Allow only numbers, +, -, and spaces
+                                                if (regex.test(inputValue)) {
+                                                    setCandidate((values) => ({ ...values, alt_contact_number: inputValue }));
+                                                }
+                                            }}
+                                            placeholder="Alt. Contact Number"
+                                        />
+                                    </div>
+
                                     <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Email Address</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.email_address} onChange={(e) => setCandidate((values) => ({ ...values, email_address: e.target.value }))} /></div>
                                     <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Alt. Email Address</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.alt_email_address} onChange={(e) => setCandidate((values) => ({ ...values, alt_email_address: e.target.value }))} /></div>
                                     <hr />
@@ -641,14 +687,14 @@ function CandidateView() {
                                                         />
                                                         <input
                                                             type='number' // Change to number for easier input handling
-                                                            value={experience.total_tenure_months || ''} // Adjusted to take months
-                                                            onChange={(e) => handleExperienceInputChange(index, 'total_tenure_months', e.target.value)}
+                                                            value={experience.total_tenure_years || ''} // Adjusted to take months
+                                                            onChange={(e) => handleExperienceInputChange(index, 'total_tenure_years', e.target.value)}
                                                             placeholder='Total Tenure Years'
                                                             className='border p-2 px-4 mr-2'
                                                         />
                                                         <input
                                                             type='number' // Change to number for easier input handling
-                                                            value={experience.total_tenure_years || ''} // Adjusted to take months
+                                                            value={experience.total_tenure_months || ''} // Adjusted to take months
                                                             onChange={(e) => handleExperienceInputChange(index, 'total_tenure_months', e.target.value)}
                                                             placeholder='Total Tenure Months'
                                                             className='border p-2 px-4 mr-2'
@@ -666,7 +712,7 @@ function CandidateView() {
                                                     </div>
                                                 ) : (
                                                     <span>
-                                                        {experience.organisation_name} - {experience.last_designation} ({experience.total_tenure_months} months) - Last Drawn Salary: {experience.last_drawn_salary}
+                                                        {experience.organisation_name} - {experience.last_designation} - {experience.total_tenure_years} Years {experience.total_tenure_months} Months - Last Drawn Salary: {experience.last_drawn_salary}
                                                     </span>
                                                 )}
                                             </div>
@@ -739,7 +785,7 @@ function CandidateView() {
                                                             </button>
                                                         </>
                                                     ) : (
-                                                        <span>{education.college_university} - {education.course} ({education.year_of_passing}) - Grade: {education.percentage_cgpa}</span>
+                                                        education.college_university !== "" ? <span>{education.college_university} - {education.course} ({education.year_of_passing}) - Grade: {education.percentage_cgpa}</span> : "There Is No Education Added"
                                                     )}
                                                 </div>
                                             )) : "No Education"}
@@ -879,6 +925,63 @@ function CandidateView() {
 
 
 
+                    {/* Update Status */}
+                    <div className={`fixed z-[101] top-0 w-full h-full flex justify-center items-center left-0 backdrop-blur-sm text-black border shadow-2xl gap-4 p-4 ${nextRoundSelection.checked ? "flex" : "hidden"}`}>
+                        <div className='w-96 bg-white border grid gap-4 p-10'>
+                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "FollowUp" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                onClick={() => setNextRoundSelection((values) => ({ ...values, value: "FollowUp" }))}>
+                                <FaListUl size={"12px"} /> Follow Up
+                            </button>
+
+                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Rejected" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Rejected" }))}>
+                                <IoMdClose size={"14px"} /> Rejected
+                            </button>
+
+                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Shortlisted" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Shortlisted" }))}>
+                                <RiListCheck3 size={"16px"} /> Shortlisted
+                            </button>
+
+                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Offered" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Offered" }))}>
+                                <MdOutlineDone size={"16px"} />Offered
+                            </button>
+
+                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "OnBoard" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                onClick={() => setNextRoundSelection((values) => ({ ...values, value: "OnBoard" }))}>
+                                <RiUserSharedFill size={"14px"} />On Board
+                            </button>
+
+                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Training" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Training" }))}>
+                                <VscVmRunning size={"16px"} />Training
+                            </button>
+
+                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Live" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                                onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Live" }))}>
+                                <FaCircleDot size={"16px"} /> Live
+                            </button>
+
+
+                            <div className='flex gap-4'>
+                                <button className={`p-2.5 inline-flex items-center justify-center gap-2 border w-full rounded-md bg-gray-100`}
+                                    onClick={() => {
+                                        setNextRoundSelection((values) => ({ ...values, checked: false }));
+                                    }}>Cancel
+                                </button>
+
+                                <button className={`p-2.5 min-w-[60%] inline-flex items-center justify-center gap-2 border rounded-md bg-black text-white border-black`}
+                                    onClick={() => {
+                                        updateCandidateStatus();
+                                        console.log(nextRoundSelection.value)
+                                    }}
+                                >
+                                    <MdDone size={"16px"} /> Update
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Set Interview */}
                     <div className={`fixed flex justify-center items-center h-full w-full z-[101] backdrop-blur-sm left-0 top-0 ${nextRoundSelection.value === "New Interview" ? "block" : "hidden"}`}>
@@ -928,7 +1031,7 @@ function CandidateView() {
                             <br />
 
                             <div className='flex gap-4'>
-                                <button className='min-w-[30%] px-5 rounded-md bg-gray-100' onClick={() => setNextRoundSelection((values) => ({ ...values, value: "", checked: false }))}>Cancel</button>
+                                <button className='min-w-[30%] px-5 rounded-md bg-gray-100 border' onClick={() => setNextRoundSelection((values) => ({ ...values, value: "", checked: false }))}>Cancel</button>
                                 <button onClick={scheduleInterview} className={`min-w-[60%] p-2.5 bg-indigo-700 text-white w-full rounded-md`}
                                     disabled={newInterviewDetails.loading ? true : newInterviewDetails.success ? true : !permissions.createInterview ? true : false}
                                     style={{
