@@ -78,7 +78,7 @@ const useNewCandidate = () => {
                 setLoading(false);
                 setSuccess(true);
                 setError(false);
-                navigate("/candidates");
+                navigate(`/candidates/view/${response.data.candidate_id}`);
 
                 setTimeout(() => {
                     setSuccess(false);

@@ -507,18 +507,18 @@ const NewCandidate = () => {
         <form onSubmit={(e) => {
             e.preventDefault()
             registerCandidate(candidate, experienceFields, qualifications, skillFields, hobbyFields, selectedJobs.ids, nextRoundSelection.value, nextRoundSelection.value !== "Rejected" || nextRoundSelection.value !== "Follow-up" ? "Shortlisted" : nextRoundSelection.status, newInterviewDetails)
-        }} className="p-4 component-rendering-tranistion h-full overflow-auto">
+        }} className="p-8 component-rendering-tranistion h-full overflow-auto bg-gray-100">
             <h1 className="text-2xl font-semibold">Create New Candidate</h1>
             <span className={`inline-flex items-center gap-2 fixed top-28 p-3 min-w-60 bg-green-600 text-white transition-small ${success ? 'right-12' : '-right-[100%]'}`}><IoIosCheckmarkCircleOutline size={'18px'} />User Created Successfully</span>
             <span className={`inline-flex items-center gap-2 fixed top-28 p-3 min-w-60 bg-red-600 text-white transition-small ${error ? 'right-12' : '-right-[100%]'}`}><IoIosCheckmarkCircleOutline size={'18px'} />User Creation Failed</span>
 
-            <div className="w-full mt-10">
+            <div className="w-full mt-2">
 
 
-                <div className="bg-gray-50 p-8 rounded-xl border">
-                    <h1 className="flex items-center"><span className="inline-block min-w-fit text-2xl mr-5">Personal Details</span> <hr className="w-full" /></h1>
+                <div className="bg-white shadow-xl p-8 rounded-xl border">
+                    <h1 className="flex items-center"><span className="inline-block min-w-fit text-xl mr-5 font-bold">Personal Details</span></h1>
 
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-4 gap-4 mt-2">
                         <div>
                             <label htmlFor="title" className="font-semibold inline-block p-4 pl-0">
                                 Title<span className="text-red-500">*</span>
@@ -788,8 +788,8 @@ const NewCandidate = () => {
 
 
                 {/* Experience Component */}
-                <div className="bg-green-50 rounded-xl border p-8 mt-6">
-                    <h1 className="flex items-center"><span className="inline-block min-w-fit text-2xl mr-5">Experience<span className="text-red-500">*</span></span> <hr className="w-full" /></h1>
+                <div className="bg-white rounded-xl border p-8 mt-8 shadow-xl">
+                    <h1 className="flex items-center"><span className="inline-block min-w-fit text-xl mr-5 font-bold">Experience<span className="text-red-500">*</span></span></h1>
                     <div>
                         <div className="mb-5 w-1/4 pr-3">
                             <label htmlFor="experience" className="font-semibold inline-block p-4 pl-0">Experience Level<span className="text-red-500">*</span></label>
@@ -948,8 +948,8 @@ const NewCandidate = () => {
                 {/* Education/ Qualification Handling */}
                 {/* Education/ Qualification Handling */}
                 {/* Education/ Qualification Handling */}
-                <div className="bg-indigo-50 p-8 mt-8 border rounded-xl">
-                    <h1 className="flex items-center"><span className="inline-block min-w-fit text-2xl mr-5">Qualifications</span> <hr className="w-full" /></h1>
+                <div className="bg-white p-8 mt-8 border rounded-xl shadow-xl">
+                    <h1 className="flex items-center"><span className="inline-block min-w-fit text-xl mr-5 font-bold">Qualifications</span></h1>
                     <div>
                         {qualifications.map((qualificationField, index) => (
                             <div key={index} className="grid grid-cols-4 gap-4 mb-5 pb-10 border-b relative">
@@ -1060,30 +1060,32 @@ const NewCandidate = () => {
 
 
 
-                {/* Skills Hanlding */}
-                {/* Skills Hanlding */}
-                {/* Skills Hanlding */}
-                <h1 className="flex items-center my-8"><span className="inline-block min-w-fit text-2xl mr-5">Skills</span> <hr className="w-full" /></h1>
-                {/* <Skills /> */}
-                <div className='flex flex-wrap items-center'>
-                    <input
-                        type="text"
-                        className="mr-2 w-60 p-3 px-6 my-2 border rounded-full"
-                        placeholder="Add a skill"
-                        value={skillFields[skillFields.length - 1].skill}
-                        onChange={event => handleSkillsChange(skillFields.length - 1, event)}
-                        onKeyDown={handleSkillsKeyDown}
-                    />
-                    <div className="flex flex-wrap">
-                        {skillFields.slice(0, -1).map((skillField, index) => ( // Don't show the last empty field as a tag
-                            <div key={skillField.id} className="flex items-center justify-between bg-gray-100 w-60 border rounded-full p-3 px-6 my-2 mr-2">
-                                <span className="mr-2">{skillField.skill}</span>
-                                <FaTimes
-                                    className="cursor-pointer text-red-600 ml-4"
-                                    onClick={() => removeSkillField(index)}
-                                />
-                            </div>
-                        ))}
+                <div className="p-8 mt-8 bg-white shadow-xl rounded-xl">
+                    {/* Skills Hanlding */}
+                    {/* Skills Hanlding */}
+                    {/* Skills Hanlding */}
+                    <h1 className="flex items-center mb-2"><span className="inline-block min-w-fit text-xl mr-5 font-bold">Skills</span></h1>
+                    {/* <Skills /> */}
+                    <div className='flex flex-wrap items-center'>
+                        <input
+                            type="text"
+                            className="mr-2 w-60 p-3 px-6 my-2 border rounded-full"
+                            placeholder="Add a skill"
+                            value={skillFields[skillFields.length - 1].skill}
+                            onChange={event => handleSkillsChange(skillFields.length - 1, event)}
+                            onKeyDown={handleSkillsKeyDown}
+                        />
+                        <div className="flex flex-wrap">
+                            {skillFields.slice(0, -1).map((skillField, index) => ( // Don't show the last empty field as a tag
+                                <div key={skillField.id} className="flex items-center justify-between bg-gray-100 w-60 border rounded-full p-3 px-6 my-2 mr-2">
+                                    <span className="mr-2">{skillField.skill}</span>
+                                    <FaTimes
+                                        className="cursor-pointer text-red-600 ml-4"
+                                        onClick={() => removeSkillField(index)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
@@ -1094,36 +1096,33 @@ const NewCandidate = () => {
 
 
 
-                {/* Hobbies Handling */}
-                {/* Hobbies Handling */}
-                {/* Hobbies Handling */}
-                <h1 className="flex items-center my-8"><span className="inline-block min-w-fit text-2xl mr-5">Hobbies</span> <hr className="w-full" /></h1>
-                <div className='flex flex-wrap items-center'>
-                    <input
-                        type="text"
-                        className="mr-2 p-3 px-6 my-2 border rounded-full w-60"
-                        placeholder="Add a hobby"
-                        value={hobbyFields[hobbyFields.length - 1].hobby}
-                        onChange={event => handleHobbyChange(hobbyFields.length - 1, event)}
-                        onKeyDown={handleKeyDown}
-                    />
-                    <div className="flex flex-wrap">
-                        {hobbyFields.slice(0, -1).map((hobbyField, index) => ( // Don't show the last empty field as a tag
-                            <div key={index} className="flex items-center justify-between bg-gray-100 w-60 border rounded-full p-3 px-6 my-2 mr-2">
-                                <span className="mr-2">{hobbyField.hobby}</span>
-                                <FaTimes
-                                    className="cursor-pointer text-red-600 ml-4"
-                                    onClick={() => removeHobbyField(index)}
-                                />
-                            </div>
-                        ))}
+                <div className="p-8 mt-8 bg-white rounded-xl shadow-xl">
+                    {/* Hobbies Handling */}
+                    {/* Hobbies Handling */}
+                    {/* Hobbies Handling */}
+                    <h1 className="flex items-center mb-2"><span className="inline-block min-w-fit text-xl mr-5 font-bold">Hobbies</span></h1>
+                    <div className='flex flex-wrap items-center'>
+                        <input
+                            type="text"
+                            className="mr-2 p-3 px-6 my-2 border rounded-full w-60"
+                            placeholder="Add a hobby"
+                            value={hobbyFields[hobbyFields.length - 1].hobby}
+                            onChange={event => handleHobbyChange(hobbyFields.length - 1, event)}
+                            onKeyDown={handleKeyDown}
+                        />
+                        <div className="flex flex-wrap">
+                            {hobbyFields.slice(0, -1).map((hobbyField, index) => ( // Don't show the last empty field as a tag
+                                <div key={index} className="flex items-center justify-between bg-gray-100 w-60 border rounded-full p-3 px-6 my-2 mr-2">
+                                    <span className="mr-2">{hobbyField.hobby}</span>
+                                    <FaTimes
+                                        className="cursor-pointer text-red-600 ml-4"
+                                        onClick={() => removeHobbyField(index)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
-
-
-                <br />
-                <hr />
-                <br />
 
 
                 <div className="my-2">
@@ -1236,9 +1235,9 @@ const NewCandidate = () => {
 
 
 
-                <div className="flex items-center justify-end mt-10">
+                <div className="flex items-center justify-end mt-8">
                     <div className="w-1/4 pl-4">
-                        <button type="submit" className={`primary-button justify-center ${loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
+                        <button type="submit" className={`rounded-full bg-indigo-700 w-full h-12 text-white ${loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
                             disabled={loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError}
                         >Create Candidate</button>
                     </div>

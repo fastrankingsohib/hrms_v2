@@ -5,6 +5,8 @@ import axios from 'axios';
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { GoLinkExternal } from "react-icons/go";
 import AllInterviews from './AllInterviews';
+import { FiExternalLink } from "react-icons/fi";
+
 
 
 function ViewInterview() {
@@ -39,6 +41,7 @@ function ViewInterview() {
     // useEffect(() => {
     //     console.log(interviewDetails)
     // }, [interviewDetails])
+    const [appliedCandidate, setAppliedCandidate] = useState()
 
     useEffect(() => {
         setInterviewEvents({ loading: true, success: false, error: false });
@@ -57,7 +60,6 @@ function ViewInterview() {
             .then((res) => {
                 setInterviewEvents({ loading: false, success: true, error: false });
                 setInterviewDetails(res.data.data[0])
-                console.log(res.data.data[0])
 
                 setUpdatedInterviewDetails({
                     attempted: false,
@@ -92,11 +94,13 @@ function ViewInterview() {
                 axios.get(`/candidate-info/${res.data.data[0].candidate_id}`)
                     .then((res) => {
                         setCandidateDetails(res.data.candidate);
+                        console.log(res.data)
                         setAppliedJobs(res.data.candidate.candidate_applied_jobs);
                     })
                     .catch((err) => {
                         console.log(err)
                     })
+
             })
             .catch((err) => {
                 setInterviewEvents({ loading: false, success: false, error: true });
@@ -139,20 +143,26 @@ function ViewInterview() {
 
     if (interviewDetails) {
         return (
-            <div className='p-4 h-full w-full'>
-                <button className='flex gap-3 items-center bg-gray-100 rounded-full p-2 px-4' onClick={() => navigate(-1)}><IoMdArrowBack /> Back</button>
+            <div className='p-8 h-full w-full'>
+                <div className='flex items-center gap-8'>
+                    <button className='flex gap-3 items-center bg-gray-100 rounded-full p-2 px-4' onClick={() => navigate(-1)}><IoMdArrowBack /> Back</button>
+                    <span className='text-2xl mr-4 font-bold'>Interview Details</span>
+                </div>
 
                 {
                     interviewEvents.loading ?
                         <div className='h-[95%] w-full flex items-center justify-center'>Loading Interview...</div>
 
                         : interviewEvents.success ?
-                            <div className="mt-4">
-                                <h1 className='font-semibold mb-4'>
-                                    <span className='text-2xl'>Interview Details</span>
-                                    <button className={`ml-4 p-2 px-5 rounded-full ${isEditable ? "bg-green-600 text-white" : "bg-gray-100"}`} onClick={() => setIsEditable(!isEditable)}>{isEditable ? "Save Details" : "Edit Details"}</button>
+                            <div className="mt-4 p-4 bg-gray-50 border rounded-xl">
+                                <h1 className='mb-4 flex justify-between items-center'>
+                                    <div>
+                                        <span className='mr-4'><span className='font-semibold ml-2 text-indigo-700'>Interview Scheduled For:</span> <Link title='View Complete Candidate Profile' to={`/candidates/view/${interviewDetails.candidate_id}`} className='hover:text-indigo-700 hover:underline inline-flex items-center gap-2 ml-2'>{candidateDetails ? `${candidateDetails.title} ${candidateDetails.first_name} ${candidateDetails.middle_name} ${candidateDetails.last_name}` : ""} <FiExternalLink  /></Link></span>
+                                    </div>
+                                    <button className={`ml-4 p-2 px-5 rounded-full border ${isEditable ? "bg-green-50 border-green-300" : "bg-red-50 border-red-300"}`} onClick={() => setIsEditable(!isEditable)}>{isEditable ? "Disable Edit" : "Enable to Edit Interview Details"}</button>
                                 </h1>
-                                <div className='grid grid-cols-5 gap-4'>
+                                <hr />
+                                <div className='grid grid-cols-5 gap-4 mt-10'>
                                     <div>
                                         <div className='font-semibold pl-2'>Interview ID</div>
                                         <div className='text-gray-500 p-2'>#{interviewId}</div>
@@ -162,7 +172,7 @@ function ViewInterview() {
                                         <div className='font-semibold pl-2'>Interview Date</div>
                                         <div className='text-gray-500 p-2'>
                                             {
-                                                isEditable ? <input type="date" defaultValue={updatedInterviewDetails.interview_date} className={`p-2 ${isEditable ? "bg-gray-100" : "bg-white"}`} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, interview_date: e.target.value }))} /> :
+                                                isEditable ? <input type="date" defaultValue={updatedInterviewDetails.interview_date} className={`p-2 ${isEditable ? "bg-gray-100" : "bg-transparent"}`} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, interview_date: e.target.value }))} /> :
                                                     new Date(updatedInterviewDetails.interview_date).toLocaleDateString('en-US', {
                                                         day: 'numeric',
                                                         month: 'short',
@@ -178,7 +188,7 @@ function ViewInterview() {
                                         <div className='font-semibold pl-2'>Interview Time</div>
                                         <div className='text-gray-500 p-2'>
                                             {
-                                                isEditable ? <input type="time" defaultValue={interviewDetails.interview_time} className={`p-2 ${isEditable ? "bg-gray-100" : "bg-white"}`} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, interview_time: e.target.value }))} /> :
+                                                isEditable ? <input type="time" defaultValue={interviewDetails.interview_time} className={`p-2 ${isEditable ? "bg-gray-100" : "bg-transparent"}`} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, interview_time: e.target.value }))} /> :
                                                     (() => {
                                                         const [hours, minutes] = updatedInterviewDetails.interview_time.split(':'); // Split the time string into hours and minutes
                                                         const date = new Date(); // Create a new date object
@@ -198,7 +208,7 @@ function ViewInterview() {
                                     <div>
                                         <div className='font-semibold pl-2'>Interviewer</div>
                                         <div className='text-gray-500 flex items-center gap-2 p-2'>
-                                            <select defaultValue={interviewDetails.interviewer} className={`${isEditable ? "bg-gray-100 p-2" : "bg-white"}`} disabled={!isEditable} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, interviewer: e.target.value }))}>
+                                            <select defaultValue={interviewDetails.interviewer} className={`${isEditable ? "bg-gray-100 p-2" : "bg-transparent"}`} disabled={!isEditable} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, interviewer: e.target.value }))}>
                                                 <option value="---" disabled={true}>--- Change Interviewer ---</option>
                                                 {
                                                     allUsers.length > 0 ?
@@ -215,7 +225,7 @@ function ViewInterview() {
                                     <div>
                                         <div className='font-semibold pl-2'>Job Title</div>
                                         <div className='text-gray-500 w-[90%] flex items-center gap-2 p-2'>
-                                            <select defaultValue={interviewDetails.job_id} className={`${isEditable ? "bg-gray-100 p-2" : "bg-white"}`} disabled={!isEditable} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, job_id: e.target.value }))}>
+                                            <select defaultValue={interviewDetails.job_id} className={`${isEditable ? "bg-gray-100 p-2" : "bg-transparent"}`} disabled={!isEditable} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, job_id: e.target.value }))}>
                                                 <option value="---" disabled={true}>--- Change Job Title ---</option>
                                                 {
                                                     appliedJobs.length > 0 ?
@@ -299,7 +309,7 @@ function ViewInterview() {
                                     <div>
                                         <div className='font-semibold pl-2'>Remarks</div>
                                         <div className='text-gray-500 flex items-center gap-2 p-2'>
-                                            <input type="text" disabled={true} className={`p-2 bg-white`} defaultValue={updatedInterviewDetails.remarks ? interviewDetails.remarks : "No Remarks"} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, remarks: e.target.value }))} />
+                                            <input type="text" disabled={true} className={`p-2 bg-transparent`} defaultValue={updatedInterviewDetails.remarks ? interviewDetails.remarks : "No Remarks"} onChange={(e) => setUpdatedInterviewDetails((values) => ({ ...values, remarks: e.target.value }))} />
                                         </div>
                                     </div>
 
@@ -332,21 +342,21 @@ function ViewInterview() {
                                             <h1 className='text-xl font-semibold'>Update Interview Status</h1>
 
                                             <label className='mt-4 inline-block'>Select Status</label>
-                                            <select className='w-full border p-2.5 rounded-md' defaultValue={changeStatus.job_candidate_status} onChange={(e) => setChangeStatus((values) => ({...values, job_candidate_status: e.target.value}))}>
+                                            <select className='w-full border p-2.5 rounded-md' defaultValue={changeStatus.job_candidate_status} onChange={(e) => setChangeStatus((values) => ({ ...values, job_candidate_status: e.target.value }))}>
                                                 <option value="---" disabled={true}>--- Selected Updated Status ---</option>
                                                 <option value="Selected">Selected</option>
                                                 <option value="Rejected">Rejected</option>
                                             </select>
-                                            
+
                                             <label className='mt-4 inline-block'>Attempt Status</label>
-                                            <select className='w-full border p-2.5 rounded-md' defaultValue={changeStatus.attempted} onChange={(e) => setChangeStatus((values) => ({...values, attempted: Boolean(e.target.value)}))}>
+                                            <select className='w-full border p-2.5 rounded-md' defaultValue={changeStatus.attempted} onChange={(e) => setChangeStatus((values) => ({ ...values, attempted: Boolean(e.target.value) }))}>
                                                 <option value="---" disabled={true}>--- Selected Updated Status ---</option>
                                                 <option value={true}>Selected</option>
                                                 <option value={false}>Rejected</option>
                                             </select>
 
                                             <label className='mt-4 inline-block'>HR Remarks</label>
-                                            <input type="text" className='block w-full p-2.5 rounded-md border' defaultValue={changeStatus.remarks} onChange={(e) => setChangeStatus((values) => ({...values, remarks: e.target.value}))} placeholder='Remarks' />
+                                            <input type="text" className='block w-full p-2.5 rounded-md border' defaultValue={changeStatus.remarks} onChange={(e) => setChangeStatus((values) => ({ ...values, remarks: e.target.value }))} placeholder='Remarks' />
 
 
                                             <div className='flex gap-4 mt-4'>
