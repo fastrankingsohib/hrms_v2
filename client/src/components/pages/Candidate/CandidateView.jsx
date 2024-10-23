@@ -77,8 +77,6 @@ function CandidateView() {
                     setCandidateLoading(false);
                     setCandidateError(false);
                     setCandidate(candidateData);
-                    setExpeirenceInYears(res.data.experience_years)
-                    setExpeirenceInMonths(res.data.experience_months)
 
                     // Populate education and experience lists after data is fetched
                     setEducationList(candidateData.qualifications || []);
@@ -117,11 +115,13 @@ function CandidateView() {
             .then((res) => {
                 if (res.data.success) {
                     const candidateData = res.data.candidate;
+                    console.log(res.data.candidate)
                     setCandidateSuccess(true);
                     setCandidateLoading(false);
                     setCandidateError(false);
                     setCandidate(candidateData);
-                    setExpeirenceInYears(res.data.experience_in_years)
+                    setExpeirenceInYears(res.data.experience_years)
+                    setExpeirenceInMonths(res.data.experience_months)
 
                     // Populate education and experience lists after data is fetched
                     setEducationList(candidateData.qualifications || []);
@@ -473,7 +473,7 @@ function CandidateView() {
             <div className='h-full'>
                 <div className={`h-full overflow-auto`}>
                     <span className={`inline-block fixed z-40 top-56 tranition-basic p-3 ${updateEvents.success ? "right-10" : "-right-[100%]"} bg-green-600 text-white`}>Data Updated Successfully</span>
-                    <div className='flex items-center justify-between sticky top-0 bg-white border-b'>
+                    <div className='flex items-center justify-between sticky top-0 z-50 bg-white border-b'>
                         <div className='min-w-80'>
                             <div className='flex items-center p-4'>
                                 <div className='inline-flex items-center justify-center h-20 w-20 bg-gray-100 rounded-full mr-4'><FaUser size={"20px"} className='text-gray-400' /></div>
@@ -906,7 +906,7 @@ function CandidateView() {
 
                     {/* Applied Jobs */}
                     <div className={`h-full ${selectedFilter === "Applied Jobs" ? "block" : "hidden"}`}>
-                        <AppliedJobs candidateId={candidate_id} />
+                        <AppliedJobs candidateId={candidate_id} candidate={candidate} />
                     </div>
 
 

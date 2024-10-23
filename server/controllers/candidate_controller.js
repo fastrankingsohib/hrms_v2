@@ -719,5 +719,30 @@ const specific_job_status_update = async (req, res) => {
   }
 };
 
+const add_job_application = async(req,res)=>{
+  const {job_ids,candidate_id}=req.body;
+  try {
+    const length = job_ids.length
+    for(let i=0;i<length;i++){
+      const job_id = job_ids[i];
+      await prisma.candidate_applied_jobs.create({
+        data: {
+          job_id: job_id,
+          candidate_id: candidate_id,
+        }
+      })
+    }
+    res.status(200).send({
+      success:true,
+      message:"Job application added successfully",
+    })
+  } catch (error) {
+    res.status(500).send({
+      message: "Error with request",
+      success: false
+    })
+  }
 
-export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update, candidate_applied_based_jobs}
+}
+
+export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update, candidate_applied_based_jobs,add_job_application}
