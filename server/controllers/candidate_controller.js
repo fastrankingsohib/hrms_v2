@@ -755,5 +755,59 @@ const add_job_application = async (req, res) => {
   }
 };
 
-export {add_candidate,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update, candidate_applied_based_jobs,add_job_application}
+const hierarchical_candidates_list = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user_data = await prisma.user.findUnique({
+      where: {
+        id: parseInt(id) // Assuming `id` is an integer, convert it
+      }
+    });
+
+    if (!user_data) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    const candidate_data = await prisma.candidate_list.findMany({
+      where: {
+        OR: [
+          { created_by: user_data.username },
+          { user_reporting_to: user_data.username }
+        ]
+      },
+       include: {
+        workExperiences: true, 
+        qualifications: true, 
+        candidate_applied_jobs: {
+          include: {
+            job: { 
+              select: {
+                job_title: true,
+              },
+            },
+          },
+        },
+      }
+    });
+
+    res.status(200).send({
+      success: true,
+      message: "Candidates list",
+      candidate_data: candidate_data
+    });
+    
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error sending candidates list"
+    });
+  }
+};
+
+
+export {add_candidate,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update, candidate_applied_based_jobs,add_job_application,hierarchical_candidates_list}
 // reporting_to_users,

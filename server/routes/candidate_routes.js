@@ -5,6 +5,7 @@ import {
   all_candidates,
   candidate_applied_based_jobs,
   delete_candidate,
+  hierarchical_candidates_list,
   id_based_jobs_applicants,
   module_data,
   my_candidates,
@@ -110,5 +111,6 @@ router.get('/applicants-applied-jobs/:id', authenticateToken, candidate_applied_
 router.post('/update-candidate-status/:id', authenticateToken, update_candidate_status);
 router.post('/specific-job-status-update/:job_id/:candidate_id', authenticateToken, specific_job_status_update);
 router.post('/add_job_application',authenticateToken,add_job_application)
+router.get('/hierarchical_candidate_list/:id',authenticateToken,hierarchical_candidates_list)
 
 export default router;

@@ -125,6 +125,7 @@ model candidate_list {
   candidate_highest_qualification String?
   candidate_pan                   String?
   work_tenure                     String?                  @db.VarChar(100)
+  user_reporting_to               String?                  @db.VarChar(50)
   candidate_applied_jobs          candidate_applied_jobs[]
   comments                        comments[]
   interview_details               interview_details[]
