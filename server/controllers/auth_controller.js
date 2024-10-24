@@ -564,4 +564,27 @@ const delete_user = async (req, res) => {
     }
 }
 
-export { register, login, authenticateToken, logout, send_all_user_data, id_based_data, update_user_data, delete_user };
+const reporting_to_users = async (req, res) => {
+    try {
+      const data = await prisma.user.findMany({
+        where: {
+          role: {
+            in: ["Manager", "Master Admin", "Admin"] 
+          }
+        }
+      });
+      res.status(200).send({
+        success: true,
+        data: data,
+        message: "Reporting to data sent successfully"
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        success: false,
+        message: "Error fetching users data"
+      });
+    }
+  };
+  
+export { register, login, authenticateToken, logout, send_all_user_data, id_based_data, update_user_data, delete_user,reporting_to_users };
