@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   add_candidate,
+  add_job_application,
   all_candidates,
   candidate_applied_based_jobs,
   delete_candidate,
@@ -108,5 +109,6 @@ router.get('/job_applicants/:id', authenticateToken, id_based_jobs_applicants);
 router.get('/applicants-applied-jobs/:id', authenticateToken, candidate_applied_based_jobs);
 router.post('/update-candidate-status/:id', authenticateToken, update_candidate_status);
 router.post('/specific-job-status-update/:job_id/:candidate_id', authenticateToken, specific_job_status_update);
+router.post('/add_job_application',authenticateToken,add_job_application)
 
 export default router;
