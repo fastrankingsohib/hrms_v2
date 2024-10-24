@@ -166,13 +166,13 @@ const UpdateUser = () => {
 
 
     return (
-        <section className="relative p-4 component-rendering-transition">
-            <p className="fixed inline-flex items-center gap-2 top-24 right-8 bg-green-600 text-white font-semibold text-lg p-4 z-50 tranition-basic" style={{ marginRight: success === true ? 0 : '-100%' }}>
+        <section className="relative p-4 component-rendering-transition bg-gray-100">
+            <p className="fixed z-[1000] inline-flex items-center gap-2 top-28 right-8 bg-green-600 text-white font-semibold text-lg p-4 tranition-basic" style={{ marginRight: success === true ? 0 : '-100%' }}>
                 <span><IoIosCheckmarkCircleOutline size={'18px'} /></span>
                 User Updated Successfully
             </p>
-            <h1 className="text-2xl font-semibold flex items-center justify-between">
-                {user.username}
+            <h1 className="text-2xl font-semibold flex items-center justify-between p-8 pt-6 pb-0">
+                {`${user.title} ${user.firstName} ${user.middleName} ${user.lastName}`}
                 <div className="max-w-60 h-12">
                     <button
                         onClick={toggleEdit}
@@ -183,8 +183,8 @@ const UpdateUser = () => {
                 </div>
             </h1>
 
-            <form className="w-full mt-10">
-                <div className="grid grid-cols-4 gap-4">
+            <form className="w-full p-8">
+                <div className="grid grid-cols-5 gap-8 p-8 bg-white rounded-xl shadow-xl">
                     <div>
                         <label htmlFor="title" className="font-semibold inline-block p-4 pl-0">Title</label>
                         <select
@@ -280,6 +280,7 @@ const UpdateUser = () => {
                             placeholder="Username"
                             name=""
                             id=""
+                            disabled={!isEditing}
                             value={user.username} // Controlled input
                             onChange={(e) => {
                                 const value = e.target.value;
@@ -326,6 +327,7 @@ const UpdateUser = () => {
                             className="primary-input"
                             placeholder="Mobile Number"
                             id="mobile"
+                            disabled={!isEditing}
                             value={user.mobile} // Controlled input
                             onChange={(e) => {
                                 const value = e.target.value;
@@ -568,30 +570,33 @@ const UpdateUser = () => {
                     </div>
                 </div>
 
-                <div className="grid gap-4 grid-cols-1 2xl:grid-cols-2 border-t-2 mt-10">
-                    {
-                        user.modules.map((currentModule, moduleKey) => {
+                <div className="p-8 bg-white rounded-xl shadow-xl mt-8">
+                    <h1 className="text-xl font-bold">Update Permitted Modules To The User</h1>
+                    <div className="grid gap-4 grid-cols-1 2xl:grid-cols-2">
+                        {
+                            user.modules.map((currentModule, moduleKey) => {
 
-                            let module_status = currentModule.module_status
-                            // console.log(`module_name: ${currentModule.module_name}, module crud: c - ${currentModule.c}, r - ${currentModule.r}, u - ${currentModule.u}, d - ${currentModule.d}, `)
+                                let module_status = currentModule.module_status
+                                // console.log(`module_name: ${currentModule.module_name}, module crud: c - ${currentModule.c}, r - ${currentModule.r}, u - ${currentModule.u}, d - ${currentModule.d}, `)
 
-                            return (
-                                <UserModule
-                                    editable={!isEditing}
-                                    key={moduleKey}
-                                    checked={currentModule.module_status == true ? true : false}
-                                    create={currentModule.c == true ? true : false}
-                                    read={currentModule.r == true ? true : false}
-                                    update={currentModule.u == true ? true : false}
-                                    delete={currentModule.d == true ? true : false}
-                                    id={`module-${currentModule.module_name}`}
-                                    name={currentModule.module_name}
-                                    module={currentModule.module_status}
+                                return (
+                                    <UserModule
+                                        editable={!isEditing}
+                                        key={moduleKey}
+                                        checked={currentModule.module_status == true ? true : false}
+                                        create={currentModule.c == true ? true : false}
+                                        read={currentModule.r == true ? true : false}
+                                        update={currentModule.u == true ? true : false}
+                                        delete={currentModule.d == true ? true : false}
+                                        id={`module-${currentModule.module_name}`}
+                                        name={currentModule.module_name}
+                                        module={currentModule.module_status}
 
-                                />
-                            )
-                        })
-                    }
+                                    />
+                                )
+                            })
+                        }
+                    </div>
                 </div>
 
                 <div className="flex items-center justify-end mt-10">

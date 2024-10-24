@@ -59,7 +59,7 @@ function ViewInterview() {
         axios.get(`/interview-by-id/${interviewId}`)
             .then((res) => {
                 setInterviewEvents({ loading: false, success: true, error: false });
-                setInterviewDetails(res.data.data[0])
+                setInterviewDetails(res.data.data[0]);
 
                 setUpdatedInterviewDetails({
                     attempted: false,
@@ -94,7 +94,6 @@ function ViewInterview() {
                 axios.get(`/candidate-info/${res.data.data[0].candidate_id}`)
                     .then((res) => {
                         setCandidateDetails(res.data.candidate);
-                        console.log(res.data)
                         setAppliedJobs(res.data.candidate.candidate_applied_jobs);
                     })
                     .catch((err) => {
@@ -108,7 +107,6 @@ function ViewInterview() {
             });
     }, [interviewId])
 
-
     const hanldeUpdateInterview = () => {
         axios.post(`/update-interview/${interviewId}`, updatedInterviewDetails)
             .then((res) => {
@@ -117,20 +115,69 @@ function ViewInterview() {
             .catch((err) => {
                 console.log(err)
             })
-
-        // console.log(updatedInterviewDetails)
     }
-
 
     const hanldeUpdateStatus = () => {
         setChangeStatus((values) => ({ ...values, success: false, loading: true, error: false, attempted: true }))
-        console.log(changeStatus)
         axios.post(`/update-candidate-interview-status/${interviewId}`, changeStatus)
             .then((res) => {
                 setChangeStatus((values) => ({ ...values, success: true, loading: false, error: false, toggled: false }))
                 setTimeout(() => {
                     setChangeStatus((values) => ({ ...values, success: false, loading: false, error: false }))
-                }, 2000)
+                }, 2000);
+
+
+
+                // Fecthing Interview Again
+                axios.get(`/interview-by-id/${interviewId}`)
+                    .then((res) => {
+                        setInterviewEvents({ loading: false, success: true, error: false });
+                        setInterviewDetails(res.data.data[0]);
+
+                        setUpdatedInterviewDetails({
+                            attempted: false,
+                            interview_round: res.data.data[0].interview_round,
+                            interviewer: res.data.data[0].interviewer,
+                            interview_time: res.data.data[0].interview_time,
+                            interview_date: res.data.data[0].interview_date,
+                            job_id: res.data.data[0].job_id,
+                            remarks: res.data.data[0].remarks
+                        })
+
+                        setChangeStatus({
+                            toggled: false,
+                            job_candidate_status: res.data.data[0].job_candidate_status,
+                            remarks: res.data.data[0].remarks,
+                            candidate_id: res.data.data[0].candidate_id,
+                            job_id: res.data.data[0].job_id,
+                            attempted: res.data.data[0].attempted,
+                        })
+
+                        // Job Details
+                        const jobId = res.data.data[0].job_id
+                        axios.get(`/id_based_jobs/${jobId}`)
+                            .then((res) => {
+                                setJobDetails(res.data.job)
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            })
+
+                        // Candidate Details
+                        axios.get(`/candidate-info/${res.data.data[0].candidate_id}`)
+                            .then((res) => {
+                                setCandidateDetails(res.data.candidate);
+                                setAppliedJobs(res.data.candidate.candidate_applied_jobs);
+                            })
+                            .catch((err) => {
+                                console.log(err)
+                            })
+
+                    })
+                    .catch((err) => {
+                        setInterviewEvents({ loading: false, success: false, error: true });
+                        console.log(err);
+                    });
             })
             .catch((err) => {
                 setChangeStatus((values) => ({ ...values, success: false, loading: false, error: true }))
@@ -139,6 +186,7 @@ function ViewInterview() {
                 }, 2000)
                 console.log(err);
             })
+        console.log(changeStatus)
     }
 
     if (interviewDetails) {
@@ -157,7 +205,7 @@ function ViewInterview() {
                             <div className="mt-4 p-4 bg-gray-50 border rounded-xl">
                                 <h1 className='mb-4 flex justify-between items-center'>
                                     <div>
-                                        <span className='mr-4'><span className='font-semibold ml-2 text-indigo-700'>Interview Scheduled For:</span> <Link title='View Complete Candidate Profile' to={`/candidates/view/${interviewDetails.candidate_id}`} className='hover:text-indigo-700 hover:underline inline-flex items-center gap-2 ml-2'>{candidateDetails ? `${candidateDetails.title} ${candidateDetails.first_name} ${candidateDetails.middle_name} ${candidateDetails.last_name}` : ""} <FiExternalLink  /></Link></span>
+                                        <span className='mr-4'><span className='font-semibold ml-2 text-indigo-700'>Interview Scheduled For:</span> <Link title='View Complete Candidate Profile' to={`/candidates/view/${interviewDetails.candidate_id}`} className='hover:text-indigo-700 hover:underline inline-flex items-center gap-2 ml-2'>{candidateDetails ? `${candidateDetails.title} ${candidateDetails.first_name} ${candidateDetails.middle_name} ${candidateDetails.last_name}` : ""} <FiExternalLink /></Link></span>
                                     </div>
                                     <button className={`ml-4 p-2 px-5 rounded-full border ${isEditable ? "bg-green-50 border-green-300" : "bg-red-50 border-red-300"}`} onClick={() => setIsEditable(!isEditable)}>{isEditable ? "Disable Edit" : "Enable to Edit Interview Details"}</button>
                                 </h1>
@@ -318,9 +366,11 @@ function ViewInterview() {
                                         <div className='font-semibold pl-2'>Intervew Attempt Status</div>
                                         <div className='text-gray-500 flex items-center gap-2'>
                                             <span className='p-2'>
-                                                {
-                                                    interviewDetails.attempted ? interviewDetails.attempted : <span className='text-orange-500'>Pending</span>
-                                                }
+                                                {/* {
+                                                    interviewDetails.attempted ? interviewDetails.attempted : <span className='text-orange-500'>{interviewDetails}</span>
+                                                } */}
+
+                                                {interviewDetails.attempted ? `${interviewDetails.attempted}` : "Not Attempted"}
                                             </span>
                                         </div>
                                         {/* <div className='p-2'>
@@ -341,22 +391,30 @@ function ViewInterview() {
                                         <div className='text-left min-h-60 w-96 p-10 bg-white border shadow-xl'>
                                             <h1 className='text-xl font-semibold'>Update Interview Status</h1>
 
-                                            <label className='mt-4 inline-block'>Select Status</label>
-                                            <select className='w-full border p-2.5 rounded-md' defaultValue={changeStatus.job_candidate_status} onChange={(e) => setChangeStatus((values) => ({ ...values, job_candidate_status: e.target.value }))}>
-                                                <option value="---" disabled={true}>--- Selected Updated Status ---</option>
+                                            <label className='mt-4 inline-block'>Select Attempt Status</label>
+                                            <select
+                                                className='w-full border p-2.5 rounded-md'
+                                                defaultValue={""}
+                                                onChange={(e) => {
+                                                    const value = e.target.value === "true"; // Convert string "true" or "false" to boolean
+                                                    setChangeStatus((values) => ({ ...values, attempted: value }));
+                                                }}
+                                            >
+                                                <option value="" disabled={true}>--- Select Attempted Status ---</option>
+                                                <option value={true}>Attempted</option>
+                                                <option value={false}>Not Attempted</option>
+                                            </select>
+
+
+                                            <label className='mt-4 inline-block'>Select Updated Status</label>
+                                            <select className='w-full border p-2.5 rounded-md' defaultValue={""} onChange={(e) => setChangeStatus((values) => ({ ...values, job_candidate_status: e.target.value }))}>
+                                                <option value="" disabled={true}>--- Select Updated Status ---</option>
                                                 <option value="Selected">Selected</option>
                                                 <option value="Rejected">Rejected</option>
                                             </select>
 
-                                            <label className='mt-4 inline-block'>Attempt Status</label>
-                                            <select className='w-full border p-2.5 rounded-md' defaultValue={changeStatus.attempted} onChange={(e) => setChangeStatus((values) => ({ ...values, attempted: Boolean(e.target.value) }))}>
-                                                <option value="---" disabled={true}>--- Selected Updated Status ---</option>
-                                                <option value={true}>Selected</option>
-                                                <option value={false}>Rejected</option>
-                                            </select>
-
                                             <label className='mt-4 inline-block'>HR Remarks</label>
-                                            <input type="text" className='block w-full p-2.5 rounded-md border' defaultValue={changeStatus.remarks} onChange={(e) => setChangeStatus((values) => ({ ...values, remarks: e.target.value }))} placeholder='Remarks' />
+                                            <textarea className='block w-full p-2.5 min-h-40 rounded-md border' onChange={(e) => setChangeStatus((values) => ({ ...values, remarks: e.target.value }))} placeholder='Remarks'></textarea>
 
 
                                             <div className='flex gap-4 mt-4'>

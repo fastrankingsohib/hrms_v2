@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import useRegisterUser from "../../../helpers/useRegisterUser";
 import allModules from "./AllModules";
 import { useSelector } from "react-redux";
-import UserModule from "../User/AllModules"
+import UserModule from "../../Commons/UserModule";
 
 // Icons
 import { GoEyeClosed, GoEye, GoTriangleUp } from "react-icons/go";
 
-const NewUser = () => {
+export default function NewUser() {
     const warnDefault = useSelector((state) => state.moduleSelection.invalid.length);
     const [mobileError, setMobileError] = useState(false);
     const [submitError, setsubmitError] = useState(false)
@@ -144,16 +144,16 @@ const NewUser = () => {
 
 
     return (
-        <section className="p-10 component-rendering-tranistion">
+        <section className="p-8 component-rendering-tranistion bg-gray-100">
             <h1 className="text-2xl font-semibold">Create New User</h1>
 
             <form onSubmit={register} className="w-full mt-10">
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-5 gap-8 p-8 pb-10 bg-white shadow-xl rounded-xl">
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Title <span className="text-red-500">*</span></label>
-                        <select className="primary-input" required
+                        <select required className="primary-input bg-gray-50" defaultValue={""}
                             onChange={(e) => setUser((values) => ({ ...values, title: e.target.value }))} >
-                            <option disabled={true} defaultValue={true}>-- Select --</option>
+                            <option disabled={true} value={""}>-- Select --</option>
                             <option value="Mr.">Mr.</option>
                             <option value="Ms.">Ms.</option>
                         </select>
@@ -182,10 +182,10 @@ const NewUser = () => {
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Gender <span className="text-red-500">*</span></label>
-                        <select className="primary-input" required
+                        <select className="primary-input" required defaultValue={""}
                             onChange={(e) => setUser((values) => ({ ...values, gender: e.target.value }))}
                         >
-                            <option disabled={true} defaultValue={true}>-- Select --</option>
+                            <option disabled={true} value={""}>-- Select --</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
@@ -262,9 +262,10 @@ const NewUser = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Email ID</label>
+                        <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Email ID <span className="text-red-500">*</span></label>
                         <input
                             type="email"
+                            required
                             className="primary-input"
                             placeholder="Email ID"
                             value={user.emailId} // Controlled input
@@ -276,9 +277,10 @@ const NewUser = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="mobile" className="font-semibold inline-block p-4 pl-0">Mobile</label>
+                        <label htmlFor="mobile" className="font-semibold inline-block p-4 pl-0">Mobile <span className="text-red-500">*</span></label>
                         <input
                             type="tel"
+                            required
                             className="primary-input"
                             placeholder="Mobile Number"
                             id="mobile"
@@ -316,10 +318,10 @@ const NewUser = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Reporting to <span className="text-red-500">*</span></label>
                         <select className="primary-input"
-                            required
+                            required defaultValue={""}
                             onChange={(e) => setUser((values) => ({ ...values, reportingTo: e.target.value }))}
                         >
-                            <option disabled={true} defaultValue={true}>-- Select --</option>
+                            <option disabled={true} value={""}>-- Select --</option>
                             <option value="Akram">Akram</option>
                             <option value="Vivek Singh">Vivek Singh</option>
                         </select>
@@ -335,10 +337,10 @@ const NewUser = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Status <span className="text-red-500">*</span></label>
                         <select className="primary-input"
-                            required
+                            required defaultValue={""}
                             onChange={(e) => setUser((values) => ({ ...values, status: e.target.value }))}
                         >
-                            <option disabled={true} defaultValue={true}>-- Select --</option>
+                            <option disabled={true} value={""}>-- Select --</option>
                             <option value="Active">Active</option>
                             <option value="Inavtive">Inactive</option>
                         </select>
@@ -346,47 +348,27 @@ const NewUser = () => {
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">User Type <span className="text-red-500">*</span></label>
-                        <select className="primary-input" required
+                        <select className="primary-input" required defaultValue={""}
                             onChange={(e) => setUser((values) => ({ ...values, userType: e.target.value }))}
                         >
-                            <option value="" disabled defaultValue={true}>-- Select User Type --</option>
+                            <option value="" disabled={true}>-- Select User Type --</option>
 
-                            <optgroup label="Admin">
-                                <option value="Super Admin">Super Admin</option>
-                                <option value="Admin">Admin</option>
-                            </optgroup>
-
-                            <optgroup label="Manager">
-                                <option value="Project Manager">Project Manager</option>
-                                <option value="Sales Manager">Sales Manager</option>
-                                <option value="HR Manager">HR Manager</option>
-                            </optgroup>
-
-                            <optgroup label="Employee">
-                                <option value="Full-time Employee">Full-time Employee</option>
-                                <option value="Part-time Employee">Part-time Employee</option>
-                                <option value="Intern">Intern</option>
-                            </optgroup>
-
-                            <optgroup label="Client">
-                                <option value="Regular Client">Regular Client</option>
-                                <option value="Guest Client">Guest Client</option>
-                            </optgroup>
-
-                            <optgroup label="Vendor">
-                                <option value="Supplier">Supplier</option>
-                                <option value="Service Provider">Service Provider</option>
-                            </optgroup>
+                            <option value="Super Admin">Super Admin</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Restricted User">Restricted User</option>
+                            <option value="User">User</option>
+                            <option value="Guest">Guest</option>
+                            <option value="Vendor">Vendor</option>
                         </select>
                     </div>
 
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Designation <span className="text-red-500">*</span></label>
                         <select className="primary-input"
-                            required
+                            required defaultValue={""}
                             onChange={(e) => setUser((values) => ({ ...values, designation: e.target.value }))}
                         >
-                            <option value="" disabled defaultValue={true}>-- Select Designation --</option>
+                            <option value="" disabled={true}>-- Select Designation --</option>
 
                             <optgroup label="Software Development">
                                 <option value="Software Engineer">Software Engineer</option>
@@ -461,10 +443,10 @@ const NewUser = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Department <span className="text-red-500">*</span></label>
                         <select className="primary-input"
-                            required
+                            required defaultValue={""}
                             onChange={(e) => setUser((values) => ({ ...values, department: e.target.value }))}
                         >
-                            <option value="" disabled defaultValue={true}>-- Select Department --</option>
+                            <option value="" disabled={true}>-- Select Department --</option>
 
                             <optgroup label="Technical Departments" className="optgroup">
                                 <option value="Software Development">Software Development</option>
@@ -491,10 +473,10 @@ const NewUser = () => {
                     <div>
                         <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Role <span className="text-red-500">*</span></label>
                         <select className="primary-input"
-                            required
+                            required defaultValue={""}
                             onChange={(e) => setUser((values) => ({ ...values, role: e.target.value }))}
                         >
-                            <option disabled={true} defaultValue={true}>-- Select --</option>
+                            <option value="" disabled={true}>-- Select --</option>
                             <option value="Super Admin">Super Admin</option>
                             <option value="Admin">Admin</option>
                             <option value="Director">Director</option>
@@ -508,18 +490,21 @@ const NewUser = () => {
                 </div>
 
 
-                <div className="grid gap-4 grid-cols-2 border-t-2 mt-10">
-                    {
-                        allModules.map((currentModule, moduleKey) => {
-                            return (
-                                <UserModule
-                                    key={moduleKey}
-                                    id={`module-${currentModule.module_name}`}
-                                    name={currentModule.module_name}
-                                />
-                            )
-                        })
-                    }
+                <div className="mt-10 p-8 bg-white rounded-xl shadow-xl">
+                    <h1 className="text-xl font-bold">Select Permitted Module with CRUD Permissions</h1>
+                    <div className="grid gap-2 grid-cols-2">
+                        {
+                            allModules.map((currentModule, moduleKey) => {
+                                return (
+                                    <UserModule
+                                        key={moduleKey}
+                                        id={`module-${currentModule.module_name}`}
+                                        name={currentModule.module_name}
+                                    />
+                                )
+                            })
+                        }
+                    </div>
                 </div>
 
 
@@ -544,4 +529,4 @@ const NewUser = () => {
         </section>
     )
 }
-export default NewUser;
+// export default NewUser;

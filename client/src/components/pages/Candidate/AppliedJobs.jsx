@@ -9,6 +9,9 @@ function AppliedJobs(props) {
     const [newAppliedJobs, setNewAppliedJobs] = useState({
         jobs: [],  // Stores selected jobs
         toggled: false, // Toggles the dropdown
+        success: true, 
+        error: false, 
+        loading: false
     });
 
     useEffect(() => {
@@ -61,24 +64,33 @@ function AppliedJobs(props) {
         newAppliedJobs.jobs.map((value) => {
             allJobs.push(value.job_id); // Use job_id consistently
         });
-        console.log({
-            "jobs": allJobs,
-            "candidate_id": candidate_id
-        });
 
+        setNewAppliedJobs((values) => ({...values, loading: true, success: false, error: false}))
         axios.post(`/add_job_application`, {
             "job_ids": allJobs,
             "candidate_id": Number(candidate_id)
         })
-            .then((res) => {
-                console.log(res.data);
-                console.log({
-                    "jobs": allJobs,
-                    "candidate_id": candidate_id
-                });
+        .then((res) => {
+                axios.get(`/applicants-applied-jobs/${props.candidateId}`)
+                    .then((res) => {
+                        const fetchedJobs = res.data.data;
+                        setAppliedJobs(fetchedJobs);
+                        // Initialize selected jobs to an empty array, preventing default selection
+                        setNewAppliedJobs((values) => ({ ...values, jobs: [], toggled: false, success: true, error: false, loading: false }));
+                        setTimeout(() => {
+                            setNewAppliedJobs((values) => ({...values, loading: false, success: false, error: false}))
+                        }, 1000)
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
             })
             .catch((err) => {
                 console.log(err);
+                setNewAppliedJobs((values) => ({...values, loading: false, success: false, error: false}))
+                setTimeout(() => {
+                    setNewAppliedJobs((values) => ({...values, loading: false, success: false, error: false}))
+                }, 1000)
             });
     };
 
@@ -120,16 +132,16 @@ function AppliedJobs(props) {
                                         <div className="p-4">No Jobs Found!</div>
                                     )}
 
-                                    <button className='p-2.5 bg-black text-white rounded-md mt-0.5' onClick={updateAppliedJobs}>Update Jobs</button>
+                                    <button className={`p-2.5 bg-black text-white rounded-md mt-0.5 ${newAppliedJobs.loading ? "bg-opacity-50 cursor-not-allowed" : ""}`} onClick={updateAppliedJobs} disabled={newAppliedJobs.loading}>{newAppliedJobs.loading ? "Updating..." : newAppliedJobs.success ? "Jobs Updated" : "Update Jobs"}</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <button
-                        className='p-2.5 px-5 rounded-full bg-gray-100 border'
+                        className={`p-2.5 px-5 rounded-full border ${newAppliedJobs.toggled ? "bg-black text-white border-black" : "bg-gray-100"} ${newAppliedJobs.loading ? "opacity-70 cursor-not-allowed" : "opacity-100"}`}
                         onClick={() => setNewAppliedJobs((values) => ({ ...values, toggled: !newAppliedJobs.toggled }))}
                     >
-                        Select Jobs
+                        Update jobs
                     </button>
                 </div>
             </div>

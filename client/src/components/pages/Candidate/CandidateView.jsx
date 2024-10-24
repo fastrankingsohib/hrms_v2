@@ -125,11 +125,14 @@ function CandidateView() {
 
                     // Populate education and experience lists after data is fetched
                     setEducationList(candidateData.qualifications || []);
+                    console.log(res.data)
                     setExperienceList(candidateData.workExperiences.map((exp, index) => ({
                         id_updated: index + 1,
                         organisation_name: exp.organisation_name || '',
                         last_designation: exp.last_designation || '',
                         total_tenure: exp.total_tenure || '',
+                        total_tenure_months: exp.total_tenure_months || '',
+                        total_tenure_years: exp.total_tenure_years || '',
                         last_drawn_salary: exp.last_drawn_salary || '',
                     })) || []);
 
@@ -248,6 +251,57 @@ function CandidateView() {
         success: false
     })
 
+    useEffect(() => {
+        if (updateEvents.success) {
+            setCandidateLoading(true);
+            axios.get(`/candidate-info/${candidate_id}`)
+                .then((res) => {
+                    if (res.data.success) {
+                        const candidateData = res.data.candidate;
+                        console.log(res.data.candidate)
+                        setCandidateSuccess(true);
+                        setCandidateLoading(false);
+                        setCandidateError(false);
+                        setCandidate(candidateData);
+                        setExpeirenceInYears(res.data.experience_years)
+                        setExpeirenceInMonths(res.data.experience_months)
+
+                        // Populate education and experience lists after data is fetched
+                        setEducationList(candidateData.qualifications || []);
+                        console.log(res.data)
+                        setExperienceList(candidateData.workExperiences.map((exp, index) => ({
+                            id_updated: index + 1,
+                            organisation_name: exp.organisation_name || '',
+                            last_designation: exp.last_designation || '',
+                            total_tenure: exp.total_tenure || '',
+                            total_tenure_months: exp.total_tenure_months || '',
+                            total_tenure_years: exp.total_tenure_years || '',
+                            last_drawn_salary: exp.last_drawn_salary || '',
+                        })) || []);
+
+                        // Convert skills string into an array
+                        const skillsArray = candidateData.skills
+                            ? candidateData.skills.split(',').map(skill => skill.trim())
+                            : []; // If there are no skills, use an empty array
+                        setSkills(skillsArray); // Update skills state
+
+                        // Convert hobbies string into an array
+                        const hobbiesArray = candidateData.hobbies
+                            ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
+                            : []; // If there are no hobbies, use an empty array
+                        setHobbies(hobbiesArray); // Update hobbies state
+
+                    }
+                })
+                .catch((err) => {
+                    setCandidateError(true);
+                    setCandidateSuccess(false);
+                    setCandidateLoading(false);
+                });
+            // fetchCandidate()
+        }
+    }, [updateEvents])
+
     const handleDelete = () => {
         setDeleteEvents({ loading: true, error: false, success: false })
         axios.get(`/delete-candidate/${candidate_id}`)
@@ -349,7 +403,7 @@ function CandidateView() {
                     setTimeout(() => {
                         setNextRoundSelection((values) => ({ ...values, checked: false, value: "" }));
                         setNewInterviewDetails((values) => ({ ...values, success: false, date: null, time: null, job: "null", interviewer: "null" }))
-                    }, 3000);
+                    }, 800);
                 })
                 .catch((err) => {
                     setNewInterviewDetails((values) => ({
@@ -667,56 +721,59 @@ function CandidateView() {
                                 <div className='grid gap-4'>
                                     {/* Render each experience entry in edit/view mode */}
                                     {experienceList.length > 0 ? (
-                                        experienceList.map((experience, index) => (
-                                            <div key={index} className='p-4 border mt-4 flex justify-between items-center'>
-                                                {isExperienceEditing ? (
-                                                    <div className='grid grid-cols-6'>
-                                                        <input
-                                                            type='text'
-                                                            value={experience.organisation_name}
-                                                            onChange={(e) => handleExperienceInputChange(index, 'organisation_name', e.target.value)}
-                                                            placeholder='Organisation Name'
-                                                            className='border p-2 px-4 mr-2'
-                                                        />
-                                                        <input
-                                                            type='text'
-                                                            value={experience.last_designation}
-                                                            onChange={(e) => handleExperienceInputChange(index, 'last_designation', e.target.value)}
-                                                            placeholder='Last Designation'
-                                                            className='border p-2 px-4 mr-2'
-                                                        />
-                                                        <input
-                                                            type='number' // Change to number for easier input handling
-                                                            value={experience.total_tenure_years || ''} // Adjusted to take months
-                                                            onChange={(e) => handleExperienceInputChange(index, 'total_tenure_years', e.target.value)}
-                                                            placeholder='Total Tenure Years'
-                                                            className='border p-2 px-4 mr-2'
-                                                        />
-                                                        <input
-                                                            type='number' // Change to number for easier input handling
-                                                            value={experience.total_tenure_months || ''} // Adjusted to take months
-                                                            onChange={(e) => handleExperienceInputChange(index, 'total_tenure_months', e.target.value)}
-                                                            placeholder='Total Tenure Months'
-                                                            className='border p-2 px-4 mr-2'
-                                                        />
-                                                        <input
-                                                            type='text'
-                                                            value={experience.last_drawn_salary}
-                                                            onChange={(e) => handleExperienceInputChange(index, 'last_drawn_salary', e.target.value)}
-                                                            placeholder='Last Drawn Salary'
-                                                            className='border p-2 px-4 mr-2'
-                                                        />
-                                                        <button onClick={() => removeExperience(experience.id_updated)} className='text-red-500 bg-red-100 flex items-center gap-2 justify-center'>
-                                                            <MdDelete /> Remove Experience
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <span>
-                                                        {experience.organisation_name} - {experience.last_designation} - {experience.total_tenure_years} Years {experience.total_tenure_months} Months - Last Drawn Salary: {experience.last_drawn_salary}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        ))
+                                        experienceList.map((experience, index) => {
+                                            console.log(experienceList)
+                                            return (
+                                                <div key={index} className='p-4 border mt-4 flex justify-between items-center'>
+                                                    {isExperienceEditing ? (
+                                                        <div className='grid grid-cols-6'>
+                                                            <input
+                                                                type='text'
+                                                                value={experience.organisation_name}
+                                                                onChange={(e) => handleExperienceInputChange(index, 'organisation_name', e.target.value)}
+                                                                placeholder='Organisation Name'
+                                                                className='border p-2 px-4 mr-2'
+                                                            />
+                                                            <input
+                                                                type='text'
+                                                                value={experience.last_designation}
+                                                                onChange={(e) => handleExperienceInputChange(index, 'last_designation', e.target.value)}
+                                                                placeholder='Last Designation'
+                                                                className='border p-2 px-4 mr-2'
+                                                            />
+                                                            <input
+                                                                type='number' // Change to number for easier input handling
+                                                                value={experience.total_tenure_years || ''} // Adjusted to take months
+                                                                onChange={(e) => handleExperienceInputChange(index, 'total_tenure_years', e.target.value)}
+                                                                placeholder='Total Tenure Years'
+                                                                className='border p-2 px-4 mr-2'
+                                                            />
+                                                            <input
+                                                                type='number' // Change to number for easier input handling
+                                                                value={experience.total_tenure_months || ''} // Adjusted to take months
+                                                                onChange={(e) => handleExperienceInputChange(index, 'total_tenure_months', e.target.value)}
+                                                                placeholder='Total Tenure Months'
+                                                                className='border p-2 px-4 mr-2'
+                                                            />
+                                                            <input
+                                                                type='text'
+                                                                value={experience.last_drawn_salary}
+                                                                onChange={(e) => handleExperienceInputChange(index, 'last_drawn_salary', e.target.value)}
+                                                                placeholder='Last Drawn Salary'
+                                                                className='border p-2 px-4 mr-2'
+                                                            />
+                                                            <button onClick={() => removeExperience(experience.id_updated)} className='text-red-500 bg-red-100 flex items-center gap-2 justify-center'>
+                                                                <MdDelete /> Remove Experience
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span>
+                                                            {experience.organisation_name} - {experience.last_designation} - {experience.total_tenure_years} Years {experience.total_tenure_months} Months - Last Drawn Salary: {experience.last_drawn_salary}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )
+                                        })
                                     ) : (
                                         <div>No Experience Added</div>
                                     )}
