@@ -404,6 +404,67 @@ function CandidateView() {
                         setNextRoundSelection((values) => ({ ...values, checked: false, value: "" }));
                         setNewInterviewDetails((values) => ({ ...values, success: false, date: null, time: null, job: "null", interviewer: "null" }))
                     }, 800);
+
+
+
+
+
+                    // Updating Candidate Status
+                    setShortlisted((values) => ({ ...values, loading: true, success: false, error: false }))
+                    axios.post(`/update-candidate-status/${candidate_id}`,
+                        {
+                            "status": "Shortlisted",
+                            "current_status": "Shortlisted"
+                        }
+                    )
+                        .then((res) => {
+                            setShortlisted((values) => ({ ...values, loading: false, success: true, error: false }))
+                            setNextRoundSelection((values) => ({ ...values, checked: false }))
+                            setCandidateLoading(true);
+                            axios.get(`/candidate-info/${candidate_id}`)
+                                .then((res) => {
+                                    if (res.data.success) {
+                                        const candidateData = res.data.candidate;
+                                        setCandidateSuccess(true);
+                                        setCandidateLoading(false);
+                                        setCandidateError(false);
+                                        setCandidate(candidateData);
+                                        setExpeirenceInYears(res.data.experience_in_years)
+
+                                        // Populate education and experience lists after data is fetched
+                                        setEducationList(candidateData.qualifications || []);
+                                        setExperienceList(candidateData.workExperiences.map((exp, index) => ({
+                                            id_updated: index + 1,
+                                            organisation_name: exp.organisation_name || '',
+                                            last_designation: exp.last_designation || '',
+                                            total_tenure: exp.total_tenure || '',
+                                            last_drawn_salary: exp.last_drawn_salary || '',
+                                        })) || []);
+
+                                        // Convert skills string into an array
+                                        const skillsArray = candidateData.skills
+                                            ? candidateData.skills.split(',').map(skill => skill.trim())
+                                            : []; // If there are no skills, use an empty array
+                                        setSkills(skillsArray); // Update skills state
+
+                                        // Convert hobbies string into an array
+                                        const hobbiesArray = candidateData.hobbies
+                                            ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
+                                            : []; // If there are no hobbies, use an empty array
+                                        setHobbies(hobbiesArray); // Update hobbies state
+
+                                    }
+                                })
+                                .catch((err) => {
+                                    setCandidateError(true);
+                                    setCandidateSuccess(false);
+                                    setCandidateLoading(false);
+                                });
+                        })
+                        .catch((err) => {
+                            setShortlisted((values) => ({ ...values, loading: false, success: false, error: true }))
+                            console.log(err)
+                        })
                 })
                 .catch((err) => {
                     setNewInterviewDetails((values) => ({
@@ -498,6 +559,71 @@ function CandidateView() {
             .catch((err) => console.log(err))
     }
 
+
+    const [shortlisted, setShortlisted] = useState({
+        loading: false,
+        success: false,
+        error: false
+    })
+
+    const shortlistCandidate = () => {
+        setShortlisted((values) => ({ ...values, loading: true, success: false, error: false }))
+        axios.post(`/update-candidate-status/${candidate_id}`,
+            {
+                "status": "Shortlisted",
+                "current_status": "Shortlisted"
+            }
+        )
+            .then((res) => {
+                setShortlisted((values) => ({ ...values, loading: false, success: true, error: false }))
+                setNextRoundSelection((values) => ({ ...values, checked: false }))
+                setCandidateLoading(true);
+                axios.get(`/candidate-info/${candidate_id}`)
+                    .then((res) => {
+                        if (res.data.success) {
+                            const candidateData = res.data.candidate;
+                            setCandidateSuccess(true);
+                            setCandidateLoading(false);
+                            setCandidateError(false);
+                            setCandidate(candidateData);
+                            setExpeirenceInYears(res.data.experience_in_years)
+
+                            // Populate education and experience lists after data is fetched
+                            setEducationList(candidateData.qualifications || []);
+                            setExperienceList(candidateData.workExperiences.map((exp, index) => ({
+                                id_updated: index + 1,
+                                organisation_name: exp.organisation_name || '',
+                                last_designation: exp.last_designation || '',
+                                total_tenure: exp.total_tenure || '',
+                                last_drawn_salary: exp.last_drawn_salary || '',
+                            })) || []);
+
+                            // Convert skills string into an array
+                            const skillsArray = candidateData.skills
+                                ? candidateData.skills.split(',').map(skill => skill.trim())
+                                : []; // If there are no skills, use an empty array
+                            setSkills(skillsArray); // Update skills state
+
+                            // Convert hobbies string into an array
+                            const hobbiesArray = candidateData.hobbies
+                                ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
+                                : []; // If there are no hobbies, use an empty array
+                            setHobbies(hobbiesArray); // Update hobbies state
+
+                        }
+                    })
+                    .catch((err) => {
+                        setCandidateError(true);
+                        setCandidateSuccess(false);
+                        setCandidateLoading(false);
+                    });
+            })
+            .catch((err) => {
+                setShortlisted((values) => ({ ...values, loading: false, success: false, error: true }))
+                console.log(err)
+            })
+    }
+
     // Component Loading -------------------------------------------------------------------------------------------------------
     // Component Loading -------------------------------------------------------------------------------------------------------
     if (candidateLoading) {
@@ -543,10 +669,11 @@ function CandidateView() {
                         <div className='flex gap-4 items-center pr-8' ref={popupRef}>
                             {/* Filter Buttons */}
                             <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Overview" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Overview")}>Overview</button>
-                            <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
-                            <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
+                            <button className={`p-2.5 rounded-lg w-32 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"} ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
+                            <button className={`p-2.5 rounded-lg w-32 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"} ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
                             <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Comments" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Comments")}>Comments</button>
-                            <div className={`relative`} >
+                            <button className={`p-2.5 rounded-lg min-w-32 ${candidate.status === "Follow-up" ? "inline-block" : "hidden"} ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={shortlistCandidate}>{shortlisted.loading ? "Shortlisting..." : shortlisted.success ? "Candidate Shortlisted" : shortlisted.error ? "Candidate Shortlisted" : "Shortlist"}</button>
+                            <div className={`relative `} >
                                 <span
                                     onClick={() => {
                                         if (nextRoundSelection.value !== "New Interview") {
@@ -556,10 +683,10 @@ function CandidateView() {
                                             setNextRoundSelection((values) => ({ ...values, value: "", checked: false }))
                                         }
                                     }}
-                                    className='cursor-pointer inline-block p-2.5 px-5 rounded-lg min-w-40 bg-black text-white'>Schedule Interview</span>
+                                    className='cursor-pointer inline-block p-2.5 px-5 rounded-lg min-w-40 bg-black text-white'>{candidate.status === "Follow-up" ? "Shortlist & Schedule Interview" : "Schedule Interview"}</span>
                             </div>
 
-                            <div className={`p-2.5`}>
+                            <div className={`p-2.5 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"}`}>
                                 <button className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
                                     onClick={() => {
                                         setNextRoundSelection((values) => ({ ...values, checked: true }));
@@ -978,26 +1105,23 @@ function CandidateView() {
                         <CandidateComments candidateId={candidate_id} />
                     </div>
 
-
-
-
                     {/* Update Status */}
                     <div className={`fixed z-[101] top-0 w-full h-full flex justify-center items-center left-0 backdrop-blur-sm text-black border shadow-2xl gap-4 p-4 ${nextRoundSelection.checked ? "flex" : "hidden"}`}>
                         <div className='w-96 bg-white border grid gap-4 p-10'>
-                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "FollowUp" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                            {/* <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "FollowUp" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "FollowUp" }))}>
                                 <FaListUl size={"12px"} /> Follow Up
-                            </button>
+                            </button> */}
 
                             <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Rejected" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Rejected" }))}>
                                 <IoMdClose size={"14px"} /> Rejected
                             </button>
 
-                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Shortlisted" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                            {/* <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Shortlisted" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Shortlisted" }))}>
                                 <RiListCheck3 size={"16px"} /> Shortlisted
-                            </button>
+                            </button> */}
 
                             <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Offered" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Offered" }))}>

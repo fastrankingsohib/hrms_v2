@@ -68,8 +68,8 @@ function AllInterviews() {
                                 </h1>
 
 
-                                <div className='ml-[38px] font-light flex items-center'>
-                                    <span className='w-full inline-flex items-center gap-2'>
+                                <div className='ml-[38px] font-light flex items-center text-sm'>
+                                    <span className='w-full inline-flex items-center gap-2 text-sm'>
                                         <HiOutlineCalendarDays size={"14px"} />
                                         {
                                             new Date(interview.interview_date).toLocaleDateString('en-US', {
@@ -80,7 +80,7 @@ function AllInterviews() {
                                         }
                                     </span>
 
-                                    <span className='w-full inline-flex items-center gap-2 ml-4'>
+                                    <span className='w-full inline-flex items-center gap-2 ml-4 text-sm'>
                                         <IoTimeOutline />
                                         {
                                             (() => {
@@ -97,7 +97,7 @@ function AllInterviews() {
                                         }
                                     </span>
 
-                                    <span className='w-full inline-flex items-center gap-2 ml-4'>
+                                    <span className='w-full inline-flex items-center gap-2 ml-4 text-sm'>
                                         <FaUserTie />
                                         {
                                             allUsers.length > 0 ? 

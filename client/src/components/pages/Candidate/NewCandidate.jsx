@@ -39,7 +39,7 @@ const NewCandidate = () => {
         work_experience: "",
         recruiter_comments: "",
         communication_skills: "Excellent",
-        status: "",
+        status: "Follow-up",
         current_status: "",
         other1: "Additional info 1",
         other2: "Additional info 2",
@@ -48,6 +48,10 @@ const NewCandidate = () => {
         work_tenure: "",
         created_by: "",
     });
+
+    useEffect(() => {
+        console.log(candidate.status == "Follow-up" ? false : true)
+    }, [candidate])
 
     const [allJobs, setAllJobs] = useState([]);
     const dropdownRef = useRef(null); // Ref for the dropdown
@@ -607,7 +611,7 @@ const NewCandidate = () => {
 
                         <div>
                             <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Address Line 1<span className="text-red-500">*</span></label>
-                            <input required type="text" className="primary-input"
+                            <input required={candidate.status === "Shortlisted" || candidate.current_status === "Shortlisted" ? false : true} type="text" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, address_line1: e.target.value }))}
                                 placeholder="Address Line1" name="" id="" />
                         </div>
@@ -621,21 +625,21 @@ const NewCandidate = () => {
 
                         <div>
                             <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">City<span className="text-red-500">*</span></label>
-                            <input required type="text" className="primary-input"
+                            <input required={candidate.status === "Shortlisted" ? false : true} type="text" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, city: e.target.value }))}
                                 placeholder="Address Line 2" name="" id="" />
                         </div>
 
                         <div>
                             <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">State<span className="text-red-500">*</span></label>
-                            <input required type="text" className="primary-input"
+                            <input required={candidate.status === "Shortlisted" ? false : true} type="text" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, state: e.target.value }))}
                                 placeholder="State" name="" id="" />
                         </div>
 
                         <div>
                             <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Pin Code<span className="text-red-500">*</span></label>
-                            <input required type="number" className="primary-input" placeholder="Pin Code" name="" id="" />
+                            <input required={candidate.status === "Shortlisted" ? false : true} type="number" className="primary-input" placeholder="Pin Code" name="" id="" />
                         </div>
 
                         <div>
@@ -703,7 +707,7 @@ const NewCandidate = () => {
 
                         <div>
                             <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of Birth<span className="text-red-500">*</span></label>
-                            <input required type="date" className="primary-input"
+                            <input required={candidate.status === "Shortlisted" ? false : true} type="date" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, date_of_birth: e.target.value }))}
                                 placeholder="Date of Birth" name="" id="" />
                         </div>
@@ -794,7 +798,7 @@ const NewCandidate = () => {
                         <div className="mb-5 w-1/4 pr-3">
                             <label htmlFor="experience" className="font-semibold inline-block p-4 pl-0">Experience Level<span className="text-red-500">*</span></label>
                             <select
-                                required
+                                required={candidate.status === "Shortlisted" ? false : true}
                                 id="experience"
                                 className="primary-input"
                                 onChange={handleExperienceChange}

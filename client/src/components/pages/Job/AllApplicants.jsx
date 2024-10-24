@@ -20,14 +20,14 @@ function AllApplicants(props) {
     }, [shortlistedApplicants])
     const [rejectedApplicants, setRejectedApplicants] = useState([])
     useEffect(() => {
-        axios.get(`/job_applicants/${props.jobId}`)
+        axios.get(`/job_applicants/${props.jobId}/${user.id}`)
             .then((response) => {
                 setAppliedApplicants(response.data.data);
                 let shortlisted = [];
                 let rejected = [];
 
                 response.data.data.map((value, key) => {
-                    if (value.candidate.status === "Shortlisted") {
+                    if (value.candidate.status === "Shortlisted" || value.candidate.status === "Offered") {
                         shortlisted.push(value);
                         console.log(value.candidate.status)
                     }
