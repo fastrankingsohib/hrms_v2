@@ -10,7 +10,6 @@ function CandidateInterviews(props) {
         // All Users Api
         axios.get("/user/all-users")
             .then((res) => {
-                console.log(res.data)
                 setAllUsers(res.data.data);
             })
             .catch((err) => {
@@ -20,7 +19,6 @@ function CandidateInterviews(props) {
         // All Jobs
         axios.get("/display_jobs")
             .then((res) => {
-                console.log(res.data)
                 setAllJobs(res.data.jobs)
             })
             .catch((err) => console.log(err))
@@ -56,7 +54,7 @@ function CandidateInterviews(props) {
                                         allJobs.length > 0 ?
                                         allJobs.map((job, index) => {
                                             if(job.id == value.job_id){
-                                                return <Link className='hover:underline hover:text-indigo-700' to={`/jobs/view/${job.id}`}>{job.job_title}</Link>
+                                                return <Link key={index} className='hover:underline hover:text-indigo-700' to={`/jobs/view/${job.id}`}>{job.job_title}</Link>
                                             }
                                         }) : "No Job Selected!"
                                     }

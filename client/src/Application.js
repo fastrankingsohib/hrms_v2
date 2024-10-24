@@ -50,7 +50,7 @@ const Application = () => {
 
                         <Route path="candidates" element={<CandidateLayout />}></Route>
 
-                        <Route path="/add-new-user" element={<NewUser />} />
+                        <Route path="add-new-user" element={<NewUser />} />
                         <Route path="/all-users/" element={<AllUsers />} />
                         <Route path="/user/:userid" element={<UserView />} />
                         <Route path="*" element={<PageNotFound />} />

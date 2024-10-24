@@ -11,7 +11,6 @@ function CandidateComments(props) {
         axios.get(`/display-comments/${props.candidateId}`)
             .then((res) => {
                 setAllComments(res.data.data);
-                console.log(res.data);
             })
             .catch((err) => {
                 console.log(err);

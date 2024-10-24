@@ -78,10 +78,10 @@ const useNewCandidate = () => {
                 setLoading(false);
                 setSuccess(true);
                 setError(false);
+                navigate(`/candidates/view/${response.data.candidate_id}`);
 
                 setTimeout(() => {
                     setSuccess(false);
-                    navigate("/candidates");
                 }, 3000);
             })
             .catch((err) => {

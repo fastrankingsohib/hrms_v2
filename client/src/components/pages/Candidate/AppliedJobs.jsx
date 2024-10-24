@@ -1,19 +1,22 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function AppliedJobs(props) {
     const [appliedJobs, setAppliedJobs] = useState([]);
+    const location = useLocation();
 
     useEffect(() => {
+        console.log("Jobs Api Called")
         axios.get(`/applicants-applied-jobs/${props.candidateId}`)
             .then((res) => {
                 setAppliedJobs(res.data.data);
+                console.log(res.data)
             })
             .catch((err) => {
-                console.log(err)
+                console.log(err);
             })
-    }, [])
+    }, [location]);
 
     return (
         <div className='h-full sticky top-0'>
@@ -27,7 +30,7 @@ function AppliedJobs(props) {
                 appliedJobs.length > 0 ?
                     appliedJobs.map((value, index) => {
                         return (
-                            <div className='grid grid-cols-4 hover:bg-gray-50'>
+                            <div key={index} className='grid grid-cols-4 hover:bg-gray-50'>
                                 <div className='p-4'>#{value.job.id}</div>
                                 <div className='p-4'>{value.job.job_title}</div>
                                 <div className='p-4'>
@@ -47,7 +50,7 @@ function AppliedJobs(props) {
                             </div>
                         )
                     }) :
-                    <div className='p-4'>No Interviews Found!</div>
+                    <div className='p-4'>No Applied Jobs Found!</div>
             }
         </div>
     )
