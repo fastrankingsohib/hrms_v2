@@ -70,6 +70,7 @@ const add_candidate = async (req, res) => {
       jobs,
       created_by,
       work_tenure,
+      user_reporting_to
     } = req.body;
 
     const files = req.files || {};
@@ -132,6 +133,7 @@ const add_candidate = async (req, res) => {
         candidate_pan,
         candidate_highest_qualification,
         work_tenure,
+        user_reporting_to
       },
     });
 
@@ -796,7 +798,7 @@ const hierarchical_candidates_list = async (req, res) => {
     res.status(200).send({
       success: true,
       message: "Candidates list",
-      candidate_data: candidate_data
+      candidates: candidate_data
     });
     
   } catch (error) {

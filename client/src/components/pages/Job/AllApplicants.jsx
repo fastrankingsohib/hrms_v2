@@ -9,33 +9,34 @@ function AllApplicants(props) {
     const location = useLocation()
     const [jobDetails, setJobDetails] = useState(props.jobDetails);
     const [selectedTab, setSelectedTab] = useState("all")
+    let user = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null;
 
     const [appliedApplicants, setAppliedApplicants] = useState([]);
     const [shortlistedApplicants, setShortlistedApplicants] = useState([])
 
     useEffect(() => {
-        console.log(shortlistedApplicants)
+        // console.log("shortlistedApplicants")
+        // console.log(shortlistedApplicants)
     }, [shortlistedApplicants])
     const [rejectedApplicants, setRejectedApplicants] = useState([])
     useEffect(() => {
         axios.get(`/job_applicants/${props.jobId}`)
             .then((response) => {
-                console.log(response.data.data);
                 setAppliedApplicants(response.data.data);
-
                 let shortlisted = [];
                 let rejected = [];
-                appliedApplicants.map((value, key) => {
-                    console.log(value.candidate.current_status)
-                    if (value.candidate.current_status === "Shortlisted") {
-                        console.log(value.candidate)
+
+                response.data.data.map((value, key) => {
+                    if (value.candidate.status === "Shortlisted") {
                         shortlisted.push(value);
+                        console.log(value.candidate.status)
                     }
 
-                    else {
+                    else if (value.candidate.status === "Rejected") {
                         rejected.push(value)
                     }
                 })
+                console.log(shortlisted)
                 setShortlistedApplicants(shortlisted)
                 setRejectedApplicants(rejected)
             })
@@ -92,7 +93,7 @@ function AllApplicants(props) {
                                     {/* <div className='p-2.5'>{candidate.id}</div> */}
                                     <div className='p-2.5'>{`${candidate.candidate.title} ${candidate.candidate.first_name} ${candidate.candidate.middle_name} ${candidate.candidate.last_name}`}</div>
                                     {/* <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.status}</span></div> */}
-                                    <div className={`p-2.5`}><span>{candidate.candidate.current_status}</span></div>
+                                    <div className={`p-2.5`}><span>{candidate.candidate.status}</span></div>
                                     <div className='p-2.5'>
                                         {new Date(candidate.candidate.created_at).toLocaleDateString('en-GB', {
                                             day: '2-digit',
@@ -112,7 +113,8 @@ function AllApplicants(props) {
                                             <div className='p-2.5'><span className='inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-400'><FaUserLarge size={'13px'} /></span> <span className='ml-2'>#{candidate.id}</span></div>
                                             {/* <div className='p-2.5'>{candidate.id}</div> */}
                                             <div className='p-2.5'>{`${candidate.candidate.title} ${candidate.candidate.first_name} ${candidate.candidate.middle_name} ${candidate.candidate.last_name}`}</div>
-                                            <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.job_status}</span></div>
+                                            {/* <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.job_status}</span></div> */}
+                                            <div className={`p-2.5`}><span>{candidate.candidate.status}</span></div>
                                             <div className='p-2.5'>
                                                 {new Date(candidate.candidate.created_at).toLocaleDateString('en-GB', {
                                                     day: '2-digit',
@@ -132,7 +134,7 @@ function AllApplicants(props) {
                                             {/* <div className='p-2.5'>{candidate.id}</div> */}
                                             <div className='p-2.5'>{`${candidate.candidate.title} ${candidate.candidate.first_name} ${candidate.candidate.middle_name} ${candidate.candidate.last_name}`}</div>
                                             {/* <div className={`p-2.5`}><span className={`p-1 px-3 inline-flex items-center justify-center text-sm rounded-full border ${candidate.status === "Pending" ? "text-orange-400 border-orange-300 bg-orange-50" : candidate.job_status === "Rejected" ? "text-red-500 border-red-300 bg-red-50" : "text-green-500 border-green-300 bg-green-50"} capitalize`}>{candidate.job_status}</span></div> */}
-                                            <div className={`p-2.5`}><span>{candidate.candidate.current_status}</span></div>
+                                            <div className={`p-2.5`}><span>{candidate.candidate.status}</span></div>
                                             <div className='p-2.5'>
                                                 {new Date(candidate.candidate.created_at).toLocaleDateString('en-GB', {
                                                     day: '2-digit',

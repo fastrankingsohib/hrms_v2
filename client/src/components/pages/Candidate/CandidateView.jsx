@@ -533,7 +533,7 @@ function CandidateView() {
                                 <div className='inline-flex items-center justify-center h-20 w-20 bg-gray-100 rounded-full mr-4'><FaUser size={"20px"} className='text-gray-400' /></div>
                                 <div>
                                     <div className='text-xl font-bold'>{`${candidate.title} ${candidate.first_name} ${candidate.last_name}`}</div>
-                                    <div className='flex items-center gap-2'><MdWork /> {`${experienceInYears > 0 ? `${experienceInYears} Year` : `${experienceInYears} Years`}`} {experienceInMonths > 0 ? `& ${experienceInMonths} Months` : ""}</div>
+                                    <div className='flex items-center gap-2'><MdWork /> {`${experienceInYears > 0 ? `${experienceInYears} Year` : `Fresher`}`} {experienceInMonths > 0 ? `& ${experienceInMonths} Months` : ""}</div>
                                     {/* <div className={`${candidate.status === "Active" ? "text-green-500" : candidate.status === "Inactive" ? "bg-orange-500" : "text-red-500"}`}>{`${candidate.status}`}</div> */}
                                     <div className='flex items-center gap-2'><VscDebugStepOut size={"14px"} className='rotate-90' /> {`${candidate.status}`}</div>
                                 </div>
@@ -722,7 +722,6 @@ function CandidateView() {
                                     {/* Render each experience entry in edit/view mode */}
                                     {experienceList.length > 0 ? (
                                         experienceList.map((experience, index) => {
-                                            console.log(experienceList)
                                             return (
                                                 <div key={index} className='p-4 border mt-4 flex justify-between items-center'>
                                                     {isExperienceEditing ? (

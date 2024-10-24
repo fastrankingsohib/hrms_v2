@@ -6,7 +6,7 @@ const useNewCandidate = () => {
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
-    const loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : [];
+    const loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null;
     const navigate = useNavigate();
 
     const registerCandidate = (candidate, experiences, educations, skills, hobbies, selectedJobs, currentStatus, status, newInterviewDetails) => {
@@ -58,24 +58,8 @@ const useNewCandidate = () => {
             "qualifications": educations,
         };
 
-        let scheduleInterview = (candidate_id) => {
-            // axios.post(`/schedule-interview`,
-            //     {
-            //         "job_id": newInterviewDetails.jobId,
-            //         "candidate_id": candidate_id,
-            //         "interview_date": newInterviewDetails.date,
-            //         "interview_time": newInterviewDetails.time,
-            //         "interviewer": newInterviewDetails.interviewer,
-            //         "interview_round": newInterviewDetails.round
-            //     }
-            // )
-            //     .then((res) => console.log(res.data))
-            //     .catch((err) => console.log(err))
-        }
-
         axios.post("/add-candidate", new_candidate)
             .then((response) => {
-                scheduleInterview(response.data.candidate_id)
                 setLoading(false);
                 setSuccess(true);
                 setError(false);
