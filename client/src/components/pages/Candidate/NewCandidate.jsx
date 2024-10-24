@@ -46,7 +46,7 @@ const NewCandidate = () => {
         other3: "Additional info 3",
         jobs: selectedJobs.ids, // Updated to use ids directly
         work_tenure: "",
-        created_by: "recruiter@example.com",
+        created_by: "",
     });
 
     const [allJobs, setAllJobs] = useState([]);

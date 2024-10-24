@@ -7,10 +7,11 @@ import { isAction } from '@reduxjs/toolkit';
 import AllCandidates from './AllCandidates';
 
 function CandidateLayout() {
-    const [activeButton, setActiveButton] = useState("all");
+    const [activeButton, setActiveButton] = useState("my candidates");
     const [allCandidate, setAllCandidates] = useState([]);
     const [dropDown, setDropDown] = useState(false);
     const location = useLocation();
+    const user = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
 
     // Handle button click to toggle dropdown
     const handleButtonClick = (e) => {
@@ -28,9 +29,19 @@ function CandidateLayout() {
             })
     }, [])
 
+    const [modulePermitted, setModulePermitted] = useState(false)
+
     useEffect(() => {
         // setActiveButton("all")
-    }, [location])
+        if(user.role === "Manager" || user.role === "Master Admin"  || user.role === "Admin"){
+            // setActiveButton("All candidates")
+            setModulePermitted(true)
+        } 
+        else{
+            setActiveButton("my candidates")
+            setModulePermitted(false)
+        }
+    }, [activeButton])
     return (
         <div className='h-full flex overflow-hidden'>
             <div className='w-1/4 h-full border-r border-b select-none'>
@@ -48,7 +59,7 @@ function CandidateLayout() {
                             onClick={() => setActiveButton("my candidates")}>
                             My Candidates
                         </div>
-                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "all candidates" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`}
+                        <div className={`${modulePermitted ? "block" : "hidden"}  mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "all candidates" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`}
                             onClick={() => setActiveButton("all candidates")}>
                             All Candidates
                         </div>

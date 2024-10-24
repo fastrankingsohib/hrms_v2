@@ -6,6 +6,7 @@ import UserModule from "../../Commons/UserModule";
 
 // Icons
 import { GoEyeClosed, GoEye, GoTriangleUp } from "react-icons/go";
+import axios from "axios";
 
 export default function NewUser() {
     const warnDefault = useSelector((state) => state.moduleSelection.invalid.length);
@@ -142,6 +143,21 @@ export default function NewUser() {
         validatePassword(user.password, newConfirmPassword);
     };
 
+
+
+
+    // Reporting To Users
+    const [reportingToUsers, setReportingToUsers] = useState([]);
+    useEffect(() => {
+        axios.get("/reporting-to-users")
+            .then((res) => {
+                console.log(res.data);
+                setReportingToUsers(res.data.data);
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }, [])
 
     return (
         <section className="p-8 component-rendering-tranistion bg-gray-100">
@@ -322,8 +338,16 @@ export default function NewUser() {
                             onChange={(e) => setUser((values) => ({ ...values, reportingTo: e.target.value }))}
                         >
                             <option disabled={true} value={""}>-- Select --</option>
-                            <option value="Akram">Akram</option>
-                            <option value="Vivek Singh">Vivek Singh</option>
+                            {/* <option value="Akram">Akram</option>
+                            <option value="Vivek Singh">Vivek Singh</option> */}
+                            {
+                                reportingToUsers.length > 0 ?
+                                    reportingToUsers.map((value, index) => {
+                                        return (
+                                            <option value={value.username}>{value.username}</option>
+                                        )
+                                    }) : ""
+                            }
                         </select>
                     </div>
 
@@ -477,7 +501,7 @@ export default function NewUser() {
                             onChange={(e) => setUser((values) => ({ ...values, role: e.target.value }))}
                         >
                             <option value="" disabled={true}>-- Select --</option>
-                            <option value="Super Admin">Super Admin</option>
+                            <option value="Master Admin">Master Admin</option>
                             <option value="Admin">Admin</option>
                             <option value="Director">Director</option>
                             <option value="Manager">Manager</option>

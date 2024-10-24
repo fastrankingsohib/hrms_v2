@@ -165,6 +165,18 @@ const UpdateUser = () => {
 
 
 
+    const [reportingToUsers, setReportingToUsers] = useState([]);
+    useEffect(() => {
+        axios.get("/reporting-to-users")
+            .then((res) => {
+                console.log(res.data);
+                setReportingToUsers(res.data.data);
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }, [])
+
     return (
         <section className="relative p-4 component-rendering-transition bg-gray-100">
             <p className="fixed z-[1000] inline-flex items-center gap-2 top-28 right-8 bg-green-600 text-white font-semibold text-lg p-4 tranition-basic" style={{ marginRight: success === true ? 0 : '-100%' }}>
@@ -384,8 +396,16 @@ const UpdateUser = () => {
                             onChange={(e) => setUser((values) => ({ ...values, reportingTo: e.target.value }))}
                         >
                             {/* <option disabled={true} defaultValue={true}={true}>-- Select --</option> */}
-                            <option value="Akram">Akram</option>
-                            <option value="Vivek Singh">Vivek Singh</option>
+                            {/* <option value="Akram">Akram</option>
+                            <option value="Vivek Singh">Vivek Singh</option> */}
+                            {
+                                reportingToUsers.length > 0 ?
+                                    reportingToUsers.map((value, index) => {
+                                        return (
+                                            <option key={index} value={value.username}>{value.username}</option>
+                                        )
+                                    }) : ""
+                            }
                         </select>
                     </div>
 
@@ -558,7 +578,7 @@ const UpdateUser = () => {
                         >
                             {/* <option disabled={true} defaultValue={true}={true}>-- Select --</option> */}
 
-                            <option value="Super Admin">Super Admin</option>
+                            <option value="Master Admin">Master Admin</option>
                             <option value="Admin">Admin</option>
                             <option value="Director">Director</option>
                             <option value="Manager">Manager</option>

@@ -51,6 +51,7 @@ const useNewCandidate = () => {
             "current_status": candidate.current_status,
             "status": candidate.status,
             "created_by": loggedInUser.username,
+            "user_reporting_to": loggedInUser.reporting_to,
             "jobs": selectedJobs,
             "experiences": experiences,
             "work_tenure": `${candidate.work_tenure}`,

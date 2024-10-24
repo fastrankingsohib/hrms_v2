@@ -199,27 +199,27 @@ const add_candidate = async (req, res) => {
 
 
 
-const reporting_to_users = async(req, res) => {
-  try {
-    const reporting_to = await prisma.user.findMany({
-      where: {
-        role: 'Team Lead'
-      },
-      select: {
-        username: true
-      }
-    })
-    res.status(200).send({
-     message: 'Reporting to users fetched successfully',
-     success: true,
-     report_users: reporting_to
-    })
-  } catch (error) {
-   res.status(500).send({
-     message: "cannot send reporting to list"
-   })
-  }
-}
+// const reporting_to_users = async(req, res) => {
+//   try {
+//     const reporting_to = await prisma.user.findMany({
+//       where: {
+//         role: 'Team Lead'
+//       },
+//       select: {
+//         username: true
+//       }
+//     })
+//     res.status(200).send({
+//      message: 'Reporting to users fetched successfully',
+//      success: true,
+//      report_users: reporting_to
+//     })
+//   } catch (error) {
+//    res.status(500).send({
+//      message: "cannot send reporting to list"
+//    })
+//   }
+// }
 
 const all_candidates = async (req, res) => {
   try {
@@ -755,4 +755,5 @@ const add_job_application = async (req, res) => {
   }
 };
 
-export {add_candidate,reporting_to_users,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update, candidate_applied_based_jobs,add_job_application}
+export {add_candidate,all_candidates, my_candidates,delete_candidate,send_data_by_id, update_candidate,module_data,id_based_jobs_applicants, update_candidate_status, specific_job_status_update, candidate_applied_based_jobs,add_job_application}
+// reporting_to_users,

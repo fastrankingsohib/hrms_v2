@@ -8,7 +8,7 @@ import {
   id_based_jobs_applicants,
   module_data,
   my_candidates,
-  reporting_to_users,
+  // reporting_to_users,
   send_data_by_id,
   specific_job_status_update,
   update_candidate,
@@ -98,7 +98,7 @@ router.use((err, req, res, next) => {
 
 // Routes
 router.post('/add-candidate', upload, add_candidate);
-router.get('/reporting-user', authenticateToken, reporting_to_users);
+// router.get('/reporting-user', authenticateToken, reporting_to_users);
 router.get('/all-candidates', authenticateToken, all_candidates);
 router.post('/my-candidates', authenticateToken, my_candidates);
 router.get('/delete-candidate/:id', authenticateToken, delete_candidate);

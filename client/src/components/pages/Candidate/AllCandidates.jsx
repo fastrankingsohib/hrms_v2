@@ -39,7 +39,7 @@ function AllCandidates(props) {
                 });
         }
 
-        else {
+        else if(props.activeButton === "all candidates") {
             setLoading(true);
             axios.get("/all-candidates")
                 .then((res) => {
