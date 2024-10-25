@@ -608,7 +608,7 @@ const id_based_jobs_applicants = async(req,res) =>{
     const data = await prisma.candidate_applied_jobs.findMany({
       where: {
         job_id: Number(job_id),
-        AND: [
+        OR: [
           { candidate: { created_by: user_data.username } },
           { candidate: { user_reporting_to: user_data.username } }
         ]

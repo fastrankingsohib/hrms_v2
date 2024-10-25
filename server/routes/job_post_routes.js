@@ -4,6 +4,7 @@ import { authenticateToken } from '../controllers/auth_controller.js'
 import multer from 'multer'
 import path from 'path'
 import { fileURLToPath } from 'url';
+import checkPermissions from '../Middlewares/checkpermissions.js'
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename)
 
@@ -44,14 +45,53 @@ const upload = multer({
 //ROUTES
 //ROUTES
 
-router.post('/post_job', upload.single('file'), post_jobs);
-router.get('/display_jobs',authenticateToken,display_posted_jobs)
-router.get('/id_based_jobs/:id',authenticateToken,id_based_jobs)
-router.post('/update_job_post/:id',update_post_job)
-router.get('/delete/:id',authenticateToken,delete_posts)
-router.get('/latest_job_post',authenticateToken,latest_created_job)
-router.get('/active_jobs',authenticateToken,active_job_posts)
-router.get('/inactive_jobs',authenticateToken,inactive_job_posts)
+router.post('/post_job',(req, res, next) => {
+    req.body.module_name = 'Jobs';
+    req.body.action = 'create'; 
+    next(); 
+  }, checkPermissions, upload.single('file'), post_jobs);
+
+router.get('/display_jobs',(req, res, next) => {
+    req.body.module_name = 'Jobs';
+  req.body.action = 'read'; 
+  next(); 
+}, checkPermissions,authenticateToken,display_posted_jobs)
+
+router.get('/id_based_jobs/:id',(req, res, next) => {
+    req.body.module_name = 'Jobs';
+    req.body.action = 'read'; 
+    next(); 
+  }, checkPermissions,authenticateToken,id_based_jobs)
+
+router.post('/update_job_post/:id',(req, res, next) => {
+    req.body.module_name = 'Jobs';
+  req.body.action = 'update'; 
+  next(); 
+}, checkPermissions,update_post_job)
+
+router.get('/delete/:id',(req, res, next) => {
+    req.body.module_name = 'Jobs';
+    req.body.action = 'delete'; 
+    next(); 
+  }, checkPermissions,authenticateToken,delete_posts)
+
+router.get('/latest_job_post',(req, res, next) => {
+    req.body.module_name = 'Jobs';
+    req.body.action = 'read'; 
+    next(); 
+  }, checkPermissions,authenticateToken,latest_created_job)
+
+router.get('/active_jobs',(req, res, next) => {
+    req.body.module_name = 'Jobs';
+    req.body.action = 'read'; 
+    next(); 
+  }, checkPermissions,authenticateToken,active_job_posts)
+
+router.get('/inactive_jobs',(req, res, next) => {
+    req.body.module_name = 'Jobs';
+    req.body.action = 'read'; 
+    next(); 
+  }, checkPermissions,authenticateToken,inactive_job_posts)
 
 export default router
 
