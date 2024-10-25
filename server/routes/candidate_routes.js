@@ -1,3 +1,5 @@
+// Filename: routes/candidate_routes.js
+
 import express from 'express';
 import {
   add_candidate,
@@ -9,31 +11,25 @@ import {
   id_based_jobs_applicants,
   module_data,
   my_candidates,
-  // reporting_to_users,
   send_data_by_id,
   specific_job_status_update,
   update_candidate,
   update_candidate_status
 } from '../controllers/candidate_controller.js';
-import {
-  authenticateToken
-} from '../controllers/auth_controller.js';
+import { authenticateToken } from '../controllers/auth_controller.js';
 import multer from 'multer';
 import path from 'path';
-import {
-  fileURLToPath
-} from 'url';
+import { fileURLToPath } from 'url';
+import checkPermissions from '../Middlewares/checkpermissions.js';
 
-const __filename = fileURLToPath(
-  import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
-// Configure multer to handle file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    let folderPath = path.join(__dirname, '../public/uploaded_images/'); // Default path
+    let folderPath = path.join(__dirname, '../public/uploaded_images/');
 
     switch (file.fieldname) {
       case 'candidate_image':
@@ -56,61 +52,101 @@ const storage = multer.diskStorage({
   }
 });
 
-// Configure Multer to accept multiple files for each field, files are optional
-const upload = multer({
-  storage: storage
-}).fields([{
-    name: 'candidate_image',
-    maxCount: 5
-  }, // Optional
-  {
-    name: 'candidate_aadhar',
-    maxCount: 5
-  }, // Optional
-  {
-    name: 'candidate_pan',
-    maxCount: 5
-  }, // Optional
-  {
-    name: 'candidate_highest_qualification',
-    maxCount: 5
-  }, // Optional
-  {
-    name: 'candidate_resume',
-    maxCount: 5
-  } // Optional
+const upload = multer({ storage }).fields([
+  { name: 'candidate_image', maxCount: 5 },
+  { name: 'candidate_aadhar', maxCount: 5 },
+  { name: 'candidate_pan', maxCount: 5 },
+  { name: 'candidate_highest_qualification', maxCount: 5 },
+  { name: 'candidate_resume', maxCount: 5 }
 ]);
 
-// Error handling middleware for Multer
 router.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
-    return res.status(400).json({
-      success: false,
-      message: err.message
-    });
+    return res.status(400).json({ success: false, message: err.message });
   } else if (err) {
-    return res.status(500).json({
-      success: false,
-      message: err.message
-    });
+    return res.status(500).json({ success: false, message: err.message });
   }
   next();
 });
 
 // Routes
-router.post('/add-candidate', upload, add_candidate);
-// router.get('/reporting-user', authenticateToken, reporting_to_users);
-router.get('/all-candidates', authenticateToken, all_candidates);
-router.post('/my-candidates', authenticateToken, my_candidates);
-router.get('/delete-candidate/:id', authenticateToken, delete_candidate);
-router.get('/candidate-info/:id', authenticateToken, send_data_by_id);
-router.post('/update-candidate/:id', authenticateToken, update_candidate);
-router.get("/all-modules", module_data);
-router.get('/job_applicants/:id/:user_id', authenticateToken, id_based_jobs_applicants);
-router.get('/applicants-applied-jobs/:id', authenticateToken, candidate_applied_based_jobs);
-router.post('/update-candidate-status/:id', authenticateToken, update_candidate_status);
-router.post('/specific-job-status-update/:job_id/:candidate_id', authenticateToken, specific_job_status_update);
-router.post('/add_job_application',authenticateToken,add_job_application)
-router.get('/hierarchical_candidate_list/:id',authenticateToken,hierarchical_candidates_list)
+
+router.post('/add-candidate', upload, (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'create';
+  next();
+}, authenticateToken, checkPermissions, add_candidate);
+
+router.get('/all-candidates', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'read';
+  next();
+}, authenticateToken, checkPermissions, all_candidates);
+
+router.post('/my-candidates', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'read';
+  next();
+}, authenticateToken, checkPermissions, my_candidates);
+
+router.get('/delete-candidate/:id', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'delete';
+  next();
+}, authenticateToken, checkPermissions, delete_candidate);
+
+router.get('/candidate-info/:id', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'read';
+  next();
+}, authenticateToken, checkPermissions, send_data_by_id);
+
+router.post('/update-candidate/:id', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'update';
+  next();
+}, authenticateToken, checkPermissions, update_candidate);
+
+router.get('/all-modules', (req, res, next) => {
+  req.body.module_name = 'Modules';
+  req.body.action = 'read';
+  next();
+}, authenticateToken, checkPermissions, module_data);
+
+router.get('/job_applicants/:id/:user_id', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'read';
+  next();
+}, authenticateToken, checkPermissions, id_based_jobs_applicants);
+
+router.get('/applicants-applied-jobs/:id', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'read';
+  next();
+}, authenticateToken, checkPermissions, candidate_applied_based_jobs);
+
+router.post('/update-candidate-status/:id', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'update';
+  next();
+}, authenticateToken, checkPermissions, update_candidate_status);
+
+router.post('/specific-job-status-update/:job_id/:candidate_id', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'update';
+  next();
+}, authenticateToken, checkPermissions, specific_job_status_update);
+
+router.post('/add_job_application', (req, res, next) => {
+  req.body.module_name = 'Job Applications';
+  req.body.action = 'create';
+  next();
+}, authenticateToken, checkPermissions, add_job_application);
+
+router.get('/hierarchical_candidate_list/:id', (req, res, next) => {
+  req.body.module_name = 'Candidates';
+  req.body.action = 'read';
+  next();
+}, authenticateToken, checkPermissions, hierarchical_candidates_list);
 
 export default router;
