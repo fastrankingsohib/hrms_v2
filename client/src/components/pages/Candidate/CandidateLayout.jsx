@@ -8,6 +8,7 @@ import AllCandidates from './AllCandidates';
 
 function CandidateLayout() {
     const [activeButton, setActiveButton] = useState("my candidates");
+    const [userType, setUserType] = useState("Manager");
     const [allCandidate, setAllCandidates] = useState([]);
     const [dropDown, setDropDown] = useState(false);
     const location = useLocation();
@@ -36,6 +37,7 @@ function CandidateLayout() {
         if(user.role === "Manager" || user.role === "Master Admin"  || user.role === "Admin"){
             // setActiveButton("All candidates")
             setModulePermitted(true)
+            setUserType(user.role)
         } 
         else{
             setActiveButton("my candidates")
@@ -69,7 +71,7 @@ function CandidateLayout() {
                 </div>
 
 
-                <div className='h-full overflow-auto pb-20'><AllCandidates location={location} activeButton={activeButton} /></div>
+                <div className='h-full overflow-auto pb-20'><AllCandidates location={location} activeButton={activeButton} userRole={userType} /></div>
 
             </div>
             <div className='w-3/4'><Outlet /></div>
