@@ -49,8 +49,10 @@ const NewCandidate = () => {
         created_by: "",
     });
 
+    const [feildsRequired, setFieldsRequired] = useState(false)
+
     useEffect(() => {
-        console.log(candidate.status == "Follow-up" ? false : true)
+        setFieldsRequired(candidate.status == "Follow-up" ? false : true)
     }, [candidate])
 
     const [allJobs, setAllJobs] = useState([]);
@@ -108,12 +110,6 @@ const NewCandidate = () => {
     const handleToggleDropdown = () => {
         setSelectedJobs((prevState) => ({ ...prevState, toggled: !prevState.toggled }));
     };
-
-
-
-
-
-
 
     // Initial experience field structure
     const initialExperienceField = {
@@ -242,7 +238,6 @@ const NewCandidate = () => {
     // Skills Handling -------------------------
 
     const [skillFields, setSkillFields] = useState([{ id: Date.now(), skill: "" }]); // Add ID
-
     const handleSkillsChange = (index, event) => {
         const values = [...skillFields];
         values[index].skill = event.target.value;
@@ -349,6 +344,10 @@ const NewCandidate = () => {
         } else {
             setErrors((prevErrors) => ({ ...prevErrors, emailError: '' }));
         }
+
+        if (e.target.value === null || e.target.value === "") {
+            setErrors((prevErrors) => ({ ...prevErrors, emailError: '' }))
+        }
     };
 
     // Handle changes and validation for alternate email
@@ -360,6 +359,11 @@ const NewCandidate = () => {
             setErrors((prevErrors) => ({ ...prevErrors, altEmailError: 'Invalid alternate email or contains special characters.' }));
         } else {
             setErrors((prevErrors) => ({ ...prevErrors, altEmailError: '' }));
+        }
+
+
+        if (e.target.value === null || e.target.value === "") {
+            setErrors((prevErrors) => ({ ...prevErrors, altEmailError: '' }))
         }
     };
 
@@ -395,6 +399,10 @@ const NewCandidate = () => {
                 contact_number: '',
             }));
         }
+
+        if (e.target.value === null || e.target.value === "") {
+            setValidationErrors((prevErrors) => ({ ...prevErrors, contact_number: '' }))
+        }
     };
 
     const handleAltContactChange = (e) => {
@@ -412,6 +420,10 @@ const NewCandidate = () => {
                 ...prevErrors,
                 alt_contact_number: '',
             }));
+        }
+
+        if (e.target.value === null || e.target.value === "") {
+            setValidationErrors((prevErrors) => ({ ...prevErrors, alt_contact_number: '' }))
         }
     };
 
@@ -495,7 +507,6 @@ const NewCandidate = () => {
 
     // Years
     const [years, setYears] = useState([]);
-
     useEffect(() => {
         const currentYear = new Date().getFullYear(); // Get the current year
         const yearRange = [];
@@ -610,8 +621,8 @@ const NewCandidate = () => {
 
 
                         <div>
-                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Address Line 1<span className="text-red-500">*</span></label>
-                            <input required={candidate.status === "Shortlisted" || candidate.current_status === "Shortlisted" ? false : true} type="text" className="primary-input"
+                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Address Line 1<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                            <input required={feildsRequired} type="text" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, address_line1: e.target.value }))}
                                 placeholder="Address Line1" name="" id="" />
                         </div>
@@ -624,27 +635,27 @@ const NewCandidate = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">City<span className="text-red-500">*</span></label>
-                            <input required={candidate.status === "Shortlisted" ? false : true} type="text" className="primary-input"
+                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">City<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                            <input required={feildsRequired} type="text" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, city: e.target.value }))}
                                 placeholder="Address Line 2" name="" id="" />
                         </div>
 
                         <div>
-                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">State<span className="text-red-500">*</span></label>
-                            <input required={candidate.status === "Shortlisted" ? false : true} type="text" className="primary-input"
+                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">State<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                            <input required={feildsRequired} type="text" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, state: e.target.value }))}
                                 placeholder="State" name="" id="" />
                         </div>
 
                         <div>
-                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Pin Code<span className="text-red-500">*</span></label>
-                            <input required={candidate.status === "Shortlisted" ? false : true} type="number" className="primary-input" placeholder="Pin Code" name="" id="" />
+                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Pin Code<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                            <input required={feildsRequired} type="number" className="primary-input" placeholder="Pin Code" name="" id="" />
                         </div>
 
                         <div>
-                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Country<span className="text-red-500">*</span></label>
-                            <input required type="text" className="primary-input"
+                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Country<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                            <input required={feildsRequired} type="text" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, country: e.target.value }))}
                                 placeholder="Country" name="" id="" />
                         </div>
@@ -706,8 +717,8 @@ const NewCandidate = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of Birth<span className="text-red-500">*</span></label>
-                            <input required={candidate.status === "Shortlisted" ? false : true} type="date" className="primary-input"
+                            <label htmlFor="#" className="font-semibold inline-block p-4 pl-0">Date of Birth<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                            <input required={feildsRequired} type="date" className="primary-input"
                                 onChange={(e) => setCandidate((values) => ({ ...values, date_of_birth: e.target.value }))}
                                 placeholder="Date of Birth" name="" id="" />
                         </div>
@@ -762,11 +773,12 @@ const NewCandidate = () => {
 
                         <div>
                             <label htmlFor="select-default-status" className="font-semibold inline-block p-4 pl-0">
-                                Set Default Status<span className="text-red-500">*</span>
+                                Set Default Status<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span>
                             </label>
                             <select
                                 id="select-default-status"
                                 required
+                                // required={feildsRequired}
                                 defaultValue=""
                                 className="primary-input"
                                 onChange={(e) =>
@@ -781,24 +793,41 @@ const NewCandidate = () => {
                                     --- Select Default Status ---
                                 </option>
                                 <option value="Follow-up">Follow-up</option>
-                                <option value="Shortlisted">Shortlisted</option>
+                                <option value="Shortlisted" className={`${selectedJobs.jobs.length > 0 ? "inline-block" : "hidden"}`}>Shortlisted</option>
                             </select>
                         </div>
 
 
 
                     </div>
+
+
+                    <br />
+                    <div className="">
+                        <h1 className="font-bold mb-4">Selected Jobs</h1>
+                        <div className="flex items-center gap-4">
+                            {
+                                selectedJobs.jobs.map((value, index) => {
+                                    if (selectedJobs.jobs.length > 0) {
+                                        return (
+                                            <div className="inline-block w-fit border p-2.5 px-5 rounded-full">{value.job_title}</div>
+                                        )
+                                    }
+                                })
+                            }
+                        </div>
+                    </div>
                 </div>
 
 
                 {/* Experience Component */}
                 <div className="bg-white rounded-xl border p-8 mt-8 shadow-xl">
-                    <h1 className="flex items-center"><span className="inline-block min-w-fit text-xl mr-5 font-bold">Experience<span className="text-red-500">*</span></span></h1>
+                    <h1 className="flex items-center"><span className="inline-block min-w-fit text-xl mr-5 font-bold">Experience</span></h1>
                     <div>
                         <div className="mb-5 w-1/4 pr-3">
-                            <label htmlFor="experience" className="font-semibold inline-block p-4 pl-0">Experience Level<span className="text-red-500">*</span></label>
+                            <label htmlFor="experience" className="font-semibold inline-block p-4 pl-0">Experience Level<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
                             <select
-                                required={candidate.status === "Shortlisted" ? false : true}
+                                required={feildsRequired}
                                 id="experience"
                                 className="primary-input"
                                 onChange={handleExperienceChange}
@@ -919,8 +948,14 @@ const NewCandidate = () => {
                                                     id={`last_drawn_salary-${index}`}
                                                     value={experienceField.last_drawn_salary}
                                                     onChange={(event) => handleInputChange(index, event)}
+                                                    onInput={(e) => {
+                                                        // Allow only numbers, alphabets, and spaces
+                                                        e.target.value = e.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+                                                    }}
                                                 />
                                             </div>
+
+
 
                                             <button
                                                 type="button"
@@ -955,95 +990,90 @@ const NewCandidate = () => {
                 <div className="bg-white p-8 mt-8 border rounded-xl shadow-xl">
                     <h1 className="flex items-center"><span className="inline-block min-w-fit text-xl mr-5 font-bold">Qualifications</span></h1>
                     <div>
-                        {qualifications.map((qualificationField, index) => (
-                            <div key={index} className="grid grid-cols-4 gap-4 mb-5 pb-10 border-b relative">
-                                <div>
-                                    <label htmlFor={`course-${index}`} className="font-semibold inline-block p-4 pl-0">Course<span className="text-red-500">*</span></label>
-                                    <input
-                                        required
-                                        type="text"
-                                        className="primary-input"
-                                        placeholder="Course"
-                                        name="course"
-                                        id={`course-${index}`}
-                                        value={qualificationField.course}
-                                        onChange={event => handleQualificationChange(index, event)}
-                                    />
-                                </div>
+                        {qualifications.map((qualificationField, index) => {
+                            const required = index > 0 ? true : false
+                            return (
+                                <div key={index} className="grid grid-cols-4 gap-4 mb-5 pb-10 border-b relative">
+                                    <div>
+                                        <label htmlFor={`course-${index}`} className="font-semibold inline-block p-4 pl-0">Course<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                                        <input
+                                            required={feildsRequired || required}
+                                            type="text"
+                                            className="primary-input"
+                                            placeholder="Course"
+                                            name="course"
+                                            id={`course-${index}`}
+                                            value={qualificationField.course}
+                                            onChange={event => handleQualificationChange(index, event)}
+                                        />
+                                    </div>
 
-                                <div>
-                                    <label htmlFor={`college_university-${index}`} className="font-semibold inline-block p-4 pl-0">College/University Name<span className="text-red-500">*</span></label>
-                                    <input
-                                        required
-                                        type="text"
-                                        className="primary-input"
-                                        placeholder="College/University Name"
-                                        name="college_university"
-                                        id={`college_university-${index}`}
-                                        value={qualificationField.college_university}
-                                        onChange={event => handleQualificationChange(index, event)}
-                                    />
-                                </div>
+                                    <div>
+                                        <label htmlFor={`college_university-${index}`} className="font-semibold inline-block p-4 pl-0">College/University Name<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                                        <input
+                                            required={feildsRequired || required}
+                                            type="text"
+                                            className="primary-input"
+                                            placeholder="College/University Name"
+                                            name="college_university"
+                                            id={`college_university-${index}`}
+                                            value={qualificationField.college_university}
+                                            onChange={event => handleQualificationChange(index, event)}
+                                        />
+                                    </div>
 
-                                <div>
-                                    <label htmlFor={`year_of_passing-${index}`} className="font-semibold inline-block p-4 pl-0">Year of Passing<span className="text-red-500">*</span></label>
-                                    {/* <input
-                                        required
-                                        type="text"
-                                        className="primary-input"
-                                        placeholder="Year of Passing"
-                                        name="year_of_passing"
-                                        id={`year_of_passing-${index}`}
-                                        value={qualificationField.year_of_passing}
-                                        onChange={event => handleQualificationChange(index, event)}
-                                    /> */}
-                                    <select
-                                        required
-                                        className="primary-input"
-                                        name="year_of_passing"
-                                        id={`year_of_passing-${index}`}
-                                        value={qualificationField.year_of_passing}
-                                        onChange={event => handleQualificationChange(index, event)}
+                                    <div>
+                                        <label htmlFor={`year_of_passing-${index}`} className="font-semibold inline-block p-4 pl-0">Year of Passing<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                                        <select
+                                            required={feildsRequired || required}
+                                            className="primary-input"
+                                            name="year_of_passing"
+                                            id={`year_of_passing-${index}`}
+                                            value={qualificationField.year_of_passing}
+                                            onChange={event => handleQualificationChange(index, event)}
+                                        >
+                                            <option value="" disabled={true}>--- Select Passing Year ---</option>
+                                            {
+                                                years.map((year, yearIndex) => {
+                                                    return (
+                                                        <option value={year}>{year}</option>
+                                                    )
+                                                })
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor={`percentage_cgpa-${index}`} className="font-semibold inline-block p-4 pl-0">Percentage/CGPA<span className={`text-red-500 ${feildsRequired ? "inline-block" : "hidden"}`}>*</span></label>
+                                        <input
+                                            required={feildsRequired || required}
+                                            type="number"
+                                            className="primary-input"
+                                            placeholder="Percentage/CGPA"
+                                            name="percentage_cgpa"
+                                            id={`percentage_cgpa-${index}`}
+                                            value={qualificationField.percentage_cgpa}
+                                            onChange={event => handleQualificationChange(index, event)}
+                                            onInput={(e) => {
+                                                const value = parseInt(e.target.value, 10);
+                                                if (value < 0) e.target.value = 0;
+                                                if (value > 100) e.target.value = 100;
+                                            }}
+                                        />
+
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        className={`absolute top-0 right-0 mt-4 text-red-600 ${qualifications.length === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                                        onClick={() => removeQualificationField(index)}
+                                        disabled={qualifications.length === 1}
                                     >
-                                        <option value="" disabled={true}>--- Select Passing Year ---</option>
-                                        {
-                                            years.map((year, yearIndex) => {
-                                                return (
-                                                    <option value={year}>{year}</option>
-                                                )
-                                            })
-                                        }
-                                    </select>
+                                        <IoMdClose size={"20px"} />
+                                    </button>
                                 </div>
-
-                                <div>
-                                    <label htmlFor={`percentage_cgpa-${index}`} className="font-semibold inline-block p-4 pl-0">Percentage/CGPA<span className="text-red-500">*</span></label>
-                                    <input
-                                        required
-                                        type="number"
-                                        min={0}
-                                        max={100}
-                                        minLength={0}
-                                        maxLength={100}
-                                        className="primary-input"
-                                        placeholder="Percentage/CGPA"
-                                        name="percentage_cgpa"
-                                        id={`percentage_cgpa-${index}`}
-                                        value={qualificationField.percentage_cgpa}
-                                        onChange={event => handleQualificationChange(index, event)}
-                                    />
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className={`absolute top-0 right-0 mt-4 text-red-600 ${qualifications.length === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
-                                    onClick={() => removeQualificationField(index)}
-                                    disabled={qualifications.length === 1}
-                                >
-                                    <IoMdClose size={"20px"} />
-                                </button>
-                            </div>
-                        ))}
+                            )
+                        })}
 
                         <div className="w-1/4 flex justify-start pr-3">
                             <button
@@ -1127,6 +1157,8 @@ const NewCandidate = () => {
                         </div>
                     </div>
                 </div>
+
+
 
 
                 <div className="my-2">

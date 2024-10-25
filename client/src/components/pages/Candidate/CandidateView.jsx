@@ -3,12 +3,12 @@ import React, { useEffect, useRef, useState, useTransition } from 'react'
 import { AiFillCodepenCircle, AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FaList, FaListUl, FaUser } from 'react-icons/fa';
 import { Link, redirect, useNavigate, useParams } from 'react-router-dom'
-import { FaCartFlatbed, FaCircleCheck, FaCircleDot, FaRegCircleCheck } from "react-icons/fa6";
+import { FaCartFlatbed, FaCircleCheck, FaCircleDot, FaK, FaRegCircleCheck } from "react-icons/fa6";
 import { MdAccessTime, MdAdd, MdDelete, MdDone, MdEdit, MdOutlineCancel, MdOutlineDone, MdOutlinePendingActions } from 'react-icons/md';
 import { RiListCheck3, RiUserSharedFill } from "react-icons/ri";
 import { VscVmRunning } from "react-icons/vsc";
 import useCandidateUpdate from '../../../helpers/useCanidateUpdate';
-import { IoMdClose } from 'react-icons/io';
+import { IoIosArrowDown, IoMdClose } from 'react-icons/io';
 import CandidateInterviews from './CandidateInterviews';
 import CandidateComments from './CandidateComments';
 import NewInterview from './NewInterview';
@@ -16,6 +16,8 @@ import AppliedJobs from './AppliedJobs';
 import { MdWork } from "react-icons/md";
 import { GrStatusGoodSmall } from "react-icons/gr";
 import { VscDebugStepOut } from "react-icons/vsc";
+import { TbAlertOctagonFilled } from "react-icons/tb";
+
 
 
 
@@ -30,6 +32,7 @@ function CandidateView() {
     const [isPersonalDetailsEditing, setIsPersonalDetailsEditing] = useState(false);
     const [experienceInYears, setExpeirenceInYears] = useState()
     const [experienceInMonths, setExpeirenceInMonths] = useState()
+    const [allJobs, setAllJobs] = useState([]);
     let loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
     const [alerts, setAlerts] = useState({
         delete: false,
@@ -45,12 +48,179 @@ function CandidateView() {
     const [isEducationEditing, setIsEducationEditing] = useState(false);
     const [isExperienceEditing, setIsExperienceEditing] = useState(false);
 
-
     // States for education and experience lists
     const [educationList, setEducationList] = useState([]);
     const [experienceList, setExperienceList] = useState([]);
     const [skills, setSkills] = useState([]); // Add state to manage skills
     const [hobbies, setHobbies] = useState([]);
+
+
+    const [candidateEmpty, setCandidateEmpty] = useState({
+        toggled: false,
+        value: true
+    });
+    const [selectedJobs, setSelectedJobs] = useState({
+        toggled: false,
+        jobs: [],
+        ids: [],
+    });
+
+    // Debugging Purpose
+    useEffect(() => {
+        console.log(selectedJobs.ids);
+    }, [selectedJobs])
+
+
+    useEffect(() => {
+        if (candidate) {
+            console.log(candidate)
+            if (
+                candidate.title === "" ||
+                candidate.first_name === "" ||
+                candidate.last_name === "" ||
+                candidate.address_line1 === "" ||
+                candidate.city === "" ||
+                candidate.state === "" ||
+                candidate.pin_code === "" ||
+                candidate.country === "" ||
+                candidate.contact_number === "" ||
+                candidate.email_address === "" ||
+                candidate.candidate_applied_jobs.length < 1
+                // candidate.date_of_birth === "" ||
+                // candidate.department === "" ||
+                // candidate.current_status === ""
+            ) {
+                setCandidateEmpty({ toggled: false, value: true })
+            }
+            else {
+                setCandidateEmpty({ toggled: false, value: false })
+            }
+        }
+    }, [candidate]);
+
+    const [emptyRequiredValue, setEmptyRequiredValue] = useState({
+        "title": true,
+        "first_name": true,
+        "last_name": true,
+        "address_line1": true,
+        "city": true,
+        "pin_code": true,
+        "country": true,
+        "contact_number": true,
+        "email_address": true,
+        "selectedJobs": true
+    })
+    useEffect(() => {
+        if (isPersonalDetailsEditing) {
+            if (candidate) {
+                if (candidateEmpty.value) {
+                    candidate.title === "" ? setEmptyRequiredValue((values) => ({ ...values, title: true })) : setEmptyRequiredValue((values) => ({ ...values, title: false }));
+                    candidate.first_name === "" ? setEmptyRequiredValue((values) => ({ ...values, first_name: true })) : setEmptyRequiredValue((values) => ({ ...values, first_name: false }));
+                    candidate.last_name === "" ? setEmptyRequiredValue((values) => ({ ...values, last_name: true })) : setEmptyRequiredValue((values) => ({ ...values, last_name: false }));
+                    candidate.address_line1 === "" ? setEmptyRequiredValue((values) => ({ ...values, address_line1: true })) : setEmptyRequiredValue((values) => ({ ...values, address_line1: false }));
+                    candidate.city === "" ? setEmptyRequiredValue((values) => ({ ...values, city: true })) : setEmptyRequiredValue((values) => ({ ...values, city: false }));
+                    candidate.pin_code === "" ? setEmptyRequiredValue((values) => ({ ...values, pin_code: true })) : setEmptyRequiredValue((values) => ({ ...values, pin_code: false }));
+                    candidate.country === "" ? setEmptyRequiredValue((values) => ({ ...values, country: true })) : setEmptyRequiredValue((values) => ({ ...values, country: false }));
+                    candidate.contact_number === "" ? setEmptyRequiredValue((values) => ({ ...values, contact_number: true })) : setEmptyRequiredValue((values) => ({ ...values, contact_number: false }));
+                    candidate.email_address === "" ? setEmptyRequiredValue((values) => ({ ...values, email_address: true })) : setEmptyRequiredValue((values) => ({ ...values, email_address: false }));
+                    candidate.candidate_applied_jobs.length < 1 ? setEmptyRequiredValue((values) => ({ ...values, selectedJobs: true })) : setEmptyRequiredValue((values) => ({ ...values, selectedJobs: false }));
+                }
+            }
+        }
+        else {
+            setEmptyRequiredValue(
+                {
+                    "title": false,
+                    "first_name": false,
+                    "last_name": false,
+                    "address_line1": false,
+                    "city": false,
+                    "pin_code": false,
+                    "country": false,
+                    "contact_number": false,
+                    "email_address": false,
+                    "selectedJobs": false
+                }
+            )
+        }
+    }, [isPersonalDetailsEditing, candidate, selectedJobs]);
+    const dropdownRef = useRef(null); // Ref for the dropdown
+
+    // When Candidate is a Follow-up
+    const [candidateInFollowup, setCandidateInFollowup] = useState(false);
+    useEffect(() => {
+        if (candidate) {
+            if (candidate.status === "Follow-up") {
+                setCandidateInFollowup(true);
+            }
+            else {
+                setCandidateInFollowup(false)
+            }
+        }
+        setCandidateInFollowup(false)
+    }, candidate)
+
+
+    useEffect(() => {
+        // Fetching jobs from the server
+        axios.get("/display_jobs")
+            .then((res) => {
+                console.log(res.data);
+                setAllJobs(res.data.jobs);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }, []);
+
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setSelectedJobs((prevState) => ({ ...prevState, toggled: false }));
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside);
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
+
+
+    const handleJobsSelection = (job, jobId, value) => {
+        setSelectedJobs((prevState) => {
+            const jobKey = job.hasOwnProperty('job_id') ? 'job_id' : 'id';
+            const jobIdentifier = job[jobKey];
+
+            const updatedJobs = value
+                ? [...prevState.jobs, job] // Add job
+                : prevState.jobs.filter((j) => j[jobKey] !== jobIdentifier); // Remove job
+
+            const updatedJobIds = updatedJobs.map(j => j[jobKey]);
+
+            // Update the candidate's job field
+            setCandidate((prevCandidate) => ({
+                ...prevCandidate,
+                jobs: updatedJobIds, // Update jobs in candidate state
+            }));
+
+            return {
+                ...prevState,
+                jobs: updatedJobs, // Update the jobs array
+                ids: updatedJobIds, // Update the jobIds array
+            };
+        });
+    };
+
+
+    const handleToggleDropdown = () => {
+        setSelectedJobs((prevState) => ({ ...prevState, toggled: !prevState.toggled }));
+    };
+
+
+
 
 
     // Fecth User Data
@@ -66,56 +236,56 @@ function CandidateView() {
 
     // Fetch candidate data
     // Fetch candidate data
-    const fetchCandidate = () => {
-        setCandidateLoading(true);
-        axios.get(`/candidate-info/${candidate_id}`)
-            .then((res) => {
-                console.log(res.data)
-                if (res.data.success) {
-                    const candidateData = res.data.candidate;
-                    setCandidateSuccess(true);
-                    setCandidateLoading(false);
-                    setCandidateError(false);
-                    setCandidate(candidateData);
+    // const fetchCandidate = () => {
+    //     setCandidateLoading(true);
+    //     axios.get(`/candidate-info/${candidate_id}`)
+    //         .then((res) => {
+    //             console.log(res.data)
+    //             if (res.data.success) {
+    //                 const candidateData = res.data.candidate;
+    //                 setCandidateSuccess(true);
+    //                 setCandidateLoading(false);
+    //                 setCandidateError(false);
+    //                 setCandidate(candidateData);
 
-                    // Populate education and experience lists after data is fetched
-                    setEducationList(candidateData.qualifications || []);
-                    setExperienceList(candidateData.workExperiences.map((exp, index) => ({
-                        id_updated: index + 1,
-                        organisation_name: exp.organisation_name || '',
-                        last_designation: exp.last_designation || '',
-                        total_tenure_years: exp.total_tenure_years || '',
-                        total_tenure_months: exp.total_tenure_months || '',
-                        last_drawn_salary: exp.last_drawn_salary || '',
-                    })) || []);
+    //                 // Populate education and experience lists after data is fetched
+    //                 setEducationList(candidateData.qualifications || []);
+    //                 setExperienceList(candidateData.workExperiences.map((exp, index) => ({
+    //                     id_updated: index + 1,
+    //                     organisation_name: exp.organisation_name || '',
+    //                     last_designation: exp.last_designation || '',
+    //                     total_tenure_years: exp.total_tenure_years || '',
+    //                     total_tenure_months: exp.total_tenure_months || '',
+    //                     last_drawn_salary: exp.last_drawn_salary || '',
+    //                 })) || []);
 
-                    // Convert skills string into an array
-                    const skillsArray = candidateData.skills
-                        ? candidateData.skills.split(',').map(skill => skill.trim())
-                        : []; // If there are no skills, use an empty array
-                    setSkills(skillsArray); // Update skills state
+    //                 // Convert skills string into an array
+    //                 const skillsArray = candidateData.skills
+    //                     ? candidateData.skills.split(',').map(skill => skill.trim())
+    //                     : []; // If there are no skills, use an empty array
+    //                 setSkills(skillsArray); // Update skills state
 
-                    // Convert hobbies string into an array
-                    const hobbiesArray = candidateData.hobbies
-                        ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
-                        : []; // If there are no hobbies, use an empty array
-                    setHobbies(hobbiesArray); // Update hobbies state
+    //                 // Convert hobbies string into an array
+    //                 const hobbiesArray = candidateData.hobbies
+    //                     ? candidateData.hobbies.split(',').map(hobby => hobby.trim())
+    //                     : []; // If there are no hobbies, use an empty array
+    //                 setHobbies(hobbiesArray); // Update hobbies state
 
-                }
-            })
-            .catch((err) => {
-                setCandidateError(true);
-                setCandidateSuccess(false);
-                setCandidateLoading(false);
-            });
-    }
+    //             }
+    //         })
+    //         .catch((err) => {
+    //             setCandidateError(true);
+    //             setCandidateSuccess(false);
+    //             setCandidateLoading(false);
+    //         });
+    // }
     useEffect(() => {
         setCandidateLoading(true);
         axios.get(`/candidate-info/${candidate_id}`)
             .then((res) => {
                 if (res.data.success) {
                     const candidateData = res.data.candidate;
-                    console.log(res.data.candidate)
+                    // console.log(res.data.candidate)
                     setCandidateSuccess(true);
                     setCandidateLoading(false);
                     setCandidateError(false);
@@ -123,9 +293,17 @@ function CandidateView() {
                     setExpeirenceInYears(res.data.experience_years)
                     setExpeirenceInMonths(res.data.experience_months)
 
+                    // Setting Selected Jobs by Default
+                    let lastJobsIds = [];
+                    let lastJobs = []
+                    res.data.candidate.candidate_applied_jobs.map((value) => {
+                        lastJobsIds.push(value.job_id)
+                        lastJobs.push(value)
+                    })
+                    setSelectedJobs((values) => ({ ...values, ids: lastJobsIds, jobs: lastJobs }))
+
                     // Populate education and experience lists after data is fetched
                     setEducationList(candidateData.qualifications || []);
-                    console.log(res.data)
                     setExperienceList(candidateData.workExperiences.map((exp, index) => ({
                         id_updated: index + 1,
                         organisation_name: exp.organisation_name || '',
@@ -242,8 +420,16 @@ function CandidateView() {
     // Update Candidate Data (Saving Changes)
     const { updateEvents, updateCandidate } = useCandidateUpdate();
     const handleUpdateCandidate = () => {
-        updateCandidate(candidate_id, educationList, experienceList, candidate, skills, hobbies, candidate ? candidate.candidate_applied_jobs : []);
+        updateCandidate(candidate_id, educationList, experienceList, candidate, skills, hobbies, selectedJobs);
     };
+
+    // Setting Editing Mode if user updated successully
+    useEffect(() => {
+        if (updateEvents.success) {
+            setIsPersonalDetailsEditing(false);
+            setSelectedJobs((values) => ({ ...values, ids: [], jobs: [], toggled: false }))
+        }
+    }, [updateEvents])
 
     const [deleteEvents, setDeleteEvents] = useState({
         loading: false,
@@ -258,13 +444,19 @@ function CandidateView() {
                 .then((res) => {
                     if (res.data.success) {
                         const candidateData = res.data.candidate;
-                        console.log(res.data.candidate)
+                        // console.log(res.data.candidate)
                         setCandidateSuccess(true);
                         setCandidateLoading(false);
                         setCandidateError(false);
                         setCandidate(candidateData);
                         setExpeirenceInYears(res.data.experience_years)
                         setExpeirenceInMonths(res.data.experience_months)
+                        let lastJobs = [];
+                        res.data.candidate.candidate_applied_jobs.map((value) => {
+                            lastJobs.push(value.job_id)
+                        })
+                        console.log("jobs")
+                        setSelectedJobs((values) => ({ ...values, ids: lastJobs }))
 
                         // Populate education and experience lists after data is fetched
                         setEducationList(candidateData.qualifications || []);
@@ -481,19 +673,6 @@ function CandidateView() {
         }
     };
 
-    // useEffect(() => {
-    //     const handleClickOutside = (event) => {
-    //         if (popupRef.current && !popupRef.current.contains(event.target)) {
-    //             setNextRoundSelection((values) => ({ ...values, checked: false }));
-    //         }
-    //     };
-
-    //     document.addEventListener("mousedown", handleClickOutside);
-    //     return () => {
-    //         document.removeEventListener("mousedown", handleClickOutside);
-    //     };
-    // }, []);
-
 
 
     const [candidateStatus, setCandidateStatus] = useState(candidate ? candidate.status : "");
@@ -513,7 +692,7 @@ function CandidateView() {
             }
         )
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 setNextRoundSelection((values) => ({ ...values, checked: false }))
                 setCandidateLoading(true);
                 axios.get(`/candidate-info/${candidate_id}`)
@@ -624,6 +803,121 @@ function CandidateView() {
             })
     }
 
+
+
+
+
+
+    // Validations
+    // Validations
+    // Validations
+
+    // Phone Number
+    const [validationErrors, setValidationErrors] = useState({
+        contact_number: '',
+        alt_contact_number: '',
+    });
+
+    const validatePhoneNumber = (number) => {
+        // Regular expression for validating a phone number
+        const regex = /^[0-9]{10,10}$/;
+        return regex.test(number);
+    };
+
+    const handleContactChange = (e) => {
+        const value = e.target.value;
+        setCandidate((values) => ({ ...values, contact_number: value }));
+
+        // Validate phone number
+        if (!validatePhoneNumber(value)) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                contact_number: 'Contact number must be at least 10 digits and contain only numbers.',
+            }));
+        } else {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                contact_number: '',
+            }));
+        }
+
+        if (e.target.value === null || e.target.value === "") {
+            setValidationErrors((prevErrors) => ({ ...prevErrors, contact_number: '' }))
+        }
+    };
+
+    const handleAltContactChange = (e) => {
+        const value = e.target.value;
+        setCandidate((values) => ({ ...values, alt_contact_number: value }));
+
+        // Validate alternate contact number
+        if (!validatePhoneNumber(value)) {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                alt_contact_number: 'Alternate contact number must be at least 10 digits and contain only numbers.',
+            }));
+        } else {
+            setValidationErrors((prevErrors) => ({
+                ...prevErrors,
+                alt_contact_number: '',
+            }));
+        }
+
+        if (e.target.value === null || e.target.value === "") {
+            setValidationErrors((prevErrors) => ({ ...prevErrors, alt_contact_number: '' }))
+        }
+    };
+
+
+    // Email Validation
+    const [errors, setErrors] = useState({
+        emailError: '',
+        altEmailError: ''
+    });
+
+    // Email validation function (disallow special characters outside valid email format)
+    const validateEmail = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+    };
+
+    // Handle changes and validation for primary email
+    const handleEmailChange = (e) => {
+        const email = e.target.value;
+        setCandidate((values) => ({ ...values, email_address: email }));
+
+        if (!validateEmail(email)) {
+            setErrors((prevErrors) => ({ ...prevErrors, emailError: 'Invalid email or contains special characters.' }));
+        } else {
+            setErrors((prevErrors) => ({ ...prevErrors, emailError: '' }));
+        }
+
+        if (e.target.value === null || e.target.value === "") {
+            setErrors((prevErrors) => ({ ...prevErrors, emailError: '' }))
+        }
+    };
+
+    // Handle changes and validation for alternate email
+    const handleAltEmailChange = (e) => {
+        const altEmail = e.target.value;
+        setCandidate((values) => ({ ...values, alt_email_address: altEmail }));
+
+        if (!validateEmail(altEmail)) {
+            setErrors((prevErrors) => ({ ...prevErrors, altEmailError: 'Invalid alternate email or contains special characters.' }));
+        } else {
+            setErrors((prevErrors) => ({ ...prevErrors, altEmailError: '' }));
+        }
+
+
+        if (e.target.value === null || e.target.value === "") {
+            setErrors((prevErrors) => ({ ...prevErrors, altEmailError: '' }))
+        }
+    };
+
+
+
+
+
     // Component Loading -------------------------------------------------------------------------------------------------------
     // Component Loading -------------------------------------------------------------------------------------------------------
     if (candidateLoading) {
@@ -668,11 +962,22 @@ function CandidateView() {
 
                         <div className='flex gap-4 items-center pr-8' ref={popupRef}>
                             {/* Filter Buttons */}
-                            <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Overview" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Overview")}>Overview</button>
-                            <button className={`p-2.5 rounded-lg w-32 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"} ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
-                            <button className={`p-2.5 rounded-lg w-32 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"} ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
-                            <button className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Comments" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Comments")}>Comments</button>
-                            <button className={`p-2.5 rounded-lg min-w-32 ${candidate.status === "Follow-up" ? "inline-block" : "hidden"} ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={shortlistCandidate}>{shortlisted.loading ? "Shortlisting..." : shortlisted.success ? "Candidate Shortlisted" : shortlisted.error ? "Candidate Shortlisted" : "Shortlist"}</button>
+                            <button type="button" className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Overview" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Overview")}>Overview</button>
+                            <button type="button" className={`p-2.5 rounded-lg w-32 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"} ${selectedFilter === "Applied Jobs" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Applied Jobs")}>Applied Jobs</button>
+                            <button type="button" className={`p-2.5 rounded-lg w-32 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"} ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Interviews")}>Interviews</button>
+                            <button type="button" className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Comments" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Comments")}>Comments</button>
+
+                            {/* Candidate Shortlisting Toggling if When user trying to shortlist the candidate */}
+                            <button type="button" className={`p-2.5 rounded-lg min-w-32 ${candidate.status === "Follow-up" ? "inline-block" : "hidden"} ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`}
+                                onClick={
+                                    () => {
+                                        candidateEmpty.value ? setCandidateEmpty({ value: true, toggled: true }) : shortlistCandidate();
+                                        candidateEmpty.value ? setIsPersonalDetailsEditing(true) : setIsPersonalDetailsEditing(false);
+                                    }
+                                }>{shortlisted.loading ? "Shortlisting..." : shortlisted.success ? "Candidate Shortlisted" : shortlisted.error ? "Candidate Shortlisted" : "Shortlist"}</button>
+
+
+
                             <div className={`relative `} >
                                 <span
                                     onClick={() => {
@@ -687,7 +992,7 @@ function CandidateView() {
                             </div>
 
                             <div className={`p-2.5 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"}`}>
-                                <button className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
+                                <button type="button" className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
                                     onClick={() => {
                                         setNextRoundSelection((values) => ({ ...values, checked: true }));
                                     }}>
@@ -697,7 +1002,9 @@ function CandidateView() {
                         </div>
                     </div>
 
-                    <div className={`max-h-full ${selectedFilter === "Overview" ? "block" : "hidden"}`}>
+
+
+                    <form onSubmit={handleUpdateCandidate} className={`max-h-full ${selectedFilter === "Overview" ? "block" : "hidden"}`}>
                         <div className='flex justify-between items-center text-sm sticky -z-10 top-[99px] bg-indigo-50 p-4'>
                             <div className='w-full min-w-fit flex items-center gap-2 pr-3'><FaCircleCheck size={"13px"} /> <span className='text-sm'>Job Applied</span></div>
                             <div className='w-full h-0.5 bg-black'></div>
@@ -714,16 +1021,40 @@ function CandidateView() {
                             <div className='w-full min-w-fit flex items-center gap-2 pl-3'><FaCircleCheck size={"13px"} /> <span className='text-sm'>Permanent</span></div>
                         </div>
 
+
+                        {/* Head Alert When User Trying to shortlist the candidate */}
+
+                        <div className={`bg-gray-50 p-4 pb-0 transition-small ${isPersonalDetailsEditing ? "h-auto" : "h-0 overflow-hidden"}`}>
+                            <div className='p-4 bg-red-100 border flex items-center gap-4 border-red-300 text-red-500'>
+                                <TbAlertOctagonFilled size={"20px"} /> Please Fill All Required Details
+                            </div>
+                        </div>
+
+
+
                         <div className='grid gap-4 p-4 bg-gray-50'>
                             <div className='grid gap-2 p-6 bg-white w-full border'>
                                 <h1 className='flex justify-between font-semibold text-indigo-700 pb-4'>
                                     <span className='text-xl'>Personal Details</span>
-                                    <button onClick={() => setIsPersonalDetailsEditing(!isPersonalDetailsEditing)}>{isPersonalDetailsEditing ? <span className='inline-flex gap-2 items-center p-2 px-5 bg-green-50 text-green-600'><MdOutlineDone /> Done</span> : <span className='inline-flex gap-2 items-center p-2 px-5'><MdEdit /> Edit Personal Details</span>}</button>
+                                    <div className='flex items-center gap-4'>
+                                        <button type="button" onClick={() => { setIsPersonalDetailsEditing(!isPersonalDetailsEditing); }}>{isPersonalDetailsEditing ? <span className='inline-flex gap-2 items-center p-2 rounded-lg px-5 bg-red-50 border border-red-300 text-red-500'><MdOutlineDone /> Disbale Edit</span> : <span className='inline-flex gap-2 items-center p-2 px-5'><MdEdit /> Edit Personal Details</span>}</button>
+                                        {/* <button type="button" className={`${isPersonalDetailsEditing ? "inline-block" : "hidden"} p-2 rounded-lg px-4 bg-indigo-700 border border-indigo-700 text-white ${updateEvents.loading ? 'bg-opacity-80 cursor-not-allowed' : ''}`}
+                                            onClick={handleUpdateCandidate}
+                                            disabled={updateEvents.loading}
+                                        >
+                                            {updateEvents.loading ? <span className='inline-flex gap-2 items-center justify-center h-4'><AiOutlineLoading3Quarters size={"10px"} className='reload-rounding' /> Updating ...</span> : updateEvents.error ? "Error!, Try Again" : "Update Candidate"}
+                                        </button> */}
+                                        <input type="submit" className={`${isPersonalDetailsEditing ? "inline-block" : "hidden"} p-2 rounded-lg px-4 bg-indigo-700 border border-indigo-700 text-white ${updateEvents.loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError ? 'bg-opacity-80 cursor-not-allowed' : 'cursor-pointer'}`}
+                                            // onClick={handleUpdateCandidate}
+                                            disabled={updateEvents.loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError} value={"Update Candidate"}
+                                        />
+                                    </div>
                                 </h1>
+
                                 <div className='grid grid-cols-2 gap-4'>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Title</span>
+                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Title<span className='text-red-500'>*</span> </span>
                                         {/* <input type="text" className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.title} onChange={(e) => setCandidate((values) => ({ ...values, title: e.target.value }))} /> */}
-                                        <select className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                        <select required className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.title ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
                                             onChange={(e) => setCandidate((values) => ({ ...values, title: e.target.value }))}
                                             disabled={!isPersonalDetailsEditing}
                                             defaultValue={candidate.title ? candidate.title : "---"}>
@@ -733,11 +1064,12 @@ function CandidateView() {
                                         </select>
                                     </div>
                                     <div className='flex gap-4'>
-                                        <span className='font-semibold min-w-40 py-2'>First Name</span>
+                                        <span className='font-semibold min-w-40 py-2'>First Name<span className='text-red-500'>*</span></span>
                                         <input
                                             type="text"
+                                            required
                                             disabled={!isPersonalDetailsEditing}
-                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.first_name ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
                                             value={candidate.first_name}
                                             onChange={(e) => {
                                                 const inputValue = e.target.value;
@@ -755,7 +1087,7 @@ function CandidateView() {
                                         <input
                                             type="text"
                                             disabled={!isPersonalDetailsEditing}
-                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
                                             value={candidate.middle_name}
                                             onChange={(e) => {
                                                 const inputValue = e.target.value;
@@ -768,12 +1100,14 @@ function CandidateView() {
                                         />
                                     </div>
 
+
                                     <div className='flex gap-4'>
-                                        <span className='font-semibold min-w-40 py-2'>Last Name</span>
+                                        <span className='font-semibold min-w-40 py-2'>Last Name<span className='text-red-500'>*</span></span>
                                         <input
                                             type="text"
+                                            required
                                             disabled={!isPersonalDetailsEditing}
-                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.last_name ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
                                             value={candidate.last_name}
                                             onChange={(e) => {
                                                 const inputValue = e.target.value;
@@ -786,54 +1120,171 @@ function CandidateView() {
                                         />
                                     </div>
 
+                                    <div className='flex gap-4'>
+                                        <span className='font-semibold min-w-40 py-2'>Date Of Birth<span className='text-red-500'>*</span></span>
+                                        <input
+                                            type="text"
+                                            required
+                                            disabled={!isPersonalDetailsEditing}
+                                            className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.first_name ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                            value={candidate.first_name}
+                                            onChange={(e) => {
+                                                // const inputValue = e.target.value;
+                                                // const regex = /^[A-Za-z\s]*$/; // Only allow alphabetic characters and spaces
+                                                // if (regex.test(inputValue)) {
+                                                //     setCandidate((values) => ({ ...values, date_of_birth: inputValue }));
+                                                // }
+                                                setCandidate((values) => ({ ...values, date_of_birth: e.target.value }));
+                                            }}
+                                            placeholder="First Name"
+                                        />
+                                    </div>
+                                    <div></div>
+
                                     <hr />
                                     <hr />
                                     <div className='flex gap-4'>
-                                        <span className='font-semibold min-w-40 py-2'>Contact Number</span>
-                                        <input
-                                            type="text"
-                                            disabled={!isPersonalDetailsEditing}
-                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
-                                            value={candidate.contact_number}
-                                            onChange={(e) => {
-                                                const inputValue = e.target.value;
-                                                const regex = /^[0-9+\- ]*$/; // Allow only numbers, +, -, and spaces
-                                                if (regex.test(inputValue)) {
-                                                    setCandidate((values) => ({ ...values, contact_number: inputValue }));
-                                                }
-                                            }}
-                                            placeholder="Contact Number"
-                                        />
+                                        <span className='font-semibold min-w-40 py-2'>Contact Number<span className='text-red-500'>*</span></span>
+                                        <div className='grid'>
+                                            <input
+                                                type="text"
+                                                required
+                                                disabled={!isPersonalDetailsEditing}
+                                                className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.contact_number ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                                value={candidate.contact_number}
+                                                onChange={(e) => {
+                                                    handleContactChange(e)
+                                                    const inputValue = e.target.value;
+                                                    const regex = /^[0-9+\- ]*$/; // Allow only numbers, +, -, and spaces
+                                                    if (regex.test(inputValue)) {
+                                                        setCandidate((values) => ({ ...values, contact_number: inputValue }));
+                                                    }
+                                                }}
+                                                placeholder="Contact Number"
+                                            />
+                                            {validationErrors.contact_number && <span className="text-red-600">{validationErrors.contact_number}</span>}
+                                        </div>
                                     </div>
 
                                     <div className='flex gap-4'>
                                         <span className='font-semibold min-w-40 py-2'>Alt. Contact Number</span>
-                                        <input
-                                            type="text"
-                                            disabled={!isPersonalDetailsEditing}
-                                            className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
-                                            value={candidate.alt_contact_number}
-                                            onChange={(e) => {
-                                                const inputValue = e.target.value;
-                                                const regex = /^[0-9+\- ]*$/; // Allow only numbers, +, -, and spaces
-                                                if (regex.test(inputValue)) {
-                                                    setCandidate((values) => ({ ...values, alt_contact_number: inputValue }));
-                                                }
-                                            }}
-                                            placeholder="Alt. Contact Number"
-                                        />
+                                        <div className='grid'>
+                                            <input
+                                                type="text"
+                                                disabled={!isPersonalDetailsEditing}
+                                                className={`text-black w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`}
+                                                value={candidate.alt_contact_number}
+                                                onChange={(e) => {
+                                                    const inputValue = e.target.value;
+                                                    const regex = /^[0-9+\- ]*$/; // Allow only numbers, +, -, and spaces
+                                                    if (regex.test(inputValue)) {
+                                                        setCandidate((values) => ({ ...values, alt_contact_number: inputValue }));
+                                                    }
+                                                    handleAltContactChange(e)
+                                                }}
+                                                placeholder="Alt. Contact Number"
+                                            />
+                                            {validationErrors.alt_contact_number && <span className="text-red-600">{validationErrors.alt_contact_number}</span>}
+                                        </div>
                                     </div>
 
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Email Address</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.email_address} onChange={(e) => setCandidate((values) => ({ ...values, email_address: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Alt. Email Address</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.alt_email_address} onChange={(e) => setCandidate((values) => ({ ...values, alt_email_address: e.target.value }))} /></div>
+                                    <div className='flex gap-4'>
+                                        <span className='font-semibold min-w-40 py-2'>Email Address<span className='text-red-500'>*</span></span>
+                                        <div>
+                                            <input type="text" required disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.email_address ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.email_address}
+                                                onChange={(e) => {
+                                                    handleEmailChange(e)
+                                                    setCandidate((values) => ({ ...values, email_address: e.target.value }))
+                                                }
+                                                } />
+                                            {errors.emailError && <p className="text-red-500">{errors.emailError}</p>}
+                                        </div>
+                                    </div>
+
+
+                                    <div className='flex gap-4'>
+                                        <span className='font-semibold min-w-40 py-2'>Alt. Email Address</span>
+                                        <div className='grid'>
+                                            <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.alt_email_address}
+                                                onChange={(e) => {
+                                                    handleAltEmailChange(e)
+                                                    setCandidate((values) => ({ ...values, alt_email_address: e.target.value }))
+                                                }} />
+                                            {errors.altEmailError && <p className="text-red-500">{errors.altEmailError}</p>}
+                                        </div>
+                                    </div>
                                     <hr />
                                     <hr />
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 1</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.address_line1} onChange={(e) => setCandidate((values) => ({ ...values, address_line1: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 2</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.address_line2} onChange={(e) => setCandidate((values) => ({ ...values, address_line2: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>POST Code</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.pin_code} onChange={(e) => setCandidate((values) => ({ ...values, pin_code: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>City</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.city} onChange={(e) => setCandidate((values) => ({ ...values, city: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>State</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.state} onChange={(e) => setCandidate((values) => ({ ...values, state: e.target.value }))} /></div>
-                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Country</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border-l-2 w-96 border-transparent focus:outline-none focus:border-l-2 p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.country} onChange={(e) => setCandidate((values) => ({ ...values, country: e.target.value }))} /></div>
+                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 1<span className='text-red-500'>*</span></span> <input required type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.address_line1 ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.address_line1} onChange={(e) => setCandidate((values) => ({ ...values, address_line1: e.target.value }))} /></div>
+                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 2</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.address_line2} onChange={(e) => setCandidate((values) => ({ ...values, address_line2: e.target.value }))} /></div>
+                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>POST Code<span className='text-red-500'>*</span></span> <input required type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.pin_code ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.pin_code} onChange={(e) => setCandidate((values) => ({ ...values, pin_code: e.target.value }))} /></div>
+                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>City<span className='text-red-500'>*</span></span> <input required type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.city ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.city} onChange={(e) => setCandidate((values) => ({ ...values, city: e.target.value }))} /></div>
+                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>State<span className='text-red-500'>*</span></span> <input required type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.state ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.state} onChange={(e) => setCandidate((values) => ({ ...values, state: e.target.value }))} /></div>
+                                    <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Country<span className='text-red-500'>*</span></span> <input required type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.country ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.country} onChange={(e) => setCandidate((values) => ({ ...values, country: e.target.value }))} /></div>
+
+
+                                    {/* Applied Jobs */}
+                                    <div className={`w-80 ${candidate.status === "Follow-up" ? "inline-block" : "hidden"}`}>
+                                        <label className={`inline-block mt-4 font-semibold`}>Select Jobs<span className="text-red-500">*</span></label>
+                                        <div className={`relative`} ref={dropdownRef}>
+                                            <div
+                                                className={`select-none cursor-pointer p-[11.5px] border rounded-md mt-4 flex items-center justify-between ${emptyRequiredValue.selectedJobs ? "border-red-500" : "bg-white"} ${selectedJobs.toggled ? "bg-gray-200" : ""}`}
+                                                onClick={handleToggleDropdown}
+                                            >
+                                                <span>Selected Jobs</span>
+                                                <span className={`transition-colors ${selectedJobs.toggled ? "rotate-180" : "rotate-0"}`}>
+                                                    <IoIosArrowDown />
+                                                </span>
+                                            </div>
+
+                                            <div className={`select-none absolute grid gap-1 top-16 right-0 p-1 bg-white shadow-2xl border w-full ${selectedJobs.toggled ? "block" : "hidden"}`}>
+                                                {allJobs.length > 0 ? (
+                                                    allJobs.map((value, key) => {
+                                                        const isChecked = selectedJobs.jobs.some(job => job.id === value.id); // Check if job is already selected
+
+                                                        if (value.job_status === "Active") {
+                                                            return (
+                                                                <label
+                                                                    key={key}
+                                                                    htmlFor={`job-id-${key}`}
+                                                                    className="flex items-center gap-4 p-2.5 bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                                                                >
+                                                                    <input
+                                                                        id={`job-id-${key}`}
+                                                                        type="checkbox"
+                                                                        checked={isChecked || selectedJobs.ids.includes(value.id)}
+                                                                        onChange={(e) => {
+                                                                            handleJobsSelection(value, value.id, e.target.checked);
+                                                                            console.log(selectedJobs);
+                                                                        }}
+                                                                    />
+                                                                    <span>{value.job_title}</span>
+                                                                </label>
+                                                            );
+                                                        }
+                                                        return null; // If not active, return null
+                                                    })
+                                                ) : (
+                                                    <div className="p-4">No Jobs Found!</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br />
+                                    <div className={`${candidate.status === "Follow-up" ? "inline-block" : "hidden"}`}>
+                                        <h1 className='font-bold'>Selected Jobs</h1>
+                                        <div className='flex items-center gap-4 mt-4'>
+                                            {
+                                                selectedJobs.jobs.length > 0 ?
+                                                    selectedJobs.jobs.map((value, index) => {
+                                                        return (
+                                                            <div key={index} className='inline-block p-2.5 px-5 rounded-full border'>{value.job_title}</div>
+                                                        )
+                                                    }) : <div className='mt-4'>No Jobs Selected Here!</div>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -854,6 +1305,7 @@ function CandidateView() {
                                                     {isExperienceEditing ? (
                                                         <div className='grid grid-cols-6'>
                                                             <input
+                                                                required
                                                                 type='text'
                                                                 value={experience.organisation_name}
                                                                 onChange={(e) => handleExperienceInputChange(index, 'organisation_name', e.target.value)}
@@ -861,6 +1313,7 @@ function CandidateView() {
                                                                 className='border p-2 px-4 mr-2'
                                                             />
                                                             <input
+                                                                required
                                                                 type='text'
                                                                 value={experience.last_designation}
                                                                 onChange={(e) => handleExperienceInputChange(index, 'last_designation', e.target.value)}
@@ -868,6 +1321,7 @@ function CandidateView() {
                                                                 className='border p-2 px-4 mr-2'
                                                             />
                                                             <input
+                                                                required
                                                                 type='number' // Change to number for easier input handling
                                                                 value={experience.total_tenure_years || ''} // Adjusted to take months
                                                                 onChange={(e) => handleExperienceInputChange(index, 'total_tenure_years', e.target.value)}
@@ -875,6 +1329,7 @@ function CandidateView() {
                                                                 className='border p-2 px-4 mr-2'
                                                             />
                                                             <input
+                                                                required
                                                                 type='number' // Change to number for easier input handling
                                                                 value={experience.total_tenure_months || ''} // Adjusted to take months
                                                                 onChange={(e) => handleExperienceInputChange(index, 'total_tenure_months', e.target.value)}
@@ -882,13 +1337,14 @@ function CandidateView() {
                                                                 className='border p-2 px-4 mr-2'
                                                             />
                                                             <input
+                                                                required
                                                                 type='text'
                                                                 value={experience.last_drawn_salary}
                                                                 onChange={(e) => handleExperienceInputChange(index, 'last_drawn_salary', e.target.value)}
                                                                 placeholder='Last Drawn Salary'
                                                                 className='border p-2 px-4 mr-2'
                                                             />
-                                                            <button onClick={() => removeExperience(experience.id_updated)} className='text-red-500 bg-red-100 flex items-center gap-2 justify-center'>
+                                                            <button type="button" onClick={() => removeExperience(experience.id_updated)} className='text-red-500 bg-red-100 flex items-center gap-2 justify-center'>
                                                                 <MdDelete /> Remove Experience
                                                             </button>
                                                         </div>
@@ -906,12 +1362,12 @@ function CandidateView() {
 
                                     <div>
                                         {isExperienceEditing && (
-                                            <button onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
+                                            <button type="button" onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
                                                 + Add More Experience
                                             </button>
                                         )}
 
-                                        <button
+                                        <button type="button"
                                             onClick={() => setIsExperienceEditing(!isExperienceEditing)}
                                             className='mt-4 bg-indigo-700 text-white p-2 px-4'
                                         >
@@ -936,6 +1392,7 @@ function CandidateView() {
                                                     {isEducationEditing ? (
                                                         <>
                                                             <input
+                                                                required
                                                                 type='text'
                                                                 defaultValue={education.college_university}
                                                                 onChange={(e) => handleEducationInputChange(index, 'college_university', e.target.value)}
@@ -943,6 +1400,7 @@ function CandidateView() {
                                                                 className='border p-2 px-4 mr-2'
                                                             />
                                                             <input
+                                                                required
                                                                 type='text'
                                                                 defaultValue={education.course}
                                                                 onChange={(e) => handleEducationInputChange(index, 'course', e.target.value)}
@@ -950,6 +1408,7 @@ function CandidateView() {
                                                                 className='border p-2 px-4 mr-2'
                                                             />
                                                             <input
+                                                                required
                                                                 type='number'
                                                                 defaultValue={education.year_of_passing}
                                                                 onChange={(e) => handleEducationInputChange(index, 'year', e.target.value)}
@@ -957,13 +1416,14 @@ function CandidateView() {
                                                                 className='border p-2 px-4 mr-2'
                                                             />
                                                             <input
+                                                                required
                                                                 type='text'
                                                                 defaultValue={education.percentage_cgpa}
                                                                 onChange={(e) => handleEducationInputChange(index, 'percentage_cgpa', e.target.value)}
                                                                 placeholder='Grade'
                                                                 className='border p-2 px-4 mr-2'
                                                             />
-                                                            <button onClick={() => removeEducation(education.id)} className='text-red-500'>
+                                                            <button type="button" onClick={() => removeEducation(education.id)} className='text-red-500'>
                                                                 <MdDelete />
                                                             </button>
                                                         </>
@@ -975,12 +1435,12 @@ function CandidateView() {
                                     </div>
 
                                     {isEducationEditing && (
-                                        <button onClick={addEducation} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
+                                        <button type="button" onClick={addEducation} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
                                             + Add More Education
                                         </button>
                                     )}
 
-                                    <button
+                                    <button type="button"
                                         onClick={() => setIsEducationEditing(!isEducationEditing)}
                                         className='mt-4 bg-indigo-700 text-white p-2 px-4'
                                     >
@@ -1007,7 +1467,7 @@ function CandidateView() {
                                         {skills.map((skill, index) => (
                                             <span key={index} className='bg-indigo-100 text-indigo-700 inline-flex justify-center gap-2 items-center p-2.5 px-5 rounded-full'>
                                                 {skill}
-                                                <button
+                                                <button type="button"
                                                     className="ml-2 text-red-500"
                                                     onClick={() => handleRemoveSkill(index)}
                                                 >
@@ -1037,7 +1497,7 @@ function CandidateView() {
                                         {hobbies.map((hobby, index) => (
                                             <span key={index} className='bg-indigo-100 text-indigo-700 p-2.5 px-5 rounded-full'>
                                                 {hobby}
-                                                <button
+                                                <button type="button"
                                                     className="ml-2 text-red-500"
                                                     onClick={() => handleRemoveHobby(index)}
                                                 >
@@ -1051,12 +1511,12 @@ function CandidateView() {
 
 
 
-                            <div className='pb-32 flex justify-end'><button className={`p-2.5 rounded-lg px-4 bg-indigo-700 text-white ${updateEvents.loading ? 'bg-opacity-80 cursor-not-allowed' : ''}`}
-                                onClick={handleUpdateCandidate}
-                                disabled={updateEvents.loading}
-                            >
-                                {updateEvents.loading ? <span className='inline-flex gap-2 items-center justify-center h-4'><AiOutlineLoading3Quarters size={"10px"} className='reload-rounding' /> Updating ...</span> : "Update Candidate"}
-                            </button></div>
+                            <div className='pb-32 flex justify-end'>
+                                <input type='submit' className={`p-2.5 rounded-lg px-4 bg-indigo-700 text-white ${updateEvents.loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError ? 'bg-opacity-80 cursor-not-allowed' : 'cursor-pointer'}`}
+                                    // onClick={}
+                                    disabled={updateEvents.loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError}
+                                    value={updateEvents.loading ? <span className='inline-flex gap-2 items-center justify-center h-4'><AiOutlineLoading3Quarters size={"10px"} className='reload-rounding' /> Updating ...</span> : "Update Candidate"}
+                                /></div>
 
                             <div className='grid gap-2 p-6 bg-white w-full border mb-4'>
                                 <h1 className='flex justify-between font-semibold mb-2'>
@@ -1064,7 +1524,7 @@ function CandidateView() {
                                     {/* <button className='inline-flex gap-2 items-center'><MdEdit /> Edit Legal Details</button> */}
                                 </h1>
                                 <div className='flex gap-4'>
-                                    <button className='text-white bg-red-500 rounded-lg p-2.5 px-5'
+                                    <button type="button" className='text-white bg-red-500 rounded-lg p-2.5 px-5'
                                         onClick={() => setAlerts((values) => ({ ...values, delete: true }))}
                                     >Delete This Candidate</button>
                                 </div>
@@ -1074,17 +1534,17 @@ function CandidateView() {
                                     <div className='w-96 min-h-32 p-10 text-center bg-white border rounded-xl'>
                                         <h1 className='text-xl font-semibold text-red-500'>Do You Want To Delete The Candidate</h1>
                                         <div className='flex flex-wrap items-center justify-center gap-2 mt-4'>
-                                            <button className='bg-gray-100 rounded-lg p-2.5 px-5 mt-4 mr-4'
+                                            <button type="button" className='bg-gray-100 rounded-lg p-2.5 px-5 mt-4 mr-4'
                                                 onClick={() => setAlerts((values) => ({ ...values, delete: false }))}
                                             >Cancel</button>
-                                            <button className={`bg-red-500 text-white rounded-lg p-2.5 px-5 mt-4 ${deleteEvents.loading ? "bg-opacity-50 cursor-not-allowed" : ""}`} onClick={handleDelete} disabled={deleteEvents.loading}>{deleteEvents.loading ? "Deleting..." : "Delete"}</button>
+                                            <button type="button" className={`bg-red-500 text-white rounded-lg p-2.5 px-5 mt-4 ${deleteEvents.loading ? "bg-opacity-50 cursor-not-allowed" : ""}`} onClick={handleDelete} disabled={deleteEvents.loading}>{deleteEvents.loading ? "Deleting..." : "Delete"}</button>
                                             <div className={`text-red-500 ${deleteEvents.error ? "opacity-100" : "hidden"}`}>Error: Cann't Delete the Candidate</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
 
 
                     {/* Applied Jobs */}
@@ -1113,7 +1573,7 @@ function CandidateView() {
                                 <FaListUl size={"12px"} /> Follow Up
                             </button> */}
 
-                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Rejected" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                            <button type="button" className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Rejected" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Rejected" }))}>
                                 <IoMdClose size={"14px"} /> Rejected
                             </button>
@@ -1123,38 +1583,38 @@ function CandidateView() {
                                 <RiListCheck3 size={"16px"} /> Shortlisted
                             </button> */}
 
-                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Offered" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                            <button type="button" className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Offered" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Offered" }))}>
                                 <MdOutlineDone size={"16px"} />Offered
                             </button>
 
-                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "OnBoard" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                            <button type="button" className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "OnBoard" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "OnBoard" }))}>
                                 <RiUserSharedFill size={"14px"} />On Board
                             </button>
 
-                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Training" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                            <button type="button" className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Training" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Training" }))}>
                                 <VscVmRunning size={"16px"} />Training
                             </button>
 
-                            <button className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Live" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
+                            <button type="button" className={`p-2.5 inline-flex items-center justify-start gap-2 border w-full rounded-md ${nextRoundSelection.value === "Live" ? "bg-indigo-700 text-white border-indigo-700" : "bg-indigo-50 border-indigo-200 hover:bg-indigo-100 hover:border-indigo-300"}`}
                                 onClick={() => setNextRoundSelection((values) => ({ ...values, value: "Live" }))}>
                                 <FaCircleDot size={"16px"} /> Live
                             </button>
 
 
                             <div className='flex gap-4'>
-                                <button className={`p-2.5 inline-flex items-center justify-center gap-2 border w-full rounded-md bg-gray-100`}
+                                <button type="button" className={`p-2.5 inline-flex items-center justify-center gap-2 border w-full rounded-md bg-gray-100`}
                                     onClick={() => {
                                         setNextRoundSelection((values) => ({ ...values, checked: false }));
                                     }}>Cancel
                                 </button>
 
-                                <button className={`p-2.5 min-w-[60%] inline-flex items-center justify-center gap-2 border rounded-md bg-black text-white border-black`}
+                                <button type="button" className={`p-2.5 min-w-[60%] inline-flex items-center justify-center gap-2 border rounded-md bg-black text-white border-black`}
                                     onClick={() => {
                                         updateCandidateStatus();
-                                        console.log(nextRoundSelection.value)
+                                        // console.log(nextRoundSelection.value)
                                     }}
                                 >
                                     <MdDone size={"16px"} /> Update
@@ -1211,8 +1671,8 @@ function CandidateView() {
                             <br />
 
                             <div className='flex gap-4'>
-                                <button className='min-w-[30%] px-5 rounded-md bg-gray-100 border' onClick={() => setNextRoundSelection((values) => ({ ...values, value: "", checked: false }))}>Cancel</button>
-                                <button onClick={scheduleInterview} className={`min-w-[60%] p-2.5 bg-indigo-700 text-white w-full rounded-md`}
+                                <button type="button" className='min-w-[30%] px-5 rounded-md bg-gray-100 border' onClick={() => setNextRoundSelection((values) => ({ ...values, value: "", checked: false }))}>Cancel</button>
+                                <button type="button" onClick={scheduleInterview} className={`min-w-[60%] p-2.5 bg-indigo-700 text-white w-full rounded-md`}
                                     disabled={newInterviewDetails.loading ? true : newInterviewDetails.success ? true : !permissions.createInterview ? true : false}
                                     style={{
                                         opacity: newInterviewDetails.loading ? 0.9 : newInterviewDetails.success ? 0.9 : !permissions.createInterview ? 0.5 : 1,
@@ -1224,6 +1684,36 @@ function CandidateView() {
                         </div>
                     </div>
 
+                </div>
+
+
+                {/* Can't Shortlist Candidate alert when user didn't filled the mendetory feilds */}
+                <div className={`fixed top-0 left-0 w-full h-full backdrop-blur-sm z-[1000] justify-center items-center hidden`}>
+                    <div className='w-96 bg-white border rounded-xl p-8'>
+                        <h1 className='flex justify-center gap-2 items-center font-bold text-xl text-red-500'>
+                            <TbAlertOctagonFilled size={"15px"} />
+                            <p className='text-xl'>Can't Shortlist The Candidate</p>
+                        </h1>
+                        <h1 className='mt-4'>Sorry! You Can't make this candidate shortlisted until unless you fill complete details of the candidate</h1>
+                        <div className='text-red-500 mt-4'>
+                            {/* <h1 className='font-bold'>These Feilds Are Required*</h1> */}
+                            <ul>
+                                <li className={`${candidate.title === "" ? "block" : "hidden"}`}>Title - is required feild</li>
+                                <li className={`${candidate.first_name === "" ? "block" : "hidden"}`}>First Name - is required feild</li>
+                                <li className={`${candidate.last_name === "" ? "block" : "hidden"}`}>Last Name - is required feild</li>
+                                <li className={`${candidate.address_line1 === "" ? "block" : "hidden"}`}>Address Line 1 - is required feild</li>
+                                <li className={`${candidate.city === "" ? "block" : "hidden"}`}>City - is required feild</li>
+                                <li className={`${candidate.state === "" ? "block" : "hidden"}`}>State - is required feild</li>
+                                <li className={`${candidate.pin_code === "" ? "block" : "hidden"}`}>POST Code - is required feild</li>
+                                <li className={`${candidate.country === "" ? "block" : "hidden"}`}>Country - is required feild</li>
+                                <li className={`${candidate.contact_number === "" ? "block" : "hidden"}`}>Contact Number - is required feild</li>
+                                <li className={`${candidate.email_address === "" ? "block" : "hidden"}`}>Email Address - is required feild</li>
+                                <li className={`${selectedJobs.jobs.length <= 0 ? "block" : "hidden"}`}>Atleast 1 Job - is required feild</li>
+                            </ul>
+
+                        </div>
+                        <button type="button" className='p-2.5 border w-full mt-4 rounded-xl' onClick={() => setCandidateEmpty({ value: true, toggled: false })}>Okay</button>
+                    </div>
                 </div>
             </div>
         )

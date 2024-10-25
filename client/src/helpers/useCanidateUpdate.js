@@ -12,12 +12,20 @@ const useCandidateUpdate = () => {
 
     const updateCandidate = (candidateId, candidateEducation, candidateExperience, personalDetails, candidateSkills, candidateHobbies, candidateJobs) => {
         setUpdateEvents({ loading: true, error: false, success: false });
-        console.log(candidateExperience)
+        // console.log("candidateJobs.ids")
+        // console.log(candidateJobs)
+        const jobs = candidateJobs.ids
+        console.log(jobs);
+        console.log(candidateId);
+        const newJobs = {
+            "job_ids": jobs,
+            "candidate_id": Number(candidateId)
+        }
+        console.log(newJobs)
 
         // Convert arrays to strings
         const skillsString = candidateSkills.join(', '); // Convert candidateSkills array to a comma-separated string
         const hobbiesString = candidateHobbies.join(', '); // Convert candidateHobbies array to a comma-separated string
-
         axios.post(`/update-candidate/${candidateId}`,
             {
                 "title": personalDetails.title,
@@ -50,8 +58,9 @@ const useCandidateUpdate = () => {
                 "status": personalDetails.status,
                 "qualifications": candidateEducation,
                 "experiences": candidateExperience,
-                // "jobs": candidateJobs,
+                // "jobs": candidateJobs.ids,
                 "created_by": personalDetails.created_by,
+                // "candidate_applied_jobs": candidateJobs.ids     
             }
         )
             .then((res) => {
@@ -67,6 +76,17 @@ const useCandidateUpdate = () => {
                 // Event handling
                 setUpdateEvents({ loading: false, error: true, success: false });
             });
+
+
+
+
+        axios.post("/add_job_application", newJobs)
+            .then((res) => {
+                console.log(res.data)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
     };
 
     return ({ updateEvents, updateCandidate });
