@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 // Icons
 import { GoEye, GoEyeClosed } from "react-icons/go";
-import { useEffect, useState } from "react";
+import {useState } from "react";
 import { MdOutlineError } from "react-icons/md";
 import useLogin from "../../../helpers/useLogin";
 import { useSelector } from "react-redux";
@@ -13,8 +13,8 @@ import LoginBg from "../../../assets/login-bg.png"
 const Login = () => {
     const [seePassword, setSeePassword] = useState(false);
     const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const { login, isUserLoggedin, loginLoading, loginError } = useLogin();
-    const userLoggedIn = useSelector((state) => state.user_auth);
+    const { login, isUserLoggedin, loginLoading } = useLogin();
+     
     return (
         <section className="h-screen w-screen flex justify-center items-center bg-opacity-10" style={{backgroundImage: `url(${LoginBg})`}}>
             <div className="flex gap-4 items-center p-8 rounded-xl border border-[#e8e4ff] bg-white">

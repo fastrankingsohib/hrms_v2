@@ -5,15 +5,16 @@ import { useSelector } from "react-redux";
 import UserModule from "../../commons/UserModule";
 
 // Icons
-import { GoEyeClosed, GoEye, GoTriangleUp } from "react-icons/go";
+import { GoEyeClosed, GoEye } from "react-icons/go";
 import axios from "axios";
 
 export default function NewUser() {
     const warnDefault = useSelector((state) => state.moduleSelection.invalid.length);
     const [mobileError, setMobileError] = useState(false);
     const [submitError, setsubmitError] = useState(false)
-    const userAssignedModule = useSelector((state) => state.userModules);
+ 
     const [passwordConfirm, setPasswordConfirm] = useState(true);
+    
     const [user, setUser] = useState({
         title: '',
         firstName: '',

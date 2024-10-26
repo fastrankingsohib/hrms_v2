@@ -1,10 +1,7 @@
 import axios from 'axios';
-import React, { useState, useEffect, useRef } from 'react';
-import { IoMdClose } from 'react-icons/io';
-import { MdOutlineStarOutline, MdOutlineStarPurple500 } from 'react-icons/md';
+import React, { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { PiUploadSimple } from "react-icons/pi";
 
 function NewJob() {
     const navigate = useNavigate();
@@ -32,12 +29,10 @@ function NewJob() {
         job_timing: "",
         min_offered_salary: "",
         max_offered_salary: "",
-        job_shift: "",
         created_by: "",
         job_status: "",
         job_exp_date: "",
         job_scheduled_date: "",
-        job_location: "",
         job_scheduled_time: "",
     });
 
@@ -64,7 +59,6 @@ function NewJob() {
             job_timing: jobDetails.job_timing,
             min_offered_salary: jobDetails.min_offered_salary,
             max_offered_salary: jobDetails.max_offered_salary,
-            job_shift: jobDetails.job_shift,
             created_by: userLoggedIn ? userLoggedIn.username : "not defined",
             job_status: jobDetails.job_scheduled_date === "" ? "Active" : "Scheduled",
             job_exp_date: jobDetails.job_exp_date === "" ? null : jobDetails.job_exp_date,
@@ -435,13 +429,7 @@ function NewJob() {
             </div>
 
 
-            {/* <div className='bg-white p-4 mt-4 select-none shadow-xl rounded-[8px]'>
-                <h1 className='text-xl font-semibold mb-4'>Upload Job Description - PDF</h1>
-                <label htmlFor="uploadPDF" className='inline-flex gap-4 items-center justify-center cursor-pointer h-28 w-80 rounded-xl bg-gray-100'>
-                    <PiUploadSimple size={"20px"} /> Click Here To Upload
-                </label>
-                <input type="file" id='uploadPDF' className='hidden' accept="application/pdf" />
-            </div> */}
+           
 
 
 

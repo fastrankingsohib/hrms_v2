@@ -1,9 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+
 
 const useCandidateUpdate = () => {
-    const navigate = useNavigate();
     const [updateEvents, setUpdateEvents] = useState({
         loading: false,
         error: false,

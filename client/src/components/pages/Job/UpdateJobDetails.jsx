@@ -1,8 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect, useRef } from 'react';
-import { IoMdClose } from 'react-icons/io';
-import { MdOutlineStarOutline, MdOutlineStarPurple500 } from 'react-icons/md';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import {useNavigate, useParams } from 'react-router-dom';
 
 function UpdateJobDetails() {
     const navigate = useNavigate();
@@ -12,7 +10,7 @@ function UpdateJobDetails() {
     // const [allStatus, setAllStatus] = useState({
     //   error
     // })
-    const [jobDetails, setJobDetails] = useState({
+    const [jobDetails] = useState({
         job_title: "",
         job_type: 'Full Time',
         experience: 'Any',
@@ -29,12 +27,9 @@ function UpdateJobDetails() {
         job_timing: "",
         min_offered_salary: "",
         max_offered_salary: "",
-        job_shift: "",
         created_by: "",
         job_status: "",
         job_exp_date: "",
-        job_scheduled_date: "",
-        job_location: "",
         job_scheduled_date: "",
     });
     const [jobExpiry, setJobExpiry] = useState(jobDetails.jobExpiry ? "Set Expiry" : "No Expiry")

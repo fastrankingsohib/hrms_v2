@@ -19,7 +19,6 @@ function AllUsers() {
             });
     }, []);
 
-    const scaleton = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     const [loading, setLoading] = useState(true)
     const handleDelete = (userId) => {
         // Show confirmation dialog

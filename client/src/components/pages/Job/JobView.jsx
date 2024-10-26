@@ -5,7 +5,6 @@ import JobOverview from './JobOverview';
 import AllApplicants from '../Job/AllApplicants';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { MdEdit } from 'react-icons/md';
-import { IoMdClose } from 'react-icons/io';
 
 function JobView() {
     const { jobId } = useParams(); // React Router hook to get jobId from the URL

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import useUpdateUser from "../../../helpers/useUpadateUser"; // Ensure this hook is defined correctly
-import allModules from "./AllModules"; // Import any required modules
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -15,7 +14,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const UpdateUser = () => {
     const { userid } = useParams();
-    const userAssignedModule = useSelector((state) => state.userModules);
+
     const [mobileError, setMobileError] = useState(false); // State to handle mobile number errors
     const dispatch = useDispatch();
     const warnDefault = useSelector((state) => state.moduleSelection.invalid.length);
@@ -119,19 +118,7 @@ const UpdateUser = () => {
         setIsEditing((prev) => !prev);
     };
 
-    const handleModuleChange = (module) => {
-        setUser((prevUser) => {
-            const isModuleAssigned = prevUser.modules.includes(module.id);
-            const updatedModules = isModuleAssigned
-                ? prevUser.modules.filter(mod => mod !== module.id)
-                : [...prevUser.modules, module.id];
-
-            return { ...prevUser, modules: updatedModules };
-        });
-    };
-
-
-
+ 
     // Email Validation
     const [emailError, setEmailError] = useState('');
 
@@ -603,11 +590,11 @@ const UpdateUser = () => {
                                     <UserModule
                                         editable={!isEditing}
                                         key={moduleKey}
-                                        checked={currentModule.module_status == true ? true : false}
-                                        create={currentModule.c == true ? true : false}
-                                        read={currentModule.r == true ? true : false}
-                                        update={currentModule.u == true ? true : false}
-                                        delete={currentModule.d == true ? true : false}
+                                        checked={currentModule.module_status === true ? true : false}
+                                        create={currentModule.c === true ? true : false}
+                                        read={currentModule.r === true ? true : false}
+                                        update={currentModule.u === true ? true : false}
+                                        delete={currentModule.d === true ? true : false}
                                         id={`module-${currentModule.module_name}`}
                                         name={currentModule.module_name}
                                         module={currentModule.module_status}

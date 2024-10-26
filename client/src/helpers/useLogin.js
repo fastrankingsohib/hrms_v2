@@ -46,7 +46,7 @@ const useLogin = () => {
                 setLoginError(true)
                 setIsUserLoggedin(false);
                 setLoginLoading(false)
-                if (err.status == '401') {
+                if (err.status === '401') {
                     setTimeout(() => {
                         setIsUserLoggedin(null)
                     }, 2900)
