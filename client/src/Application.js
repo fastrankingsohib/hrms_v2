@@ -6,7 +6,7 @@ import NewCandidate from "./components/pages/Candidate/NewCandidate";
 import NewUser from "./components/pages/User/NewUser";
 import PageNotFound from "./components/pages/PageNotFound";
 import UserView from "./components/pages/User/UserView";
-import Layout from "./components/layouts/Layout";
+import Layout from "./components/Layouts/Layout";
 import JobsLayout from "./components/pages/Job/JobsLayout";
 import NewJob from "./components/pages/Job/NewJob";
 import JobView from "./components/pages/Job/JobView";
@@ -24,7 +24,6 @@ import Home from "./components/pages/Home/Home";
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
 const Application = () => {
     return (
-      
         <BrowserRouter>
             <Routes>
                 <Route path="/" >
