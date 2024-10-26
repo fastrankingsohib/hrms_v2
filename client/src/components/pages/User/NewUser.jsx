@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import useRegisterUser from "../../../helpers/useRegisterUser";
 import allModules from "./AllModules";
 import { useSelector } from "react-redux";
-import UserModule from "../../Commons/UserModule";
-
+import axios from "axios";
+import UserModule from './../../commons/UserModule';
 // Icons
 import { GoEyeClosed, GoEye, GoTriangleUp } from "react-icons/go";
-import axios from "axios";
 
 export default function NewUser() {
     const warnDefault = useSelector((state) => state.moduleSelection.invalid.length);
