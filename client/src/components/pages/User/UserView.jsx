@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { updateModules } from "../../../redux/reducers/auth_slice";
 import '../../../style/theme/theme.scss'
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
-import UserModule from "../../Commons/UserModule"
+import UserModule from "../../commons/UserModule"
 
 
 // icons
