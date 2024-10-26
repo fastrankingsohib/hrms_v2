@@ -24,7 +24,9 @@ import Home from "./components/pages/Home/Home";
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
 const Application = () => {
     return (
+      
         <BrowserRouter>
+          <></>
             <Routes>
                 <Route path="/" >
                     <Route path="/login" element={<Login />} />
