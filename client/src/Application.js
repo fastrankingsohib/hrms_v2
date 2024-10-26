@@ -19,14 +19,13 @@ import InterviewLayout from "./components/pages/Interview/InterviewLayout";
 import InterviewLanding from "./components/pages/Interview/Landing";
 import ViewInterview from "./components/pages/Interview/ViewInterview";
 import Home from "./components/pages/Home/Home";
-// import AllJobPosts from "./components/pages/Job/AllJobPosts";
 
 const { BrowserRouter, Route, Routes } = require("react-router-dom");
 const Application = () => {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" >
+                <Route path="/">
                     <Route path="/login" element={<Login />} />
                     <Route path="" element={<Layout />}>
                         <Route path="" element={<Home />} />

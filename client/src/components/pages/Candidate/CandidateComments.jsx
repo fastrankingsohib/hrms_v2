@@ -13,7 +13,7 @@ function CandidateComments(props) {
                 setAllComments(res.data.data);
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
             });
     }, [props.candidateId]); // Add candidateId as a dependency
 
@@ -44,12 +44,12 @@ function CandidateComments(props) {
                         setIsLoading(false); // Stop loading after comment is posted
                     })
                     .catch((err) => {
-                        console.log(err);
+                        // console.log(err);
                         setIsLoading(false); // Stop loading even if there's an error
                     });
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
                 setIsLoading(false); // Stop loading even if there's an error
             });
     };

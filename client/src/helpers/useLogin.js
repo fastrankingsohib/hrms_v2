@@ -28,7 +28,7 @@ const useLogin = () => {
                     setLoginLoading(false);
 
                     Navigate('/');
-                    
+
                     dispatch(
                         userLoggedIn(
                             {

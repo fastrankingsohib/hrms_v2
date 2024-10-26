@@ -44,14 +44,6 @@ function CandidateView() {
     })
 
     useEffect(() => {
-        // setCandidateModule()
-        // const moduleAllowed = {
-        //     assigned: false,
-        //     create: false,
-        //     read: false,
-        //     update: false,
-        //     delete: false
-        // }
         if (userModules.length > 0) {
             userModules.map((value, index) => {
                 // console.log(value)
@@ -66,8 +58,6 @@ function CandidateView() {
                 }
             })
         }
-
-        console.log(candidateModule)
     }, [])
 
 
@@ -78,6 +68,7 @@ function CandidateView() {
         personalDetails: false,
         professionalDetails: false,
         legalDetails: false,
+        skillsHobbies: false
     });
 
     // States for selected filter and editing modes
@@ -91,11 +82,11 @@ function CandidateView() {
     const [skills, setSkills] = useState([]); // Add state to manage skills
     const [hobbies, setHobbies] = useState([]);
 
-
     const [candidateEmpty, setCandidateEmpty] = useState({
         toggled: false,
         value: true
     });
+
     const [selectedJobs, setSelectedJobs] = useState({
         toggled: false,
         jobs: [],
@@ -1005,7 +996,7 @@ function CandidateView() {
                             <button type="button" className={`p-2.5 rounded-lg w-32 ${selectedFilter === "Comments" ? "bg-indigo-700 text-white" : "bg-gray-100"}`} onClick={() => setSelectedFilter("Comments")}>Comments</button>
 
                             {/* Candidate Shortlisting Toggling if When user trying to shortlist the candidate */}
-                            <button type="button" className={`p-2.5 rounded-lg min-w-32 ${candidate.status === "Follow-up" ? "inline-block" : "hidden"} ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`}
+                            <button type="button" className={`p-2.5 rounded-lg min-w-32 ${candidate.status === "Follow-up" && candidateModule.update ? "inline-block" : "hidden"} ${selectedFilter === "Interviews" ? "bg-indigo-700 text-white" : "bg-gray-100"}`}
                                 onClick={
                                     () => {
                                         candidateEmpty.value ? setCandidateEmpty({ value: true, toggled: true }) : shortlistCandidate();
@@ -1015,7 +1006,7 @@ function CandidateView() {
 
 
 
-                            <div className={`relative `} >
+                            <div className={`relative ${candidateModule.update ? "block" : "hidden"}`} >
                                 <span
                                     onClick={() => {
                                         if (nextRoundSelection.value !== "New Interview") {
@@ -1028,7 +1019,7 @@ function CandidateView() {
                                     className='cursor-pointer inline-block p-2.5 px-5 rounded-lg min-w-40 bg-black text-white'>{candidate.status === "Follow-up" ? "Shortlist & Schedule Interview" : "Schedule Interview"}</span>
                             </div>
 
-                            <div className={`p-2.5 ${candidate.status === "Follow-up" && candidateModule.update || candidateModule.create ? "hidden" : "inline-block"}`}>
+                            <div className={`p-2.5 ${candidate.status === "Follow-up" && candidateModule.update || candidateModule.create || !candidateModule.update ? "hidden" : "inline-block"}`}>
                                 <button type="button" className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${candidateModule.update || candidateModule.create ? "inline-block" : "hidden"} ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
                                     onClick={() => {
                                         setNextRoundSelection((values) => ({ ...values, checked: true }));
@@ -1073,8 +1064,8 @@ function CandidateView() {
                             <div className='grid gap-2 p-6 bg-white w-full border'>
                                 <h1 className='flex justify-between font-semibold text-indigo-700 pb-4'>
                                     <span className='text-xl'>Personal Details</span>
-                                    <div className='flex items-center gap-4'>
-                                        <button type="button" onClick={() => { setIsPersonalDetailsEditing(!isPersonalDetailsEditing); }}>{isPersonalDetailsEditing ? <span className='inline-flex gap-2 items-center p-2 rounded-lg px-5 bg-red-50 border border-red-300 text-red-500'><MdOutlineDone /> Disbale Edit</span> : <span className='inline-flex gap-2 items-center p-2 px-5'><MdEdit /> Edit Personal Details</span>}</button>
+                                    <div className={`items-center gap-4 ${candidateModule.update ? "flex" : "hidden"}`}>
+                                        <button type="button" onClick={() => { setIsPersonalDetailsEditing(!isPersonalDetailsEditing); }}>{isPersonalDetailsEditing ? <span className={`inline-flex gap-2 items-center p-2 rounded-lg px-5 bg-red-50 border border-red-300 text-red-500`}><MdOutlineDone /> Disbale Edit</span> : <span className='inline-flex gap-2 items-center p-2 px-5'><MdEdit /> Edit Personal Details</span>}</button>
                                         {/* <button type="button" className={`${isPersonalDetailsEditing ? "inline-block" : "hidden"} p-2 rounded-lg px-4 bg-indigo-700 border border-indigo-700 text-white ${updateEvents.loading ? 'bg-opacity-80 cursor-not-allowed' : ''}`}
                                             onClick={handleUpdateCandidate}
                                             disabled={updateEvents.loading}
@@ -1330,6 +1321,12 @@ function CandidateView() {
                             <div className='grid gap-2 p-6 bg-white w-full border'>
                                 <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
                                     <span className='text-xl'>Professional Details</span>
+                                    <button type='button' className={`${candidateModule.update ? "inline-flex" : "hidden"} items-center gap-2`}
+                                        onClick={() => {
+                                            // setIsExperienceEditing(!isExperienceEditing);
+                                            setEditDetails((values) => ({ ...values, professionalDetails: !editDetails.professionalDetails }))
+                                        }}
+                                    >{editDetails.professionalDetails ? <span>Disable Edit</span> : <span className='inline-flex items-center gap-2'><MdEdit />Edit Details</span>}</button>
                                 </h1>
 
                                 {/* Experience And Qualifications Records Editing */}
@@ -1341,7 +1338,7 @@ function CandidateView() {
                                         experienceList.map((experience, index) => {
                                             return (
                                                 <div key={index} className='p-4 border mt-4 flex justify-between items-center'>
-                                                    {isExperienceEditing ? (
+                                                    {editDetails.professionalDetails ? (
                                                         <div className='grid grid-cols-6'>
                                                             <input
                                                                 required
@@ -1399,19 +1396,19 @@ function CandidateView() {
                                         <div>No Experience Added</div>
                                     )}
 
-                                    <div className={`${candidateModule.update || candidateModule.create ? "inline-block" : "hidden"}`}>
-                                        {isExperienceEditing && (
+                                    <div className={`${candidateModule.update || candidateModule.create || !editDetails.professionalDetails ? "inline-block" : "hidden"}`}>
+                                        {editDetails.professionalDetails && (
                                             <button type="button" onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
                                                 + Add More Experience
                                             </button>
                                         )}
 
-                                        <button type="button"
+                                        {/* <button type="button"
                                             onClick={() => setIsExperienceEditing(!isExperienceEditing)}
                                             className='mt-4 bg-indigo-700 text-white p-2 px-4'
                                         >
                                             {isExperienceEditing ? 'Save Experience' : 'Edit Experience'}
-                                        </button>
+                                        </button> */}
                                     </div>
                                 </div>
 
@@ -1427,8 +1424,8 @@ function CandidateView() {
                                     <div className='grid gap-4'>
                                         {educationList.length > 0 ?
                                             educationList.map((education, index) => (
-                                                <div key={index} className='p-4 border mt-4 flex justify-between items-center'>
-                                                    {isEducationEditing ? (
+                                                <div key={index} className='p-4 border mt-4 grid grid-cols-5 justify-between items-center'>
+                                                    {editDetails.professionalDetails ? (
                                                         <>
                                                             <input
                                                                 required
@@ -1462,8 +1459,8 @@ function CandidateView() {
                                                                 placeholder='Grade'
                                                                 className='border p-2 px-4 mr-2'
                                                             />
-                                                            <button type="button" onClick={() => removeEducation(education.id)} className='text-red-500'>
-                                                                <MdDelete />
+                                                            <button type="button" onClick={() => removeEducation(education.id)} className='inline-flex h-full items-center gap-2 justify-center text-red-500 bg-red-100'>
+                                                                <MdDelete /> Remove Education
                                                             </button>
                                                         </>
                                                     ) : (
@@ -1473,89 +1470,99 @@ function CandidateView() {
                                             )) : "No Education"}
                                     </div>
 
-                                    {isEducationEditing && (
+                                    {editDetails.professionalDetails && (
                                         <button type="button" onClick={addEducation} className={`mt-4 bg-indigo-700 text-white p-2 px-4 mr-4 ${candidateModule.update || candidateModule.create ? "inline-block" : "hidden"}`}>
                                             + Add More Education
                                         </button>
                                     )}
 
-                                    <button type="button"
+                                    {/* <button type="button"
                                         onClick={() => setIsEducationEditing(!isEducationEditing)}
                                         className={`mt-4 bg-indigo-700 text-white p-2 px-4 ${candidateModule.update || candidateModule.create ? "inline-block" : "hidden"}`}
                                     >
                                         {isEducationEditing ? 'Save Education' : 'Edit Education'}
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
 
 
-                            <div className='grid gap-2 p-6 bg-white w-full border'>
-                                <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
-                                    <span className='text-xl'>Skills</span>
+                            <div className='grid gap-2 p-6 bg-white w-full border mb-4'>
+                                <h1 className='text-indigo-700 flex items-center justify-between'>
+                                    <span className='text-xl font-semibold'>Skills & Hobbies</span>
+                                    <button type='button' className={`font-semibold ${candidateModule.update ? "inline-flex" : "hidden"}`}
+                                        onClick={() => {
+                                            setEditDetails((values) => ({ ...values, skillsHobbies: !editDetails.skillsHobbies }))
+                                        }}>{editDetails.skillsHobbies ? "Disable Edit" : "Edit Details"}</button>
                                 </h1>
-                                <div>
-                                    <input
-                                        type="text"
-                                        className="border block mb-4 w-96 rounded-full focus:outline-none p-2.5 pl-4 focus:bg-gray-100 bg-white"
-                                        placeholder="Add a skill and press Enter"
-                                        value={skillInput}
-                                        onChange={(e) => setSkillInput(e.target.value)}
-                                        onKeyDown={handleSkillsKeyDown}
-                                    />
-                                    <div className='flex flex-wrap gap-2'>
-                                        {skills.map((skill, index) => (
-                                            <span key={index} className='bg-indigo-100 text-indigo-700 inline-flex justify-center gap-2 items-center p-2.5 px-5 rounded-full'>
-                                                {skill}
-                                                <button type="button"
-                                                    className="ml-2 text-red-500"
-                                                    onClick={() => handleRemoveSkill(index)}
-                                                >
-                                                    &times;
-                                                </button>
-                                            </span>
-                                        ))}
+                                <div className=''>
+                                    <h1 className='flex justify-between font-semibold mb-2'>
+                                        <span className='font-bold'>Skills</span>
+                                    </h1>
+                                    <div>
+                                        <input
+                                            type="text"
+                                            className={`${editDetails.skillsHobbies ? "block" : "hidden"} border mb-4 w-96 rounded-full focus:outline-none p-2.5 pl-4 focus:bg-gray-100 bg-white`}
+                                            placeholder="Add a skill and press Enter"
+                                            value={skillInput}
+                                            onChange={(e) => setSkillInput(e.target.value)}
+                                            onKeyDown={handleSkillsKeyDown}
+                                        />
+                                        <div className='flex flex-wrap gap-2'>
+                                            {skills.map((skill, index) => (
+                                                <span key={index} className='bg-indigo-100 text-indigo-700 inline-flex justify-center gap-2 items-center p-2.5 px-5 rounded-full'>
+                                                    {skill}
+                                                    <button type="button"
+                                                        className="ml-2 text-red-500"
+                                                        onClick={() => handleRemoveSkill(index)}
+                                                    >
+                                                        &times;
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div className=''>
+                                    <h1 className='flex justify-between font-semibold mb-2'>
+                                        <span className='font-bold'>Hobbies</span>
+                                    </h1>
+                                    <div>
+                                        <input
+                                            type="text"
+                                            className={`${editDetails.skillsHobbies ? "block" : "hidden"} border p-2.5 mb-4 rounded-full w-96 pl-4 focus:outline-none focus:bg-gray-100 bg-white`}
+                                            placeholder="Add a hobby and press Enter"
+                                            value={hobbyInput}
+                                            onChange={(e) => setHobbyInput(e.target.value)}
+                                            onKeyDown={handleHobbiesKeyDown}
+                                        />
+                                        <div className='flex flex-wrap gap-2'>
+                                            {hobbies.map((hobby, index) => (
+                                                <span key={index} className='bg-indigo-100 text-indigo-700 p-2.5 px-5 rounded-full'>
+                                                    {hobby}
+                                                    <button type="button"
+                                                        className="ml-2 text-red-500"
+                                                        onClick={() => handleRemoveHobby(index)}
+                                                    >
+                                                        &times;
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
 
-                            <div className='grid gap-2 p-6 bg-white w-full border'>
-                                <h1 className='flex justify-between font-semibold text-indigo-700 mb-2'>
-                                    <span className='text-xl'>Hobbies</span>
-                                </h1>
-                                <div>
-                                    <input
-                                        type="text"
-                                        className="border p-2.5 mb-4 rounded-full w-96 pl-4 focus:outline-none focus:bg-gray-100 bg-white"
-                                        placeholder="Add a hobby and press Enter"
-                                        value={hobbyInput}
-                                        onChange={(e) => setHobbyInput(e.target.value)}
-                                        onKeyDown={handleHobbiesKeyDown}
-                                    />
-                                    <div className='flex flex-wrap gap-2'>
-                                        {hobbies.map((hobby, index) => (
-                                            <span key={index} className='bg-indigo-100 text-indigo-700 p-2.5 px-5 rounded-full'>
-                                                {hobby}
-                                                <button type="button"
-                                                    className="ml-2 text-red-500"
-                                                    onClick={() => handleRemoveHobby(index)}
-                                                >
-                                                    &times;
-                                                </button>
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
 
-
-
-                            <div className='pb-32 flex justify-end'>
+                            <div className={`pb-32 justify-end ${candidateModule.update ? "flex" : "hidden"}`}>
                                 <input type='submit' className={`p-2.5 rounded-lg px-4 bg-indigo-700 text-white ${updateEvents.loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError ? 'bg-opacity-80 cursor-not-allowed' : 'cursor-pointer'}`}
                                     // onClick={}
                                     disabled={updateEvents.loading || validationErrors.alt_contact_number || validationErrors.contact_number || errors.emailError || errors.altEmailError}
                                     value={updateEvents.loading ? <span className='inline-flex gap-2 items-center justify-center h-4'><AiOutlineLoading3Quarters size={"10px"} className='reload-rounding' /> Updating ...</span> : "Update Candidate"}
-                                /></div>
+                                />
+                            </div>
 
                             <div className={`grid gap-2 p-6 bg-white w-full border mb-4 ${candidateModule.delete ? "inline-block" : "hidden"}`}>
                                 <h1 className='flex justify-between font-semibold mb-2'>

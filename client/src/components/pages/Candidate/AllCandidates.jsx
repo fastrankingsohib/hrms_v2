@@ -32,7 +32,7 @@ function AllCandidates(props) {
 
                 })
                 .catch((err) => {
-                    console.log(err);
+                    // console.log(err);
                 })
                 .finally(() => {
                     setLoading(false);
@@ -47,7 +47,7 @@ function AllCandidates(props) {
                         // console.log(res.data)
                     })
                     .catch((err) => {
-                        console.log(err);
+                        // console.log(err);
                     })
                     .finally(() => {
                         setLoading(false);

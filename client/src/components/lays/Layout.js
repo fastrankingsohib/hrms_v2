@@ -8,7 +8,7 @@ import TopBar from '../requires/TopBar';
 const Layout = () => {
     const Navigate = useNavigate();
     const userLoggedIn = useSelector((state) => state.user_auth);
-    const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
+    const user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null
     useEffect(() => {
         if(!user.loggedIn){
             Navigate('/login');

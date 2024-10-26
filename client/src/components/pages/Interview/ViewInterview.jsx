@@ -189,6 +189,35 @@ function ViewInterview() {
         console.log(changeStatus)
     }
 
+
+    // Interview Module
+    let loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
+    let userModules = loggedInUser ? loggedInUser.modulesTouser : []
+    const [candidateModule, setCandidateModule] = useState({
+        assigned: false,
+        create: false,
+        read: false,
+        update: false,
+        delete: false
+    })
+
+    useEffect(() => {
+        if (userModules.length > 0) {
+            userModules.map((value, index) => {
+                // console.log(value)
+                if (value.modules.module_name === "Interviews") {
+                    setCandidateModule({
+                        assigned: true,
+                        create: value.c,
+                        read: value.r,
+                        update: value.u,
+                        delete: value.d
+                    });
+                }
+            })
+        }
+    }, [])
+
     if (interviewDetails) {
         return (
             <div className='p-8 h-full w-full'>
@@ -207,7 +236,7 @@ function ViewInterview() {
                                     <div>
                                         <span className='mr-4'><span className='font-semibold ml-2 text-indigo-700'>Interview Scheduled For:</span> <Link title='View Complete Candidate Profile' to={`/candidates/view/${interviewDetails.candidate_id}`} className='hover:text-indigo-700 hover:underline inline-flex items-center gap-2 ml-2'>{candidateDetails ? `${candidateDetails.title} ${candidateDetails.first_name} ${candidateDetails.middle_name} ${candidateDetails.last_name}` : ""} <FiExternalLink /></Link></span>
                                     </div>
-                                    <button className={`ml-4 p-2 px-5 rounded-full border ${isEditable ? "bg-green-50 border-green-300" : "bg-red-50 border-red-300"}`} onClick={() => setIsEditable(!isEditable)}>{isEditable ? "Disable Edit" : "Enable to Edit Interview Details"}</button>
+                                    <button className={`ml-4 p-2 px-5 rounded-full border ${candidateModule.update ? "inline-block" : "hidden"} ${isEditable ? "bg-green-50 border-green-300" : "bg-red-50 border-red-300"}`} onClick={() => setIsEditable(!isEditable)}>{isEditable ? "Disable Edit" : "Enable to Edit Interview Details"}</button>
                                 </h1>
                                 <hr />
                                 <div className='grid grid-cols-5 gap-4 mt-10'>
@@ -423,8 +452,8 @@ function ViewInterview() {
                                             </div>
                                         </div>
                                     </div>
-                                    <button className='bg-black text-white p-2.5 rounded-full px-5 mt-4' onClick={() => setChangeStatus((values) => ({ ...values, toggled: true }))}>Change Interview Status</button>
-                                    <button className='bg-indigo-700 text-white p-2.5 rounded-full px-5 mt-4 ml-4' onClick={hanldeUpdateInterview}>Update Details</button>
+                                    <button className={`bg-black text-white p-2.5 rounded-full px-5 mt-4 ${candidateModule.update ? "inline-block" : "hidden"}`} onClick={() => setChangeStatus((values) => ({ ...values, toggled: true }))}>Change Interview Status</button>
+                                    <button className={`bg-indigo-700 text-white p-2.5 rounded-full px-5 mt-4 ml-4 ${candidateModule.update ? "inline-block" : "hidden"}`} onClick={hanldeUpdateInterview}>Update Details</button>
                                 </div>
                             </div>
 

@@ -80,6 +80,38 @@ function JobView() {
         }
     }, [jobId]); // Only runs when jobId changes
 
+
+
+    // Jobs Module
+    let loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
+    let userModules = loggedInUser ? loggedInUser.modulesTouser : []
+    const [jobsModule, setJobsModule] = useState({
+        assigned: false,
+        create: false,
+        read: false,
+        update: false,
+        delete: false
+    })
+
+    useEffect(() => {
+        if (userModules.length > 0) {
+            userModules.map((value, index) => {
+                if (value.modules.module_name === "Jobs") {
+                    setJobsModule({
+                        assigned: true,
+                        create: value.c,
+                        read: value.r,
+                        update: value.u,
+                        delete: value.d
+                    });
+                }
+            })
+        }
+    }, [])
+
+
+
+
     if (loading) {
         return <div className='p-4 h-full w-full bg-gray-50 flex justify-center items-center text-indigo-700'><AiOutlineLoading3Quarters className='reload-rounding' size={"30px"} /></div>;
     }
@@ -127,18 +159,18 @@ function JobView() {
 
                 <div className={`${selectedTab === "overview" ? "block" : "hidden"}`}>
                     <JobOverview jobDetails={jobDetails} />
-                    <div className='p-16 pt-14 bg-gray-50 border-t mt-40 h-full'>
+                    <div className={`p-16 pt-14 bg-gray-50 border-t mt-40 h-full ${jobsModule.delete || jobsModule.update ? "block" : "hidden"}`}>
                         <h1 className='font-semibold flex items-center mb-4'>
-                            <span className='min-w-fit mr-4 text-2xl text-red-500'>Danger Zone</span>
+                            <span className={`min-w-fit mr-4 text-2xl text-red-500 ${jobsModule.delete || jobsModule.update ? "block" : "hidden"}`}>Danger Zone</span>
                         </h1>
                         <div className='flex gap-4'>
-                            <button className='h-10 px-4 border border-indigo-700 text-indigo-700 rounded-xl inline-flex gap-2 items-center'
+                            <button className={`h-10 px-4 border border-indigo-700 text-indigo-700 rounded-xl gap-2 items-center ${jobsModule.update ? "inline-flex" : "hidden"}`}
                                 onClick={() => {
                                     setPopups((values) => ({ ...values, editDetails: true }));
                                     Navigate(`/jobs/update/${jobId}`);
                                 }}
                             ><MdEdit /> Edit This Job</button>
-                            <button className='h-10 px-5 bg-red-500 text-white rounded-xl'
+                            <button className={`h-10 px-5 bg-red-500 text-white rounded-xl ${jobsModule.delete ? "block" : "hidden"}`}
                                 onClick={() => setPopups((values) => ({ ...values, delete: true }))}>
                                 Delete This Job
                             </button>

@@ -56,8 +56,10 @@ async function checkPermissions(req, res, next) {
       const userPermissions = await prisma.modulesTouser.findMany({
         where:   { user_id: user.id, module_id: module[0].id } ,
       });
-
-      
+      if (!userPermissions[0]) {
+        return res.status(403).json({ message: 'Access Denied: No permissions found for this user and module' });
+      }
+      console.log(userPermissions[0].r)
 
       const hasPermission =
         (action === 'create' && userPermissions[0].c) ||

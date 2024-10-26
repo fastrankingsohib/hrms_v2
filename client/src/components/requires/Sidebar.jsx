@@ -36,22 +36,24 @@ const Sidebar = () => {
         setOpenDropdown((prev) => (prev === dropdownName ? null : dropdownName));
     };
 
-    const userRole = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null;
+    const userDetails = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null;
     const { ValidateSidebar, reducedModules } = useSidebarAuth();
 
     useEffect(() => {
         let modules = [];
-        userRole.modulesTouser.map((value) => {
-            let module = {
-                module_name: value.modules.module_name,
-                c: value.c,
-                r: value.r,
-                u: value.u,
-                d: value.d
-            };
-            modules.push(module);
-        });
-        ValidateSidebar(modules);
+        if (userDetails) {
+            userDetails.modulesTouser.map((value) => {
+                let module = {
+                    module_name: value.modules.module_name,
+                    c: value.c,
+                    r: value.r,
+                    u: value.u,
+                    d: value.d
+                };
+                modules.push(module);
+            });
+            ValidateSidebar(modules);
+        }
     }, []);
 
     return (

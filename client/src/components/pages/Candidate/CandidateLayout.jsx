@@ -34,16 +34,46 @@ function CandidateLayout() {
 
     useEffect(() => {
         // setActiveButton("all")
-        if(user.role === "Manager" || user.role === "Master Admin"  || user.role === "Admin"){
+        if (user.role === "Manager" || user.role === "Master Admin" || user.role === "Admin") {
             // setActiveButton("All candidates")
             setModulePermitted(true)
             setUserType(user.role)
-        } 
-        else{
+        }
+        else {
             setActiveButton("my candidates")
             setModulePermitted(false)
         }
     }, [activeButton])
+
+
+
+    // Validation & Authorising Create Job Feature
+    const [candidateModule, setCandidateModule] = useState({
+        assigned: false,
+        create: false,
+        read: false,
+        update: false,
+        delete: false
+    })
+
+    useEffect(() => {
+        if (user) {
+            user.modulesTouser.map((value, index) => {
+                if (value.modules.module_name === "Candidates") {
+                    setCandidateModule({
+                        assigned: true,
+                        create: value.c,
+                        read: value.r,
+                        update: value.u,
+                        delete: value.d
+                    })
+                }
+            })
+        }
+
+        console.log(candidateModule)
+    }, [])
+
     return (
         <div className='h-full flex overflow-hidden'>
             <div className='w-1/4 h-full border-r border-b select-none'>
@@ -67,7 +97,7 @@ function CandidateLayout() {
                         </div>
                     </div>
 
-                    <NavLink to={"/candidates/new-candidate"} className={({ isActive }) => { return `${isActive ? "bg-indigo-400" : "bg-indigo-700"} h-12 inline-flex items-center justify-center p-2 w-full text-white text-2xl max-w-12 rounded-xl` }}>+</NavLink>
+                    <NavLink to={"/candidates/new-candidate"} className={({ isActive }) => { return `${isActive ? "bg-indigo-400" : "bg-indigo-700"} ${candidateModule.create ? "inline-block" : "hidden"} h-12 inline-flex items-center justify-center p-2 w-full text-white text-2xl max-w-12 rounded-xl` }}>+</NavLink>
                 </div>
 
 

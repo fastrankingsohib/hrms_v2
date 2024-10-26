@@ -33,9 +33,6 @@ const Qualifications = () => {
         values[index][name] = value;
         setQualificationFields(values);
 
-        // Log the updated qualification fields to the console
-        console.log("Updated Qualification Fields: ", values);
-
         // Dispatch updated qualifications to the Redux store
         dispatch(addQualification(values));
     };
@@ -46,9 +43,6 @@ const Qualifications = () => {
             const values = [...qualificationFields];
             values.splice(index, 1);
             setQualificationFields(values);
-
-            // Log the updated qualification fields to the console after removal
-            console.log("Updated Qualification Fields after removal: ", values);
 
             // Dispatch updated qualifications after removal to the Redux store
             dispatch(addQualification(values));

@@ -23,7 +23,7 @@ function AppliedJobs(props) {
                 setNewAppliedJobs((values) => ({ ...values, jobs: [] }));
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
             });
     }, [location, props.candidateId]);
 
@@ -34,7 +34,7 @@ function AppliedJobs(props) {
                 setAllJobs(res.data.jobs);
             })
             .catch((err) => {
-                console.log(err);
+                // console.log(err);
             });
     }, []);
 
@@ -82,7 +82,7 @@ function AppliedJobs(props) {
                         }, 1000)
                     })
                     .catch((err) => {
-                        console.log(err);
+                        // console.log(err);
                     });
             })
             .catch((err) => {
