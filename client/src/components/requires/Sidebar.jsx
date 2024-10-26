@@ -41,17 +41,19 @@ const Sidebar = () => {
 
     useEffect(() => {
         let modules = [];
-        userRole.modulesTouser.map((value) => {
-            let module = {
-                module_name: value.modules.module_name,
-                c: value.c,
-                r: value.r,
-                u: value.u,
-                d: value.d
-            };
-            modules.push(module);
-        });
-        ValidateSidebar(modules);
+        if (userRole) {
+            userRole.modulesTouser.map((value) => {
+                let module = {
+                    module_name: value.modules.module_name,
+                    c: value.c,
+                    r: value.r,
+                    u: value.u,
+                    d: value.d
+                };
+                modules.push(module);
+            });
+            ValidateSidebar(modules);
+        }
     }, []);
 
     return (

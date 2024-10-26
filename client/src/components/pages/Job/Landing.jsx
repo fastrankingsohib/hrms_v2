@@ -8,8 +8,8 @@ function JobLanding() {
             <div className='-mt-10'>
                 <img src={jobs_vector} width={"200px"} alt="" />
                 <div className='text-center mt-10'>Select Any Job For Action</div>
-                <div className='text-center'>Or</div>
-                <div className='text-center'><Link to={"/jobs/new-job"} className='underline hover:text-indigo-700'>Create New Job</Link></div>
+                {/* <div className='text-center'>Or</div>
+                <div className='text-center'><Link to={"/jobs/new-job"} className='underline hover:text-indigo-700'>Create New Job</Link></div> */}
             </div>
         </div>
     )

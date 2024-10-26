@@ -177,6 +177,38 @@ const UpdateUser = () => {
             })
     }, [])
 
+
+
+
+    // User Update Permission
+    const userDetails = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
+
+    const [adminModule, setAdminModule] = useState({
+        assigned: false,
+        create: false,
+        read: false,
+        update: false,
+        delete: false
+    })
+
+    useEffect(() => {
+        if (userDetails) {
+            userDetails.modulesTouser.map((value, index) => {
+                if (value.modules.module_name === "Administrator") {
+                    setAdminModule(
+                        {
+                            assigned: true,
+                            create: value.c,
+                            read: value.r,
+                            update: value.u,
+                            delete: value.d
+                        }
+                    )
+                }
+            })
+        }
+    }, [])
+
     return (
         <section className="relative p-4 component-rendering-transition bg-gray-100">
             <p className="fixed z-[1000] inline-flex items-center gap-2 top-28 right-8 bg-green-600 text-white font-semibold text-lg p-4 tranition-basic" style={{ marginRight: success === true ? 0 : '-100%' }}>
@@ -185,10 +217,10 @@ const UpdateUser = () => {
             </p>
             <h1 className="text-2xl font-semibold flex items-center justify-between p-8 pt-6 pb-0">
                 {`${user.title} ${user.firstName} ${user.middleName} ${user.lastName}`}
-                <div className="max-w-60 h-12">
+                <div className={`max-w-60 h-12 ${adminModule.update ? "inline-block" : "hidden"}`}>
                     <button
                         onClick={toggleEdit}
-                        className="primary-button mt-4 h-12"
+                        className={`primary-button mt-4 h-12`}
                     >
                         {isEditing ? 'Disable Edit' : 'Enable Edit'}
                     </button>
@@ -619,7 +651,7 @@ const UpdateUser = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-end mt-10">
+                <div className={`flex items-center justify-end mt-10 ${adminModule.update ? "block" : "hidden"}`}>
                     <div className="w-1/4 pl-4">
                         <button className="primary-button cursor-pointer justify-center" type="button"
                             onClick={() => {

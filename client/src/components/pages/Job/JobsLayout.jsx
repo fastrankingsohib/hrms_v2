@@ -7,16 +7,38 @@ function JobsLayout() {
     const [activeButton, setActiveButton] = useState("all");
     const [dropDown, setDropDown] = useState(false);
     const location = useLocation();
+    const user = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
 
     // Handle button click to toggle dropdown
     const handleButtonClick = (e) => {
-        // e.stopPropagation();
         setDropDown(!dropDown); // Toggles the dropdown
     };
 
+    const [jobModule, setJobModule] = useState({
+        assigned: false,
+        create: false,
+        read: false,
+        update: false,
+        delete: false
+    })
+
     useEffect(() => {
-        // setActiveButton("all")
-    }, [location])
+        if (user) {
+            user.modulesTouser.map((value, index) => {
+                if (value.modules.module_name === "Jobs") {
+                    setJobModule(
+                        {
+                            assigned: true,
+                            create: value.c,
+                            read: value.r,
+                            update: value.u,
+                            delete: value.d
+                        }
+                    )
+                }
+            })
+        }
+    }, [])
 
     return (
         <div className='w-full flex items-start h-full overflow-hidden'>
@@ -31,25 +53,25 @@ function JobsLayout() {
 
                     {/* Dropdown menu */}
                     <div onClick={handleButtonClick} style={{ display: dropDown ? "block" : "none" }} className='absolute top-20 -translate-y-2 left-2 bg-white border p-4 pt-2 rounded-lg w-[97%] shadow-xl text-left flex flex-wrap'>
-                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "all" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`} 
+                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "all" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`}
                             onClick={() => setActiveButton("all")}>
                             All
                         </div>
-                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "active" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`} 
+                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "active" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`}
                             onClick={() => setActiveButton("active")}>
                             Active
                         </div>
-                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "in-active" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`} 
+                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "in-active" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`}
                             onClick={() => setActiveButton("in-active")}>
                             In-Active
                         </div>
-                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "scheduled" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`} 
+                        <div className={`mt-2 p-2.5 px-6 w-full rounded-xl ${activeButton === "scheduled" ? 'bg-indigo-700 text-white' : 'border-transparent hover:bg-indigo-50'}`}
                             onClick={() => setActiveButton("scheduled")}>
                             Scheduled
                         </div>
                     </div>
 
-                    <Link to={"/jobs/new-job"} className='h-12 inline-flex items-center justify-center p-2 w-full bg-indigo-700 text-white text-2xl max-w-12 rounded-xl'>+</Link>
+                    <Link to={"/jobs/new-job"} className={`${jobModule.create ? "inline-block" : "hidden"} h-12 inline-flex items-center justify-center p-2 w-full bg-indigo-700 text-white text-2xl max-w-12 rounded-xl`}>+</Link>
                 </div>
 
                 <div className='grid h-full overflow-auto pb-20'>

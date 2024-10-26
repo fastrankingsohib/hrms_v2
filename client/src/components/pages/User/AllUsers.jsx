@@ -36,6 +36,35 @@ function AllUsers() {
         }
     };
 
+
+    const user = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
+
+    const [adminModule, setAdminModule] = useState({
+        assigned: false,
+        create: false,
+        read: false,
+        update: false,
+        delete: false
+    })
+
+    useEffect(() => {
+        if (user) {
+            user.modulesTouser.map((value, index) => {
+                if (value.modules.module_name === "Administrator") {
+                    setAdminModule(
+                        {
+                            assigned: true,
+                            create: value.c,
+                            read: value.r,
+                            update: value.u,
+                            delete: value.d
+                        }
+                    )
+                }
+            })
+        }
+    }, [])
+
     if (loading) {
         return (
             <div className='h-full w-full flex items-center justify-center bg-gray-100'>
@@ -68,8 +97,8 @@ function AllUsers() {
                 allUser.map((user) => (
                     <div className='flex w-full' key={user.id}> {/* Add key prop for unique identification */}
                         <div className='w-full min-w-60 p-3 border flex justify-between'>
-                            <Link to={`/user/${user.id}`} className='p-1 rounded-full px-4 bg-green-500 text-white'>View</Link>
-                            <button type='button' className='p-1 rounded-full px-4 bg-red-500 text-white'
+                            <Link to={`/user/${user.id}`} className={`p-1 rounded-full px-4 bg-green-500 text-white`}>View</Link>
+                            <button type='button' className={`p-1 rounded-full px-4 bg-red-500 text-white ${adminModule.delete ? "inline-block" : "hidden"}`}
                                 onClick={() => handleDelete(user.id)} // Call handleDelete with user id
                             >Delete</button>
                         </div>
