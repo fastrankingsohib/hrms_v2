@@ -37,7 +37,8 @@ const check_email_contact = async (req, res) => {
 
 const add_candidate = async (req, res) => {
   try {
-    const {
+  const candidate = await prisma.candidate_list.create({
+    data: {
       title,
       first_name,
       middle_name,
@@ -64,137 +65,91 @@ const add_candidate = async (req, res) => {
       other1,
       other2,
       other3,
-      status,
-      qualifications,
-      experiences,
-      jobs,
+      stat,
       created_by,
+      candidate_image,
+      candidate_resume,
+      candidate_aadhar,
+      candidate_pan,
+      candidate_highest_qualification,
       work_tenure,
-      user_reporting_to
-    } = req.body;
+      user_reporting_to,
+    },
+  });
 
-    const files = req.files || {};
+  const candidate_id = candidate.candidate_id;
+  console.log('Candidate ID:', candidate_id);
 
-    const candidate_image = files['candidate_image']?.[0]?.path || null;
-    const candidate_resume = files['candidate_resume']?.[0]?.path || null;
-    const candidate_aadhar = files['candidate_aadhar']?.[0]?.path || null;
-    const candidate_pan = files['candidate_pan']?.[0]?.path || null;
-    const candidate_highest_qualification = files['candidate_highest_qualification']?.[0]?.path || null;
+  // Filter experiences to keep entries where at least one field is not null or empty
+  const validExperiences = experiences.filter(exp =>
+    exp.organisation_name ||
+    exp.total_tenure_years ||
+    exp.total_tenure_months ||
+    exp.last_designation ||
+    exp.last_drawn_salary
+  );
 
-    console.log('Resume path:', candidate_resume);
-    console.log('Aadhar path:', candidate_aadhar);
-    console.log('PAN path:', candidate_pan);
-    console.log('Qualification path:', candidate_highest_qualification);
+  // Insert valid experiences into the database
+  if (validExperiences.length > 0) {
+    const experienceData = validExperiences.map(exp => ({
+      candidate_id: candidate_id,
+      organisation_name: exp.organisation_name,
+      total_tenure_years: exp.total_tenure_years || null,
+      total_tenure_months: exp.total_tenure_months || null,
+      last_designation: exp.last_designation || null,
+      last_drawn_salary: exp.last_drawn_salary || null,
+    }));
 
-    if (!validator.isEmail(email_address)) {
-      return res.status(400).send({ message: 'Invalid email format.' });
-    }
-
-    if (!validator.isMobilePhone(contact_number, 'any', { strictMode: false })) {
-      return res.status(400).send({ message: 'Invalid mobile number.' });
-    }
-
-    const emailOrContactCheck = await check_email_contact(req, res);
-    if (emailOrContactCheck) return;
-
-    const candidate = await prisma.candidate_list.create({
-      data: {
-        title,
-        first_name,
-        middle_name,
-        last_name,
-        address_line1,
-        address_line2,
-        city,
-        state,
-        pin_code,
-        country,
-        contact_number,
-        alt_contact_number,
-        email_address,
-        alt_email_address,
-        date_of_birth,
-        job_title,
-        department,
-        work_experience,
-        hobbies,
-        interests,
-        skills,
-        recruiter_comments,
-        communication_skills,
-        other1,
-        other2,
-        other3,
-        status,
-        created_by,
-        candidate_image,
-        candidate_resume,
-        candidate_aadhar,
-        candidate_pan,
-        candidate_highest_qualification,
-        work_tenure,
-        user_reporting_to
-      },
+    await prisma.work_experience.createMany({
+      data: experienceData,
     });
-
-    const candidate_id = candidate.candidate_id; // Get the created candidate_id
-
-    // Log the candidate_id for debugging purposes (optional)
-    console.log('Candidate ID:', candidate_id);
-
-    // Handle experiences
-    if (Array.isArray(experiences) && experiences.length > 0) {
-      const experienceData = experiences.map((exp) => ({
-        candidate_id: candidate_id,
-        organisation_name: exp.organisation_name,
-        total_tenure_years: exp.total_tenure_years || null,
-        total_tenure_months: exp.total_tenure_months || null,
-        last_designation: exp.last_designation || null,
-        last_drawn_salary: exp.last_drawn_salary || null,
-      }));
-
-      await prisma.work_experience.createMany({
-        data: experienceData,
-      });
-    }
-
-    // Handle qualifications
-    if (Array.isArray(qualifications) && qualifications.length > 0) {
-      const qualificationData = qualifications.map((qual) => ({
-        candidate_id: candidate_id,
-        course: qual.course,
-        college_university: qual.college_university,
-        year_of_passing: qual.year_of_passing,
-        percentage_cgpa: qual.percentage_cgpa || null,
-      }));
-
-      await prisma.qualifications.createMany({
-        data: qualificationData,
-      });
-    }
-
-    // Handle job applications
-    if (Array.isArray(jobs) && jobs.length > 0) {
-      const jobData = jobs.map((jobId) => ({
-        candidate_id: candidate_id,
-        job_id: jobId,
-      }));
-
-      await prisma.candidate_applied_jobs.createMany({
-        data: jobData,
-      });
-    }
-
-    // Respond with candidate_id included
-    return res.status(200).json({
-      success: true,
-      message: 'Candidate and related data successfully added.',
-      candidate_id: candidate_id,  // Include the candidate_id in the response
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: 'Error adding candidate.' });
   }
+
+  // Filter qualifications to keep entries where at least one field is not null or empty
+  const validQualifications = qualifications.filter(qual =>
+    qual.course ||
+    qual.college_university ||
+    qual.year_of_passing ||
+    qual.percentage_cgpa
+  );
+
+  // Insert valid qualifications into the database
+  if (validQualifications.length > 0) {
+    const qualificationData = validQualifications.map(qual => ({
+      candidate_id: candidate_id,
+      course: qual.course,
+      college_university: qual.college_university,
+      year_of_passing: qual.year_of_passing,
+      percentage_cgpa: qual.percentage_cgpa || null,
+    }));
+
+    await prisma.qualifications.createMany({
+      data: qualificationData,
+    });
+  }
+
+  // Handle job applications
+  if (Array.isArray(jobs) && jobs.length > 0) {
+    const jobData = jobs.map(jobId => ({
+      candidate_id: candidate_id,
+      job_id: jobId,
+    }));
+
+    await prisma.candidate_applied_jobs.createMany({
+      data: jobData,
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: 'Candidate and related data successfully added.',
+    candidate_id: candidate_id,
+  });
+} catch (error) {
+  console.error(error);
+  return res.status(500).json({ success: false, message: 'Error adding candidate.' });
+}
+
 };
 
 
