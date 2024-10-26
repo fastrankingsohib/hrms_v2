@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useRef, useState, useTransition } from 'react'
+import React, { useDeferredValue, useEffect, useRef, useState, useTransition } from 'react'
 import { AiFillCodepenCircle, AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FaList, FaListUl, FaUser } from 'react-icons/fa';
 import { Link, redirect, useNavigate, useParams } from 'react-router-dom'
@@ -34,6 +34,43 @@ function CandidateView() {
     const [experienceInMonths, setExpeirenceInMonths] = useState()
     const [allJobs, setAllJobs] = useState([]);
     let loggedInUser = localStorage.getItem("userDetails") ? JSON.parse(localStorage.getItem("userDetails")) : null
+    let userModules = loggedInUser ? loggedInUser.modulesTouser : []
+    const [candidateModule, setCandidateModule] = useState({
+        assigned: false,
+        create: false,
+        read: false,
+        update: false,
+        delete: false
+    })
+
+    useEffect(() => {
+        // setCandidateModule()
+        // const moduleAllowed = {
+        //     assigned: false,
+        //     create: false,
+        //     read: false,
+        //     update: false,
+        //     delete: false
+        // }
+        if (userModules.length > 0) {
+            userModules.map((value, index) => {
+                // console.log(value)
+                if (value.modules.module_name === "Candidates") {
+                    setCandidateModule({
+                        assigned: true,
+                        create: value.c,
+                        read: value.r,
+                        update: value.u,
+                        delete: value.d
+                    });
+                }
+            })
+        }
+
+        console.log(candidateModule)
+    }, [])
+
+
     const [alerts, setAlerts] = useState({
         delete: false,
     });
@@ -991,8 +1028,8 @@ function CandidateView() {
                                     className='cursor-pointer inline-block p-2.5 px-5 rounded-lg min-w-40 bg-black text-white'>{candidate.status === "Follow-up" ? "Shortlist & Schedule Interview" : "Schedule Interview"}</span>
                             </div>
 
-                            <div className={`p-2.5 ${candidate.status === "Follow-up" ? "hidden" : "inline-block"}`}>
-                                <button type="button" className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
+                            <div className={`p-2.5 ${candidate.status === "Follow-up" && candidateModule.update || candidateModule.create ? "hidden" : "inline-block"}`}>
+                                <button type="button" className={`text-center block rounded-lg w-40 p-2.5 h-full border text-white ${candidateModule.update || candidateModule.create ? "inline-block" : "hidden"} ${nextRoundSelection.checked ? "bg-indigo-700" : "bg-black"}`}
                                     onClick={() => {
                                         setNextRoundSelection((values) => ({ ...values, checked: true }));
                                     }}>
@@ -1195,8 +1232,8 @@ function CandidateView() {
                                                 onChange={(e) => {
                                                     handleEmailChange(e)
                                                     setCandidate((values) => ({ ...values, email_address: e.target.value }))
-                                                }
-                                                } />
+                                                }}
+                                            />
                                             {errors.emailError && <p className="text-red-500">{errors.emailError}</p>}
                                         </div>
                                     </div>
@@ -1215,6 +1252,8 @@ function CandidateView() {
                                     </div>
                                     <hr />
                                     <hr />
+
+
                                     <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 1<span className='text-red-500'>*</span></span> <input required type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.address_line1 ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.address_line1} onChange={(e) => setCandidate((values) => ({ ...values, address_line1: e.target.value }))} /></div>
                                     <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>Address Line 2</span> <input type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.address_line2} onChange={(e) => setCandidate((values) => ({ ...values, address_line2: e.target.value }))} /></div>
                                     <div className='flex gap-4'><span className='font-semibold min-w-40 py-2'>POST Code<span className='text-red-500'>*</span></span> <input required type="text" disabled={!isPersonalDetailsEditing} className={`text-black border w-96 border-transparent focus:outline-none p-2 pl-4 focus:bg-gray-100 ${emptyRequiredValue.pin_code ? "border-red-500" : ""} ${isPersonalDetailsEditing ? 'bg-gray-100 pr-5' : 'bg-white'}`} defaultValue={candidate.pin_code} onChange={(e) => setCandidate((values) => ({ ...values, pin_code: e.target.value }))} /></div>
@@ -1360,7 +1399,7 @@ function CandidateView() {
                                         <div>No Experience Added</div>
                                     )}
 
-                                    <div>
+                                    <div className={`${candidateModule.update || candidateModule.create ? "inline-block" : "hidden"}`}>
                                         {isExperienceEditing && (
                                             <button type="button" onClick={addExperience} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
                                                 + Add More Experience
@@ -1435,14 +1474,14 @@ function CandidateView() {
                                     </div>
 
                                     {isEducationEditing && (
-                                        <button type="button" onClick={addEducation} className='mt-4 bg-indigo-700 text-white p-2 px-4 mr-4'>
+                                        <button type="button" onClick={addEducation} className={`mt-4 bg-indigo-700 text-white p-2 px-4 mr-4 ${candidateModule.update || candidateModule.create ? "inline-block" : "hidden"}`}>
                                             + Add More Education
                                         </button>
                                     )}
 
                                     <button type="button"
                                         onClick={() => setIsEducationEditing(!isEducationEditing)}
-                                        className='mt-4 bg-indigo-700 text-white p-2 px-4'
+                                        className={`mt-4 bg-indigo-700 text-white p-2 px-4 ${candidateModule.update || candidateModule.create ? "inline-block" : "hidden"}`}
                                     >
                                         {isEducationEditing ? 'Save Education' : 'Edit Education'}
                                     </button>
@@ -1518,7 +1557,7 @@ function CandidateView() {
                                     value={updateEvents.loading ? <span className='inline-flex gap-2 items-center justify-center h-4'><AiOutlineLoading3Quarters size={"10px"} className='reload-rounding' /> Updating ...</span> : "Update Candidate"}
                                 /></div>
 
-                            <div className='grid gap-2 p-6 bg-white w-full border mb-4'>
+                            <div className={`grid gap-2 p-6 bg-white w-full border mb-4 ${candidateModule.delete ? "inline-block" : "hidden"}`}>
                                 <h1 className='flex justify-between font-semibold mb-2'>
                                     <span className='text-xl text-red-500'>Danger Zone</span>
                                     {/* <button className='inline-flex gap-2 items-center'><MdEdit /> Edit Legal Details</button> */}
