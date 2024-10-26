@@ -16,7 +16,7 @@ const Login = () => {
     const { login, isUserLoggedin, loginLoading, loginError } = useLogin();
     const userLoggedIn = useSelector((state) => state.user_auth);
     return (
-        <section className="h-screen w-screen flex justify-center items-center bg-opacity-10" style={{backgroundImage: `url(${LoginBg})`}}>
+        <section className="h-screen w-screen flex justify-center items-center bg-opacity-10" style={{ backgroundImage: `url(${LoginBg})` }}>
             <div className="flex gap-4 items-center p-8 rounded-xl border border-[#e8e4ff] bg-white">
                 <div className="relative">
                     <h1 className="absolute p-10 text-white left-0 top-0 text-center text-3xl font-bold">Welcome to MAHAKAYA <br /> HR Portal</h1>

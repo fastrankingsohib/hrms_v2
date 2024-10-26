@@ -26,7 +26,7 @@ const Application = () => {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" >
+                <Route path="/">
                     <Route path="/login" element={<Login />} />
                     <Route path="" element={<Layout />}>
                         <Route path="" element={<Home />} />
