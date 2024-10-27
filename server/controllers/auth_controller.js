@@ -26,170 +26,159 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Helper function to add a user to the database
-const add_to_user = async (req) => {
-    const {
-        title,
-        first_name,
-        middle_name,
-        last_name,
-        gender,
-        dob,
-        email,
-        mobile,
-        username,
-        password,
-        date_of_joining,
-        employee_id,
-        designation,
+const add_to_user = async (req, transaction) => {
+  const {
+      title,
+      first_name,
+      middle_name,
+      last_name,
+      gender,
+      dob,
+      email,
+      mobile,
+      username,
+      password,
+      date_of_joining,
+      employee_id,
+      designation,
+      status,
+      department,
+      user_type,
+      role,
+      reporting_to,
+      created_by
+  } = req.body;
 
-        status,
-        department,
-        user_type,
-        role,
-        reporting_to,
-        created_by
-    } = req.body;
+  // Validations
+  if (!username || !password || !email) {
+      throw new Error("Username, password, and email are required.");
+  }
 
-    // Validations
-    if (!username || !password || !email) {
-        throw new Error("Username, password, and email are required.");
-    }
+  if (!validator.isEmail(email)) {
+      throw new Error("Invalid email format.");
+  }
 
-    if (!validator.isEmail(email)) {
-        throw new Error("Invalid email format.");
-    }
+  if (!validator.isMobilePhone(mobile, 'any', { strictMode: false })) {
+      throw new Error("Invalid mobile number.");
+  }
 
-    if (!validator.isMobilePhone(mobile, 'any', { strictMode: false })) {
-        throw new Error("Invalid mobile number.");
-    }
+  if (!validator.isLength(username, { min: 3, max: 100 })) {
+      throw new Error("Username must be between 3 and 100 characters long.");
+  }
 
-    if (!validator.isLength(username, { min: 3, max: 100 })) {
-        throw new Error("Username must be between 3 and 100 characters long.");
-    }
+  if (!validator.isLength(password, { min: 6 })) {
+      throw new Error("Password must be at least 6 characters long.");
+  }
 
-    if (!validator.isLength(password, { min: 6 })) {
-        throw new Error("Password must be at least 6 characters long.");
-    }
+  // Hash password
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(password, salt);
 
-    // Hash password
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
+  // Create user
+  const user = await transaction.user.create({
+      data: {
+          title,
+          first_name,
+          middle_name,
+          last_name,
+          gender,
+          dob,
+          email,
+          mobile,
+          username,
+          password: hashedPassword,
+          date_of_joining,
+          employee_id,
+          designation,
+          status,
+          department,
+          user_type,
+          role,
+          reporting_to,
+          created_by
+      }
+  });
 
-    // Create user
-    const user = await prisma.user.create({
-        data: {
-            title: title,
-            first_name: first_name,
-            middle_name: middle_name,
-            last_name: last_name,
-            gender: gender,
-            dob: dob,
-            email: email,
-            mobile: mobile,
-            username: username,
-            password: hashedPassword,
-            date_of_joining: date_of_joining,
-            employee_id: employee_id,
-            designation: designation,
-
-            status: status,
-            department: department,
-            user_type: user_type,
-            role: role,
-            reporting_to: reporting_to,
-            created_by: created_by
-        }
-    });
-
-    return user.id;
+  return user.id;
 };
 
 // Helper function to get the module IDs from an array of module names
-const get_module_ids = async (module_names) => {
-    const modules = await prisma.modules.findMany({
-        where: {
-            module_name: {
-                in: module_names
-            }
-        },
-        select: {
-            id: true
-        }
-    });
+const get_module_ids = async (module_names, transaction) => {
+  const modules = await transaction.modules.findMany({
+      where: {
+          module_name: { in: module_names }
+      },
+      select: { id: true }
+  });
 
-    if (!modules.length) {
-        throw new Error("Modules not found.");
-    }
+  if (!modules.length) {
+      throw new Error("Modules not found.");
+  }
 
-    return modules.map(module => module.id);
+  return modules.map(module => module.id);
 };
 
-// Register function
+// Register function with transaction
 const register = async (req, res) => {
-    try {
-        const { email, mobile, username, modules } = req.body;
+  const { email, mobile, username, modules } = req.body;
 
-        // Check if a user with the given email exists
-        const user_data = await prisma.user.findUnique({
-            where: { email: email }
-        });
-        if (user_data) {
-            return res.status(500).send({
-                message: "User with this email already exists",
-            });
-        }
+  try {
+      await prisma.$transaction(async (transaction) => {
+          // Check if a user with the given email exists
+          const user_data = await transaction.user.findUnique({
+              where: { email }
+          });
+          if (user_data) {
+              throw new Error("User with this email already exists");
+          }
 
-        // Check if a user with the given mobile number exists
-        const user_data2 = await prisma.user.findUnique({
-            where: { mobile: mobile }
-        });
-        if (user_data2) {
-            return res.status(500).send({
-                message: "User with this number already exists",
-            });
-        }
+          // Check if a user with the given mobile number exists
+          const user_data2 = await transaction.user.findUnique({
+              where: { mobile }
+          });
+          if (user_data2) {
+              throw new Error("User with this number already exists");
+          }
 
-        // Check if a user with the given username exists
-        const user_data3 = await prisma.user.findUnique({
-            where: { username: username }
-        });
-        if (user_data3) {
-            return res.status(500).send({
-                message: "User with this username already exists",
-            });
-        }
+          // Check if a user with the given username exists
+          const user_data3 = await transaction.user.findUnique({
+              where: { username }
+          });
+          if (user_data3) {
+              throw new Error("User with this username already exists");
+          }
 
-        // Add the user and get the user ID
-        const user_id = await add_to_user(req);
+          // Add the user and get the user ID
+          const user_id = await add_to_user(req, transaction);
 
-        // Get the module IDs from the array of modules
-        const module_names = modules.map(mod => mod.module_name);  // Assuming the form sends an array of module names
-        const module_ids = await get_module_ids(module_names);
+          // Get the module IDs from the array of modules
+          const module_names = modules.map(mod => mod.module_name);
+          const module_ids = await get_module_ids(module_names, transaction);
 
-        // Assign multiple modules to the user
-        for (let i = 0; i < module_ids.length; i++) {
-            const module = modules[i];
-            await prisma.modulesTouser.create({
-                data: {
-                    user: { connect: { id: user_id } },
-                    modules: { connect: { id: module_ids[i] } },
-                    c: module.c,
-                    r: module.r,
-                    u: module.u,
-                    d: module.d
-                }
-            });
-        }
+          // Assign multiple modules to the user
+          const modulesToUserData = module_ids.map((module_id, index) => ({
+              user_id,
+              module_id,
+              c: modules[index].c,
+              r: modules[index].r,
+              u: modules[index].u,
+              d: modules[index].d,
+          }));
 
-        // Send success response
-        return res.status(200).json({
-            message: 'User registered and modules assigned successfully.'
-        });
+          await transaction.modulesTouser.createMany({
+              data: modulesToUserData
+          });
+      });
 
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: error.message });
-    }
+      // Send success response
+      return res.status(200).json({
+          message: 'User registered and modules assigned successfully.'
+      });
+
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: error.message });
+  }
 };
 
 
@@ -308,12 +297,14 @@ const send_all_user_data = async (req, res) => {
     }
 };
 
-  const id_based_data = async (req, res) => {
-    try {
-      const user_id = req.params.id;
-  
+const id_based_data = async (req, res) => {
+  try {
+    const user_id = req.params.id;
+
+    // Start a transaction to fetch all required data in a single operation
+    const [user, allModules, userModules] = await prisma.$transaction([
       // Fetch user data
-      const user = await prisma.user.findUnique({
+      prisma.user.findUnique({
         where: {
           id: Number(user_id),
         },
@@ -338,18 +329,18 @@ const send_all_user_data = async (req, res) => {
           reporting_to: true,
           created_by: true,
         },
-      });
-  
+      }),
+
       // Fetch all modules
-      const allModules = await prisma.modules.findMany({
+      prisma.modules.findMany({
         select: {
           id: true,
           module_name: true,
         },
-      });
-  
+      }),
+
       // Fetch user-specific modules data
-      const userModules = await prisma.modulesTouser.findMany({
+      prisma.modulesTouser.findMany({
         where: {
           user_id: Number(user_id),
         },
@@ -365,152 +356,156 @@ const send_all_user_data = async (req, res) => {
             },
           },
         },
-      });
-  
-      // Map user-specific modules data for quick lookup
-      const userModulesMap = userModules.reduce((map, mod) => {
-        map[mod.module_id] = mod;
-        return map;
-      }, {});
-  
-      // Merge allModules with user-specific data and add module_status
-      const modules_data = allModules.map((mod) => {
-        if (userModulesMap[mod.id]) {
-          // If user has this module, include user's specific data and set module_status to true
-          return {
-            module_id: mod.id,
-            module_name: mod.module_name,
-            c: userModulesMap[mod.id].c,
-            d: userModulesMap[mod.id].d,
-            r: userModulesMap[mod.id].r,
-            u: userModulesMap[mod.id].u,
-            module_status: true, // user has this module
-          };
-        } else {
-          // If user doesn't have this module, return default false values and set module_status to false
-          return {
-            module_id: mod.id,
-            module_name: mod.module_name,
-            c: false,
-            d: false,
-            r: false,
-            u: false,
-            module_status: false, // user doesn't have this module
-          };
-        }
-      });
-  
-      res.status(200).send({
-        success: true,
-        message: "Data fetched successfully",
-        user_data: user,
-        modules_data: modules_data,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send({
-        message: "Error fetching user data",
-      });
-    }
-  };
-  
+      }),
+    ]);
 
-const update_user = async (req) => {
-    const {
-        title,
-        first_name,
-        middle_name,
-        last_name,
-        gender,
-        dob,
-        email,
-        mobile,
-        date_of_joining,
-        employee_id,
-        designation,
-     
-        status,
-        department,
-        user_type,
-        role,
-        reporting_to,
-        created_by,
-        modules // array of modules with c, r, u, d values
-    } = req.body;
+    // Map user-specific modules data for quick lookup
+    const userModulesMap = userModules.reduce((map, mod) => {
+      map[mod.module_id] = mod;
+      return map;
+    }, {});
 
-    const user_id = req.params.id;
-
-   
-
-    if (!validator.isEmail(email)) {
-        throw new Error("Invalid email format.");
-    }
-
-    if (!validator.isMobilePhone(mobile, 'any', { strictMode: false })) {
-        throw new Error("Invalid mobile number.");
-    }
-
-    
-
-    let updatedData = {
-        title,
-        first_name,
-        middle_name,
-        last_name,
-        gender,
-        dob,
-        email,
-        mobile,
-        date_of_joining,
-        employee_id,
-        designation,
-        status,
-        department,
-        user_type,
-        role,
-        reporting_to,
-        created_by
-    };
-
-    
-   
-
-    // Update user
-    const user = await prisma.user.update({
-        where: {
-            id: Number(user_id)
-        },
-        data: updatedData
+    // Merge allModules with user-specific data and add module_status
+    const modules_data = allModules.map((mod) => {
+      if (userModulesMap[mod.id]) {
+        // If user has this module, include user's specific data and set module_status to true
+        return {
+          module_id: mod.id,
+          module_name: mod.module_name,
+          c: userModulesMap[mod.id].c,
+          d: userModulesMap[mod.id].d,
+          r: userModulesMap[mod.id].r,
+          u: userModulesMap[mod.id].u,
+          module_status: true, // user has this module
+        };
+      } else {
+        // If user doesn't have this module, return default false values and set module_status to false
+        return {
+          module_id: mod.id,
+          module_name: mod.module_name,
+          c: false,
+          d: false,
+          r: false,
+          u: false,
+          module_status: false, // user doesn't have this module
+        };
+      }
     });
 
-    // Check if modules are passed
-    if (modules && modules.length > 0) {
+    res.status(200).send({
+      success: true,
+      message: "Data fetched successfully",
+      user_data: user,
+      modules_data: modules_data,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Error fetching user data",
+    });
+  }
+};
+
+
+const update_user = async (req) => {
+  const {
+    title,
+    first_name,
+    middle_name,
+    last_name,
+    gender,
+    dob,
+    email,
+    mobile,
+    date_of_joining,
+    employee_id,
+    designation,
+    status,
+    department,
+    user_type,
+    role,
+    reporting_to,
+    created_by,
+    modules // array of modules with c, r, u, d values
+  } = req.body;
+
+  const user_id = req.params.id;
+
+  // Validate email and mobile
+  if (!validator.isEmail(email)) {
+    throw new Error("Invalid email format.");
+  }
+  if (!validator.isMobilePhone(mobile, 'any', { strictMode: false })) {
+    throw new Error("Invalid mobile number.");
+  }
+
+  // Prepare updated user data
+  let updatedData = {
+    title,
+    first_name,
+    middle_name,
+    last_name,
+    gender,
+    dob,
+    email,
+    mobile,
+    date_of_joining,
+    employee_id,
+    designation,
+    status,
+    department,
+    user_type,
+    role,
+    reporting_to,
+    created_by
+  };
+
+  try {
+    // Start a transaction to ensure atomicity
+    const result = await prisma.$transaction(async (prisma) => {
+      // Update user data
+      const user = await prisma.user.update({
+        where: { id: Number(user_id) },
+        data: updatedData,
+      });
+
+      if (modules && modules.length > 0) {
         // Delete existing modules for the user
         await prisma.modulesTouser.deleteMany({
-            where: { user_id: Number(user_id) }
+          where: { user_id: Number(user_id) },
         });
 
-        // Get the module IDs from the array of module names
-        const module_names = modules.map(mod => mod.module_name); // Assuming the form sends an array of module names
+        // Get the module IDs for the provided module names
+        const module_names = modules.map((mod) => mod.module_name); // Assumes array includes module names
         const module_ids = await get_module_ids(module_names);
 
-        // Assign new modules to the user
-        for (let i = 0; i < module_ids.length; i++) {
-            const module = modules[i];
-            await prisma.modulesTouser.create({
-                data: {
-                    user: { connect: { id: Number(user_id) } },
-                    modules: { connect: { id: module_ids[i] } },
-                    c: module.c,
-                    r: module.r,
-                    u: module.u,
-                    d: module.d
-                }
-            });
-        }
-    }
+        // Prepare module entries for batch creation
+        const moduleData = module_ids.map((id, index) => {
+          const module = modules[index];
+          return {
+            user_id: Number(user_id),
+            module_id: id,
+            c: module.c,
+            r: module.r,
+            u: module.u,
+            d: module.d,
+          };
+        });
 
-    return user;
+        // Insert new modules for the user in a batch
+        await prisma.modulesTouser.createMany({
+          data: moduleData,
+        });
+      }
+
+      return user;
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw new Error("Failed to update user data.");
+  }
 };
 
 // Update User Route

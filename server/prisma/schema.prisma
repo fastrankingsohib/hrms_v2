@@ -84,6 +84,7 @@ model job_post {
   job_pdf_file_path      String?
   candidate_applied_jobs candidate_applied_jobs[]
   interview_details      interview_details[]
+  offered_candidates     offered_candidates[]
 }
 
 model candidate_list {
@@ -131,6 +132,7 @@ model candidate_list {
   interview_details               interview_details[]
   qualifications                  qualifications[]         @relation("CandidateQualifications")
   workExperiences                 work_experience[]        @relation("CandidateWorkExperience")
+  offered_candidates              offered_candidates[]
 }
 
 model work_experience {
@@ -195,4 +197,29 @@ model comments {
   updated_at     DateTime?       @updatedAt
   candidate_id   Int?
   candidate_list candidate_list? @relation(fields: [candidate_id], references: [candidate_id])
+}
+
+model offered_candidates {
+  id             Int             @id @default(autoincrement())
+  candidate_id   Int?
+  job_id         Int?
+  joining_date   String?         @db.VarChar(50)
+  salary         String          @db.VarChar(50)
+  duration       String?         @db.VarChar(20)
+  created_by     String?         @db.VarChar(50)
+  updated_by     String?         @db.VarChar(50)
+  created_at     DateTime        @default(now())
+  updated_at     DateTime?       @updatedAt
+  candidate_list candidate_list? @relation(fields: [candidate_id], references: [candidate_id])
+  job_post       job_post?       @relation(fields: [job_id], references: [id])
+}
+
+model logs {
+  id         Int       @id @default(autoincrement())
+  action_by  String?   @db.VarChar(50)
+  action     String?   @db.VarChar(50)
+  from       String?   @db.VarChar(50)
+  to         String?   @db.VarChar(50)
+  created_by DateTime  @default(now())
+  updated_by DateTime? @updatedAt
 }

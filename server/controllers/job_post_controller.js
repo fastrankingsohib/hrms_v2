@@ -82,18 +82,17 @@ const display_posted_jobs = async (req, res) => {
 
     const [jobs, updateScheduleActive, updateJobExpiry] = await prisma.$transaction([
 
-      // Fetch all jobs ordered by id in descending order
+      
       prisma.job_post.findMany({
         orderBy: {
           id: 'desc',
         },
       }),
 
-      // Update jobs scheduled for activation based on the date
-      prisma.job_post.updateMany({
+        prisma.job_post.updateMany({
         where: {
           job_scheduled_date: {
-            lte: currentISODate, // Date is today or in the past
+            lte: currentISODate, 
           },
         },
         data: {
@@ -101,11 +100,11 @@ const display_posted_jobs = async (req, res) => {
         },
       }),
 
-      // Mark jobs as Inactive if expiration date has passed
+      
       prisma.job_post.updateMany({
         where: {
           job_exp_date: {
-            lt: currentISODate, // Expired date
+            lt: currentISODate, 
           },
         },
         data: {
